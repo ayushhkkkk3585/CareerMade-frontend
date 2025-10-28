@@ -61,6 +61,7 @@ export default function JobSeekerDashboard() {
         body: JSON.stringify(profile),
       });
       const data = await res.json();
+      console.log(data);
       if (res.ok) alert("Profile updated!");
       else alert(data.message || "Update failed");
     } catch {
