@@ -13,3 +13,6 @@
 .text2{
   font-family: 'Clash Display', sans-serif;
 }
+.input-field {
+  @apply w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#8F59ED]/60 focus:outline-none transition-all;
+}

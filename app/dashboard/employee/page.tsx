@@ -2,11 +2,28 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  Briefcase,
+  LogOut,
+  MapPin,
+  Clock,
+  Bookmark,
+} from "lucide-react";
+import Navbar from "@/app/components/Navbar";
 
 export default function EmployeeDashboardPage() {
   const router = useRouter();
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    router.push("/login");
+  };
+  const handleClick = () => {
+    router.push("/dashboard/employee/jobs/create");
+  }
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -23,81 +40,126 @@ export default function EmployeeDashboardPage() {
       .catch(() => setLoading(false));
   }, []);
 
+  const colors = ["bg-blue-500", "bg-purple-600", "bg-green-500", "bg-gray-800"];
+
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      {/* Heading */}
-      <h1 className="text-3xl font-bold mb-4">Employer Dashboard</h1>
-      <p className="text-gray-700 mb-6">
-        Welcome to your dashboard! Manage your organization profile and job posts here.
-      </p>
+    <>
 
-      {/* Main Action Buttons */}
-      <div className="flex flex-wrap gap-4 mb-10">
-        <button
-          onClick={() => router.push("/dashboard/employee/profile/view")}
-          className="bg-blue-600 text-white px-5 py-2 rounded"
+      <Navbar />
+      <div className="min-h-screen bg-gray-50 p-6 md:p-10">
+        {/* Header */}
+        <motion.header
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-between items-center mb-10 max-w-6xl mx-auto"
         >
-          View Profile
-        </button>
-
-        <button
-          onClick={() => router.push("/dashboard/employee/profile/create")}
-          className="bg-green-600 text-white px-5 py-2 rounded"
-        >
-          Create / Edit Profile
-        </button>
-
-        <button
-          onClick={() => router.push("/dashboard/employee/jobs")}
-          className="bg-gray-800 text-white px-5 py-2 rounded"
-        >
-          Manage Jobs
-        </button>
-      </div>
-
-      {/* Recent Jobs Section */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Recent Job Posts</h2>
-
-        {loading ? (
-          <p>Loading recent jobs...</p>
-        ) : jobs.length === 0 ? (
-          <p className="text-gray-600">No jobs posted yet.</p>
-        ) : (
-          <div className="grid gap-4">
-            {jobs.map((job) => (
-              <div
-                key={job._id}
-                className="p-4 border rounded-lg hover:shadow-md transition cursor-pointer"
-                onClick={() =>
-                  router.push(`/dashboard/employee/jobs/view/${job._id}`)
-                }
-              >
-                <h3 className="text-lg font-medium">{job.title}</h3>
-                <p className="text-sm text-gray-600">
-                  {job.specialization} •{" "}
-                  {job.location
-                    ? `${job.location.city}, ${job.location.state}`
-                    : "Remote"}
-                </p>
-                <p className="text-sm mt-1">Status: {job.status || "Active"}</p>
-              </div>
-            ))}
+          <div className="flex items-center gap-2">
+            <div className="bg-[#8F59ED] p-2 rounded-lg">
+              <Briefcase className="text-white w-5 h-5" />
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+              Employee Dashboard
+            </h1>
           </div>
-        )}
 
-        {/* View All Button */}
-        {jobs.length > 0 && (
-          <div className="mt-6">
-            <button
-              onClick={() => router.push("/dashboard/employee/jobs")}
-              className="bg-blue-600 text-white px-4 py-2 rounded"
+          {/* <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleClick}
+            className="flex items-center gap-2 text-sm md:text-base bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full shadow-md"
+          >
+            <LogOut className="w-4 h-4" />
+            Create Job
+          </motion.button> */}
+        </motion.header>
+
+        {/* Section Title */}
+        <div className="max-w-6xl mx-auto flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800">Job Listings</h2>
+          <button
+            onClick={() => router.push("/dashboard/employee/jobs")}
+            className="text-[#8F59ED] hover:underline text-sm font-medium"
+          >
+            View all
+          </button>
+        </div>
+
+        {/* Jobs Grid */}
+        <div className="max-w-6xl mx-auto">
+          {loading ? (
+            <p className="text-gray-600">Loading recent jobs...</p>
+          ) : jobs.length === 0 ? (
+            <p className="text-gray-600">No jobs posted yet.</p>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             >
-              View All Jobs →
-            </button>
-          </div>
-        )}
+              {jobs.map((job, index) => (
+                <motion.div
+                  key={job._id}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 200 }}
+                  onClick={() =>
+                    router.push(`/dashboard/employee/jobs/view/${job._id}`)
+                  }
+                  className="cursor-pointer bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md overflow-hidden transition"
+                >
+                  {/* Color Bar */}
+                  <div className={`h-2 ${colors[index % colors.length]}`}></div>
+
+                  <div className="p-5">
+                    {/* Title Row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-800 text-lg">
+                          {job.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {job.hospital || "City General Hospital"}
+                        </p>
+                      </div>
+                      <Bookmark className="w-5 h-5 text-gray-400 hover:text-[#8F59ED]" />
+                    </div>
+
+                    {/* Details */}
+                    <div className="text-sm text-gray-500 flex flex-col gap-1 mb-3">
+                      <p className="flex items-center gap-1">
+                        <MapPin size={14} />{" "}
+                        {job.location
+                          ? `${job.location.city}, ${job.location.state}`
+                          : "Remote"}
+                      </p>
+                      <p className="flex items-center gap-1">
+                        <Clock size={14} /> {job.experience || "5-8 years"}
+                      </p>
+                      <p>{job.salary ? `${job.salary} LPA` : "15-25 LPA"}</p>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {(job.specialization
+                        ? [job.specialization]
+                        : ["Cardiology", "Full-time", "Reception"]
+                      ).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

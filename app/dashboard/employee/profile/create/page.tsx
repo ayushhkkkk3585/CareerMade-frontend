@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Navbar from "@/app/components/Navbar";
 
 export default function EmployerProfileCreatePage() {
   const router = useRouter();
@@ -129,159 +130,203 @@ export default function EmployerProfileCreatePage() {
   };
 
   return (
-    <div className="p-8 max-w-3xl mx-auto bg-white shadow-md rounded-xl">
-      <h1 className="text-2xl font-bold mb-6">
-        {isEditing ? "Edit Employer Profile" : "Create Employer Profile"}
-      </h1>
+    <>
+     <Navbar />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Organization Info */}
-        <input
-          type="text"
-          name="organizationName"
-          placeholder="Organization Name"
-          value={formData.organizationName}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="text"
-          name="organizationType"
-          placeholder="Organization Type"
-          value={formData.organizationType}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="website"
-          placeholder="Website"
-          value={formData.website}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="number"
-          name="foundedYear"
-          placeholder="Founded Year"
-          value={formData.foundedYear}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="employeeCount"
-          placeholder="Employee Count"
-          value={formData.employeeCount}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+      <div className="max-w-4xl mx-auto p-6 sm:p-8 mt-8 bg-white rounded-2xl shadow-md border border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              {isEditing ? "Edit Employer Profile" : "Create Employer Profile"}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Fill in the details below to manage your organization profile.
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/dashboard/employee/profile/view")}
+            className="mt-4 sm:mt-0 px-4 py-2.5 bg-[#8F59ED] text-white rounded-lg text-sm font-medium hover:bg-[#7a48d1] transition-all"
+          >
+            View Profile
+          </button>
+        </div>
 
-        {/* Contact Person */}
-        <h2 className="text-lg font-semibold mt-4">Contact Person</h2>
-        <input
-          type="text"
-          name="contactPersonName"
-          placeholder="Name"
-          value={formData.contactPersonName}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="contactPersonDesignation"
-          placeholder="Designation"
-          value={formData.contactPersonDesignation}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="contactPersonPhone"
-          placeholder="Phone"
-          value={formData.contactPersonPhone}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="email"
-          name="contactPersonEmail"
-          placeholder="Email"
-          value={formData.contactPersonEmail}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+        <form onSubmit={handleSubmit} className="space-y-8 ">
+          {/* Organization Info */}
+          <section>
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              Organization Details
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="organizationName"
+                placeholder="Organization Name *"
+                value={formData.organizationName}
+                onChange={handleChange}
+                required
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="organizationType"
+                placeholder="Organization Type"
+                value={formData.organizationType}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="website"
+                placeholder="Website"
+                value={formData.website}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="number"
+                name="foundedYear"
+                placeholder="Founded Year"
+                value={formData.foundedYear}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="employeeCount"
+                placeholder="Employee Count"
+                value={formData.employeeCount}
+                onChange={handleChange}
+                className="input-field"
+              />
+            </div>
+            <textarea
+              name="description"
+              placeholder="Organization Description"
+              value={formData.description}
+              onChange={handleChange}
+              className="input-field mt-4 h-24"
+            />
+          </section>
 
-        {/* Address */}
-        <h2 className="text-lg font-semibold mt-4">Address</h2>
-        <input
-          type="text"
-          name="street"
-          placeholder="Street"
-          value={formData.street}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="city"
-          placeholder="City"
-          value={formData.city}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="state"
-          placeholder="State"
-          value={formData.state}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="pincode"
-          placeholder="Pincode"
-          value={formData.pincode}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="country"
-          placeholder="Country"
-          value={formData.country}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+          {/* Contact Person */}
+          <section>
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              Contact Person
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="contactPersonName"
+                placeholder="Name"
+                value={formData.contactPersonName}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="contactPersonDesignation"
+                placeholder="Designation"
+                value={formData.contactPersonDesignation}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="contactPersonPhone"
+                placeholder="Phone"
+                value={formData.contactPersonPhone}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="email"
+                name="contactPersonEmail"
+                placeholder="Email"
+                value={formData.contactPersonEmail}
+                onChange={handleChange}
+                className="input-field"
+              />
+            </div>
+          </section>
 
-        {/* Specializations */}
-        <h2 className="text-lg font-semibold mt-4">Specializations</h2>
-        <input
-          type="text"
-          name="specializations"
-          placeholder="Comma-separated (e.g., Nursing, Radiology)"
-          value={formData.specializations}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+          {/* Address */}
+          <section>
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">Address</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="street"
+                placeholder="Street"
+                value={formData.street}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="city"
+                placeholder="City"
+                value={formData.city}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="state"
+                placeholder="State"
+                value={formData.state}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="pincode"
+                placeholder="Pincode"
+                value={formData.pincode}
+                onChange={handleChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="country"
+                placeholder="Country"
+                value={formData.country}
+                onChange={handleChange}
+                className="input-field"
+              />
+            </div>
+          </section>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-4"
-        >
-          {loading ? "Saving..." : isEditing ? "Update Profile" : "Create Profile"}
-        </button>
-      </form>
-    </div>
+          {/* Specializations */}
+          <section>
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              Specializations
+            </h2>
+            <input
+              type="text"
+              name="specializations"
+              placeholder="Comma-separated (e.g., Nursing, Radiology)"
+              value={formData.specializations}
+              onChange={handleChange}
+              className="input-field"
+            />
+          </section>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2.5 bg-[#8F59ED] text-white rounded-lg font-medium hover:bg-[#7a48d1] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading
+                ? "Saving..."
+                : isEditing
+                ? "Update Profile"
+                : "Create Profile"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

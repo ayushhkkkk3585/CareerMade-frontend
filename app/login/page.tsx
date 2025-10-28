@@ -50,7 +50,7 @@ const Login = () => {
       if (user.role === "jobseeker") {
         router.push("/dashboard/jobseeker");
       } else if (user.role === "employer") {
-        router.push("/dashboard/employee");
+        router.push("/dashboard/employee/jobs");
       } else {
         router.push("/dashboard"); // fallback
       }
