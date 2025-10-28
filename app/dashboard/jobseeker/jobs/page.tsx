@@ -4,8 +4,18 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import { MapPin, Briefcase, Bookmark } from "lucide-react";
 
+type Job = {
+  _id: string;
+  title: string;
+  specialization?: string;
+  location?: { city?: string; state?: string };
+  experienceRequired?: { minYears?: number; maxYears?: number };
+  isRemote?: boolean;
+  salary?: { min?: number; max?: number; currency?: string };
+};
+
 export default function BrowseJobs() {
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -15,7 +25,10 @@ export default function BrowseJobs() {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then((data) => setJobs(data.data?.items || data.items || []))
+      .then((data) => {
+        const items = (data.data?.items || data.items || []) as Job[];
+        setJobs(items);
+      })
       .finally(() => setLoading(false));
   }, []);
 

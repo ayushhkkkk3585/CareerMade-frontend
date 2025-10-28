@@ -9,19 +9,149 @@ export default function JobViewPage() {
     const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
+    const [resume, setResume] = useState<any>(null);
+    const [coverLetter, setCoverLetter] = useState<any>(null);
+    const [uploadingResume, setUploadingResume] = useState(false);
+    const [uploadingCover, setUploadingCover] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+            console.warn("[JobView] No accessToken found in localStorage");
+            return;
+        }
+
+        const url = `http://localhost:5000/api/jobs/${id}`;
+        console.log("[JobView] Fetching job", { id, url });
+
+        fetch(url, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+            .then((res) => {
+                console.log("[JobView] Response", { status: res.status, ok: res.ok });
+                return res
+                    .json()
+                    .catch((e) => {
+                        console.error("[JobView] Failed to parse JSON", e);
+                        throw e;
+                    });
+            })
+            .then((data) => {
+                console.log("[JobView] Raw payload", data);
+                const dataLayer = data?.data ?? data;
+                const base = dataLayer?.job ?? dataLayer; // unwrap if API returns { data: { job: {...} } }
+                const salary = base?.salary ?? {};
+                const exp = base?.experienceRequired ?? {};
+                const normalized = {
+                    ...base,
+                    organization: base?.organization ?? base?.organizationName,
+                    salary: {
+                        min: salary?.min ?? salary?.amountMin ?? salary?.minimum ?? null,
+                        max: salary?.max ?? salary?.amountMax ?? salary?.maximum ?? null,
+                        currency: salary?.currency ?? salary?.currencyCode ?? salary?.curr,
+                    },
+                    experienceRequired: {
+                        minYears: exp?.minYears ?? exp?.min ?? exp?.minimum ?? null,
+                        maxYears: exp?.maxYears ?? exp?.max ?? exp?.maximum ?? null,
+                    },
+                };
+                console.log("[JobView] Normalized job", normalized);
+                setJob(normalized);
+            })
+            .catch((err) => {
+                console.error("[JobView] Error while loading job details", err);
+                setMessage("Failed to load job details.");
+            })
+            .finally(() => setLoading(false));
+    }, [id]);
 
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
-
-        fetch(`http://localhost:5000/api/jobs/${id}`, {
+        fetch("http://localhost:5000/api/jobseeker/profile", {
             headers: { Authorization: `Bearer ${token}` },
         })
-            .then((res) => res.json())
-            .then((data) => setJob(data.data || data))
-            .catch(() => setMessage("Failed to load job details."))
-            .finally(() => setLoading(false));
-    }, [id]);
+            .then((r) => r.json())
+            .then((data) => {
+                const js = data?.data?.jobSeeker ?? data?.jobSeeker ?? data;
+                setResume(js?.resume ?? null);
+                setCoverLetter(js?.coverLetter ?? null);
+                console.log("[JobView] Profile files", { resume: js?.resume, coverLetter: js?.coverLetter });
+            })
+            .catch((e) => console.error("[JobView] Failed to load profile", e));
+    }, []);
+
+    const handleUploadResume = async (file: File) => {
+        try {
+            setUploadingResume(true);
+            const token = localStorage.getItem("accessToken");
+            const fd = new FormData();
+            fd.append("resume", file);
+            const res = await fetch("http://localhost:5000/api/jobseeker/resume", {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` },
+                body: fd,
+            });
+            const data = await res.json();
+            setResume(data?.data?.resume ?? data?.resume ?? null);
+            setMessage(data?.message || "Resume uploaded");
+        } catch (e) {
+            setMessage("Failed to upload resume");
+        } finally {
+            setUploadingResume(false);
+        }
+    };
+
+    const handleDeleteResume = async () => {
+        try {
+            const token = localStorage.getItem("accessToken");
+            const res = await fetch("http://localhost:5000/api/jobseeker/resume", {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            if (res.ok) setResume(null);
+            setMessage(data?.message || (res.ok ? "Resume deleted" : "Failed to delete resume"));
+        } catch (e) {
+            setMessage("Failed to delete resume");
+        }
+    };
+
+    const handleUploadCover = async (file: File) => {
+        try {
+            setUploadingCover(true);
+            const token = localStorage.getItem("accessToken");
+            const fd = new FormData();
+            fd.append("coverLetter", file);
+            const res = await fetch("http://localhost:5000/api/jobseeker/cover-letter", {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` },
+                body: fd,
+            });
+            const data = await res.json();
+            setCoverLetter(data?.data?.coverLetter ?? data?.coverLetter ?? null);
+            setMessage(data?.message || "Cover letter uploaded");
+        } catch (e) {
+            setMessage("Failed to upload cover letter");
+        } finally {
+            setUploadingCover(false);
+        }
+    };
+
+    const handleDeleteCover = async () => {
+        try {
+            const token = localStorage.getItem("accessToken");
+            const res = await fetch("http://localhost:5000/api/jobseeker/cover-letter", {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            if (res.ok) setCoverLetter(null);
+            setMessage(data?.message || (res.ok ? "Cover letter deleted" : "Failed to delete cover letter"));
+        } catch (e) {
+            setMessage("Failed to delete cover letter");
+        }
+    };
 
     const applyJob = async () => {
         try {
@@ -93,8 +223,7 @@ export default function JobViewPage() {
                         {job.location && (
                             <span className="flex items-center gap-1">
                                 <MapPin className="w-4 h-4" />
-                                {`${job.location.city || ""}, ${job.location.state || ""}, ${job.location.country || ""
-                                    }`}
+                                {`${job.location?.city ?? ""}, ${job.location?.state ?? ""}, ${job.location?.country ?? ""}`}
                             </span>
                         )}
                         {job.shift && (
@@ -118,15 +247,15 @@ export default function JobViewPage() {
                         </p>
                         <p>
                             <span className="font-semibold">Experience:</span>{" "}
-                            {job.experienceRequired
-                                ? `${job.experienceRequired.minYears} - ${job.experienceRequired.maxYears} years`
+                            {job.experienceRequired && (job.experienceRequired.minYears ?? job.experienceRequired.maxYears) !== undefined
+                                ? `${job.experienceRequired.minYears ?? "?"} - ${job.experienceRequired.maxYears ?? "?"} years`
                                 : "Not specified"}
                         </p>
                         <p className="flex items-center gap-1">
                             <DollarSign className="w-4 h-4 text-gray-500" />
                             <span className="font-semibold">Salary:</span>{" "}
-                            {job.salary
-                                ? `${job.salary.min} - ${job.salary.max} ${job.salary.currency || ""}`
+                            {job.salary && (job.salary.min ?? job.salary.max) !== undefined
+                                ? `${job.salary.min ?? "?"} - ${job.salary.max ?? "?"} ${job.salary.currency ?? ""}`
                                 : "Not specified"}
                         </p>
                         <p>
@@ -150,6 +279,58 @@ export default function JobViewPage() {
                     >
                         Save Job
                     </button>
+                </div>
+
+                <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="border rounded-lg p-4">
+                        <div className="font-semibold mb-2">Resume</div>
+                        {resume ? (
+                            <div className="flex items-center justify-between text-sm">
+                                <a href={resume.url} target="_blank" rel="noreferrer" className="text-[#8F59ED] hover:underline">
+                                    {resume.filename || "View resume"}
+                                </a>
+                                <button onClick={handleDeleteResume} className="text-red-600 hover:underline">Delete</button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-3 text-sm">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.doc,.docx,.txt,.rtf"
+                                    onChange={(e) => {
+                                        const f = e.target.files?.[0];
+                                        if (f) handleUploadResume(f);
+                                    }}
+                                    disabled={uploadingResume}
+                                />
+                                {uploadingResume && <span className="text-gray-500">Uploading...</span>}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="border rounded-lg p-4">
+                        <div className="font-semibold mb-2">Cover Letter</div>
+                        {coverLetter ? (
+                            <div className="flex items-center justify-between text-sm">
+                                <a href={coverLetter.url} target="_blank" rel="noreferrer" className="text-[#8F59ED] hover:underline">
+                                    {coverLetter.filename || "View cover letter"}
+                                </a>
+                                <button onClick={handleDeleteCover} className="text-red-600 hover:underline">Delete</button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-3 text-sm">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.doc,.docx,.txt,.rtf"
+                                    onChange={(e) => {
+                                        const f = e.target.files?.[0];
+                                        if (f) handleUploadCover(f);
+                                    }}
+                                    disabled={uploadingCover}
+                                />
+                                {uploadingCover && <span className="text-gray-500">Uploading...</span>}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {message && (
