@@ -19,6 +19,13 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleGoogle = () => {
+    const backend = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    // default role can be jobseeker when logging in with OAuth
+    const role = "jobseeker";
+    window.location.href = `${backend}/api/auth/google?role=${encodeURIComponent(role)}`;
+  };
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setErrorMsg("");
@@ -166,6 +173,20 @@ const Login = () => {
           >
             {loading ? "Signing In..." : "Sign In"}
           </motion.button>
+
+          <div className="flex items-center gap-3">
+            <div className="h-px bg-gray-300 flex-1" />
+            <span className="text-xs text-gray-500">OR</span>
+            <div className="h-px bg-gray-300 flex-1" />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogle}
+            className="w-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-800 py-3 rounded-full font-medium transition"
+          >
+            Continue with Google
+          </button>
 
           {/* Footer Link */}
           <p className="text-center text-sm text-gray-600">
