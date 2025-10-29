@@ -22,11 +22,12 @@ export default function OAuthSuccess() {
 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
+      
 
       if (role === "jobseeker") {
         router.replace("/dashboard/jobseeker");
       } else if (role === "employer") {
-        router.replace("/dashboard/employee");
+        router.replace("/dashboard/employee/jobs");
       } else {
         router.replace("/dashboard");
       }

@@ -18,15 +18,6 @@ export default function JobSeekerDashboard() {
   const [resume, setResume] = useState<any>(null);
   const [coverLetter, setCoverLetter] = useState<any>(null);
   const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const storedUser =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("user") || "{}")
-        : null;
-    setUser(storedUser);
-  }, []);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -46,7 +37,7 @@ export default function JobSeekerDashboard() {
       })
       .catch(() => console.error("Failed to fetch profile"))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, []);
 
   // ---------------- HANDLE PROFILE UPDATE ----------------
   const handleChange = (e: any) => {
@@ -70,6 +61,7 @@ export default function JobSeekerDashboard() {
         body: JSON.stringify(profile),
       });
       const data = await res.json();
+      console.log(data);
       if (res.ok) alert("Profile updated!");
       else alert(data.message || "Update failed");
     } catch {
@@ -148,47 +140,24 @@ export default function JobSeekerDashboard() {
     <>
       <Navbar />
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-8 my-10 border border-gray-100">
-        {/* HEADER */}
+        {/* Header */}
         <div className="flex items-center gap-3 border-b pb-4 mb-6">
           <User className="text-indigo-600 w-8 h-8" />
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">
-              Job Seeker Dashboard
+              Job Seeker Profile
             </h1>
             <p className="text-sm text-gray-500">
-              Manage your profile and uploaded documents
+              Manage your profile, resume, and cover letter
             </p>
           </div>
         </div>
-
-        {/* USER INFO */}
-        {user && (
-          <div className="mb-8 p-5 border border-gray-100 rounded-xl bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">
-              Personal Information
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-              <p>
-                <span className="font-medium text-gray-700">Name:</span>{" "}
-                {user.firstName} {user.lastName}
-              </p>
-              <p>
-                <span className="font-medium text-gray-700">Email:</span>{" "}
-                {user.email}
-              </p>
-              <p>
-                <span className="font-medium text-gray-700">Phone:</span>{" "}
-                {user.phone || "N/A"}
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* PROFILE FORM */}
         <form onSubmit={handleSave} className="space-y-5">
           <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-indigo-600" />
-            Professional Information
+            Profile Information
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -207,14 +176,9 @@ export default function JobSeekerDashboard() {
               <label className="text-sm text-gray-600">Specialization</label>
               <input
                 type="text"
-                name="specializations"
-                value={profile.specializations?.[0] || ""}
-                onChange={(e) =>
-                  setProfile((prev: any) => ({
-                    ...prev,
-                    specializations: [e.target.value],
-                  }))
-                }
+                name="specialization"
+                value={profile.specialization || ""}
+                onChange={handleChange}
                 className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
                 placeholder="e.g. Pediatrics"
               />
@@ -224,13 +188,8 @@ export default function JobSeekerDashboard() {
               <input
                 type="number"
                 name="experience"
-                value={profile.experience?.totalYears || ""}
-                onChange={(e) =>
-                  setProfile((prev: any) => ({
-                    ...prev,
-                    experience: { ...prev.experience, totalYears: e.target.value },
-                  }))
-                }
+                value={profile.experience || ""}
+                onChange={handleChange}
                 className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
                 placeholder="e.g. 3"
               />
@@ -258,7 +217,7 @@ export default function JobSeekerDashboard() {
               </>
             ) : (
               <>
-                <Save className="w-4 h-4" /> Save Profile
+                <Save  className=" w-4 h-4 " /> Save Profile
               </>
             )}
           </button>
