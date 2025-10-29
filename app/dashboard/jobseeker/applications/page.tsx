@@ -11,7 +11,7 @@ export default function MyApplications() {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
 
-    fetch("http://localhost:5000/api/applications/me", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/applications/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

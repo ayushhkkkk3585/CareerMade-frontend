@@ -17,7 +17,7 @@ export default function ViewEmployerProfile() {
       return;
     }
 
-    fetch("http://localhost:5000/api/employer/profile", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (res) => {

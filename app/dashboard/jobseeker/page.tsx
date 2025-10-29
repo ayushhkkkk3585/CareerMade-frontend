@@ -12,7 +12,7 @@ export default function JobSeekerLayout() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    fetch("http://localhost:5000/api/jobs?limit=4", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=4`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

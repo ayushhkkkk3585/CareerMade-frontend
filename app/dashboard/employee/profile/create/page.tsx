@@ -32,7 +32,7 @@ export default function EmployerProfileCreatePage() {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
 
-    fetch("http://localhost:5000/api/employer/profile", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (res) => {
@@ -104,7 +104,7 @@ export default function EmployerProfileCreatePage() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/employer/profile", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`, {
         method: "POST", // same endpoint for create or update
         headers: {
           "Content-Type": "application/json",

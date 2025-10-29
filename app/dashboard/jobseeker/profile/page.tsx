@@ -61,7 +61,7 @@ export default function JobSeekerDashboard() {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:5000/api/jobseeker/profile", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -89,8 +89,8 @@ export default function JobSeekerDashboard() {
 
     const endpoint =
       type === "resume"
-        ? "http://localhost:5000/api/jobseeker/resume"
-        : "http://localhost:5000/api/jobseeker/cover-letter";
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`
+        : `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`;
 
     const res = await fetch(endpoint, {
       method: "POST",
@@ -111,8 +111,8 @@ export default function JobSeekerDashboard() {
 
     const endpoint =
       type === "resume"
-        ? "http://localhost:5000/api/jobseeker/resume"
-        : "http://localhost:5000/api/jobseeker/cover-letter";
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`
+        : `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`;
 
     const res = await fetch(endpoint, {
       method: "DELETE",

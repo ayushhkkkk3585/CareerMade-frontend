@@ -69,7 +69,7 @@ export default function JobsPage() {
           return;
         }
 
-        const res = await fetch("http://localhost:5000/api/jobs?limit=20", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=20`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -100,7 +100,7 @@ export default function JobsPage() {
 
     const fetchProfile = async (): Promise<void> => {
       try {
-        const res = await fetch("http://localhost:5000/api/employer/profile", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -134,7 +134,7 @@ export default function JobsPage() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/jobs/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

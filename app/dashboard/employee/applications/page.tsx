@@ -12,7 +12,7 @@ export default function EmployerApplicationsPage() {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
 
-    fetch("http://localhost:5000/api/applications/employer?limit=50", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/applications/employer?limit=50`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

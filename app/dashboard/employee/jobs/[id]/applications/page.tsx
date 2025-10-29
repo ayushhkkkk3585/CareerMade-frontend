@@ -25,7 +25,7 @@ export default function JobApplicationsPage() {
     const fetchApplications = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/applications/job/${id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/applications/job/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

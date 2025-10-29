@@ -21,7 +21,7 @@ export default function JobViewPage() {
             return;
         }
 
-        const url = `http://localhost:5000/api/jobs/${id}`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`;
         console.log("[JobView] Fetching job", { id, url });
 
         fetch(url, {
@@ -68,7 +68,7 @@ export default function JobViewPage() {
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
-        fetch("http://localhost:5000/api/jobseeker/profile", {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/profile`, {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then((r) => r.json())
@@ -87,7 +87,7 @@ export default function JobViewPage() {
             const token = localStorage.getItem("accessToken");
             const fd = new FormData();
             fd.append("resume", file);
-            const res = await fetch("http://localhost:5000/api/jobseeker/resume", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`, {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
                 body: fd,
@@ -105,7 +105,7 @@ export default function JobViewPage() {
     const handleDeleteResume = async () => {
         try {
             const token = localStorage.getItem("accessToken");
-            const res = await fetch("http://localhost:5000/api/jobseeker/resume", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -123,7 +123,7 @@ export default function JobViewPage() {
             const token = localStorage.getItem("accessToken");
             const fd = new FormData();
             fd.append("coverLetter", file);
-            const res = await fetch("http://localhost:5000/api/jobseeker/cover-letter", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`, {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
                 body: fd,
@@ -141,7 +141,7 @@ export default function JobViewPage() {
     const handleDeleteCover = async () => {
         try {
             const token = localStorage.getItem("accessToken");
-            const res = await fetch("http://localhost:5000/api/jobseeker/cover-letter", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -156,7 +156,7 @@ export default function JobViewPage() {
     const applyJob = async () => {
         try {
             const token = localStorage.getItem("accessToken");
-            const res = await fetch(`http://localhost:5000/api/jobs/${id}/apply`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}/apply`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -175,7 +175,7 @@ export default function JobViewPage() {
         try {
             const token = localStorage.getItem("accessToken");
             const res = await fetch(
-                `http://localhost:5000/api/saved-jobs/jobs/${id}/save`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/jobs/${id}/save`,
                 {
                     method: "POST",
                     headers: { Authorization: `Bearer ${token}` },

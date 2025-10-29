@@ -11,7 +11,7 @@ export default function SavedJobs() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    fetch("http://localhost:5000/api/saved-jobs/saved-jobs", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/saved-jobs`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

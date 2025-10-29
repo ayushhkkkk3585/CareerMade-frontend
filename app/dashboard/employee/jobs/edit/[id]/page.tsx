@@ -28,7 +28,7 @@ export default function EditJobPage() {
     const token = localStorage.getItem("accessToken");
     if (!id || !token) return;
 
-    fetch(`http://localhost:5000/api/jobs/${id}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -101,7 +101,7 @@ export default function EditJobPage() {
 
     try {
       setUpdating(true);
-      const res = await fetch(`http://localhost:5000/api/jobs/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

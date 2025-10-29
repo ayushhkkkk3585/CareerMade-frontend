@@ -29,7 +29,7 @@ export default function EmployeeDashboardPage() {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
 
-    fetch("http://localhost:5000/api/jobs?limit=5", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=5`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
