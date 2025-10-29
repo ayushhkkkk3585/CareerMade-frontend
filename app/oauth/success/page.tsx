@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function OAuthSuccess() {
+function OAuthHandler() {
   const router = useRouter();
   const params = useSearchParams();
   const [processing, setProcessing] = useState(true);
@@ -22,12 +22,11 @@ export default function OAuthSuccess() {
 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-      
 
       if (role === "jobseeker") {
         router.replace("/dashboard/jobseeker");
       } else if (role === "employer") {
-        router.replace("/dashboard/employee/jobs");
+        router.replace("/dashboard/employer/jobs");
       } else {
         router.replace("/dashboard");
       }
@@ -48,7 +47,23 @@ export default function OAuthSuccess() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
       <p className="text-red-600">{error || "Something went wrong."}</p>
-      <a href="/login" className="text-[#8F59ED] underline">Go to login</a>
+      <a href="/login" className="text-[#8F59ED] underline">
+        Go to login
+      </a>
     </div>
+  );
+}
+
+export default function OAuthSuccess() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-gray-700">Processing OAuth response…</p>
+        </div>
+      }
+    >
+      <OAuthHandler />
+    </Suspense>
   );
 }

@@ -4,8 +4,28 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import { Briefcase, MapPin, Clock } from "lucide-react";
 
+interface Job {
+  _id: string;
+  title?: string;
+  // logoUrl?: string;
+  organizationName?: string;
+  location?: {
+    city?: string;
+    state?: string;
+  };
+  experienceRequired?: {
+    minYears?: number;
+    maxYears?: number;
+  };
+  salary?: {
+    min?: number;
+    max?: number;
+    currency?: string;
+  };
+  specialization?: string;
+}
 export default function JobSeekerLayout() {
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const headerColors = ["#1A0152", "#9333EA", "#16A34A", "#0F172A"];
@@ -127,7 +147,7 @@ export default function JobSeekerLayout() {
                             style={{ backgroundColor: headerColor }}
                           >
                             <img
-                              src={job.logoUrl || "/card.png"}
+                              src={"/card.png"}
                               alt="Company Logo"
                               className="w-2/4 h-2/4 object-contain"
                             />
@@ -143,7 +163,7 @@ export default function JobSeekerLayout() {
                           {job.title || "Job Title"}
                         </h3>
                         <p className="text-sm text-gray-500 font-medium">
-                          {job.organizationName || "—"}
+                          {/* {job.organizationName || "—"} */} Hospital
                         </p>
                       </div>
                     </div>
