@@ -20,7 +20,7 @@ const Login = () => {
   };
 
   const handleGoogle = () => {
-    const backend = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const backend = process.env.NEXT_PUBLIC_API_URL;
     // default role can be jobseeker when logging in with OAuth
     const role = "jobseeker";
     window.location.href = `${backend}/api/auth/google?role=${encodeURIComponent(role)}`;
