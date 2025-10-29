@@ -145,7 +145,7 @@ export default function BrowseJobs() {
                           {job.title || "Job Title"}
                         </h3>
                         <p className="text-sm text-gray-500 font-medium">
-                          {job.organizationName || "—"}
+                          {/* {job.organizationName || "—"}Hospital */}Hospital
                         </p>
                       </div>
                     </div>
