@@ -9,7 +9,7 @@ export default function UploadCoverLetter() {
 
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:5000/api/jobseeker/profile", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -25,7 +25,7 @@ export default function UploadCoverLetter() {
     formData.append("coverLetter", fileInput.files[0]);
 
     setLoading(true);
-    const res = await fetch("http://localhost:5000/api/jobseeker/cover-letter", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -44,7 +44,7 @@ export default function UploadCoverLetter() {
   const handleDelete = async () => {
     if (!confirm("Delete cover letter?")) return;
     setLoading(true);
-    const res = await fetch("http://localhost:5000/api/jobseeker/cover-letter", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -15,7 +15,7 @@ export default function JobViewPage() {
     const token = localStorage.getItem("accessToken");
     if (!id || !token) return;
 
-    fetch(`http://localhost:5000/api/jobs/${id}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

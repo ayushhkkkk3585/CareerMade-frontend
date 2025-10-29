@@ -34,7 +34,7 @@ export default function JobSeekerDashboard() {
   // ---------------- FETCH PROFILE ----------------
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:5000/api/jobseeker/profile", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

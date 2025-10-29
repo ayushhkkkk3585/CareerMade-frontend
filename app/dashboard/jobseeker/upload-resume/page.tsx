@@ -9,7 +9,7 @@ export default function UploadResume() {
 
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:5000/api/jobseeker/profile", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -25,7 +25,7 @@ export default function UploadResume() {
     formData.append("resume", fileInput.files[0]);
 
     setLoading(true);
-    const res = await fetch("http://localhost:5000/api/jobseeker/resume", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -44,7 +44,7 @@ export default function UploadResume() {
   const handleDelete = async () => {
     if (!confirm("Delete resume?")) return;
     setLoading(true);
-    const res = await fetch("http://localhost:5000/api/jobseeker/resume", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
