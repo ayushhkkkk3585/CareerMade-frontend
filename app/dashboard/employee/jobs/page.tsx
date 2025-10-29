@@ -266,7 +266,7 @@ export default function JobsPage() {
                         {job.title || "Untitled"}
                       </h3>
                       <p className="text-sm text-gray-500 font-medium">
-                        {job.organizationName || "—"}
+                        {/* {job.organizationName || "Hospital"} */}Hospital
                       </p>
                     </div>
 
