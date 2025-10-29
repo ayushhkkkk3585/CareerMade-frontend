@@ -5,17 +5,24 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search, Stethoscope } from "lucide-react";
 import Link from "next/link";
+import type { Variants } from "framer-motion";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (i = 1) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.15, duration: 0.6, ease: "easeOut" },
-  }),
-};
+
+
 
 const Land = () => {
+  const fadeInUp: Variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: (i: number = 1) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.15,
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    }),
+  };
   const router = useRouter();
   return (
     <>
