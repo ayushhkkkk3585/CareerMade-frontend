@@ -17,7 +17,7 @@ export default function SavedJobs() {
       .then((res) => res.json())
       .then((data) => setSavedJobs(data.data?.items || []))
       .finally(() => setLoading(false));
-  }, []);
+  }, [])
 
   if (loading)
     return (
