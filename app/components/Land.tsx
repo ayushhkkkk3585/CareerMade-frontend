@@ -172,16 +172,20 @@ const Land = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
-        className="relative -mt-[40vh]  sm:-mt-[12vh] z-10 flex justify-center px-4"
+        className="relative z-10 flex justify-center px-4 -mt-[10vh] sm:-mt-[14vh] md:-mt-[16vh] lg:-mt-[18vh]"
       >
         <div className="w-full max-w-4xl">
-          <img
-            src="/newer.png"
-            alt="Doctor consultation"
-            className="w-full h-auto object-contain"
-          />
+          <div className="relative">
+            <div className="absolute inset-0 "></div>
+            <img
+              src="/newer.png"
+              alt="Doctor consultation"
+              className="w-full h-auto object-contain rounded-2xl "
+            />
+          </div>
         </div>
       </motion.div>
+
 
       {/* CATEGORY OVERVIEW */}
       <div className="p-3 sm:p-6 lg:p-10 bg-white pt-24 sm:pt-32 md:pt-40">
