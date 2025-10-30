@@ -6,7 +6,7 @@ import Navbar from "@/app/components/Navbar";
 import { Eye } from "lucide-react";
 
 export default function JobApplicationsPage() {
-  const { id } = useParams();
+  const { id: jobId } = useParams();
   const router = useRouter();
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,7 @@ export default function JobApplicationsPage() {
     const fetchApplications = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/applications/job/${id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/applications/job/${jobId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -50,8 +50,8 @@ export default function JobApplicationsPage() {
       }
     };
 
-    if (id) fetchApplications();
-  }, [id, router]);
+    if (jobId) fetchApplications();
+  }, [jobId, router]);
 
   if (loading) return <p className="p-6">Loading applications...</p>;
 
@@ -133,16 +133,25 @@ export default function JobApplicationsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        {resumeUrl && (
-                          <a
-                            href={resumeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#8F59ED] hover:text-[#7c4dd4]"
+                        <div className="flex items-center justify-center gap-3">
+                          <button
+                            onClick={() => router.push(`/dashboard/employee/applications/${app._id}`)}
+                            className="text-[#8F59ED] hover:text-[#7c4dd4] inline-flex items-center gap-1"
+                            title="View details"
                           >
-                            <Eye className="inline w-4 h-4" />
-                          </a>
-                        )}
+                            <Eye className="w-4 h-4" /> View
+                          </button>
+                          {resumeUrl && (
+                            <a
+                              href={resumeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-gray-600 hover:text-gray-800 text-sm underline"
+                            >
+                              Resume
+                            </a>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
