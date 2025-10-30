@@ -2,8 +2,39 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Briefcase, Clock, MapPin, DollarSign, Home, ChevronLeft } from "lucide-react";
+import {
+  Briefcase,
+  Clock,
+  MapPin,
+  DollarSign,
+  Home,
+  ChevronLeft,
+  Edit2,
+  Zap,
+  Tag,
+  Layers,
+  FileText,
+  Globe,
+} from "lucide-react";
 import Navbar from "@/app/components/Navbar";
+
+const DetailItem = ({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) => (
+  <div className="flex items-start gap-3">
+    <div className="flex-shrink-0 mt-0.5 text-gray-500">{icon}</div>
+    <div>
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-[15px] font-semibold text-gray-900">{value}</p>
+    </div>
+  </div>
+);
 
 export default function JobViewPage() {
   const { id } = useParams();
@@ -29,14 +60,15 @@ export default function JobViewPage() {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-600 text-lg">
+      <div className="flex items-center justify-center min-h-screen text-gray-600 text-lg bg-gray-50">
+        <Zap className="w-6 h-6 animate-spin mr-2 text-blue-500" />
         Loading job details...
       </div>
     );
 
   if (!job)
     return (
-      <div className="flex items-center justify-center min-h-screen text-red-500 text-lg">
+      <div className="flex items-center justify-center min-h-screen text-red-500 text-lg bg-gray-50">
         Job not found.
       </div>
     );
@@ -44,99 +76,114 @@ export default function JobViewPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[#f9f8ff] py-10 px-6 flex justify-center">
-        <div className="bg-white w-full max-w-3xl rounded-2xl shadow-md border border-gray-100 p-8 transition-all hover:shadow-lg">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <Briefcase className="text-blue-600 w-7 h-7" />
-              {job.title}
-            </h1>
+      <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 flex justify-center">
+        <div className="bg-white w-full max-w-4xl rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-10">
+          {/* Header Section */}
+          <div className="border-b pb-6 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-snug mb-3 sm:mb-0">
+                {job.title}
+              </h1>
 
-            <span
-              className={`px-3 py-1 text-sm rounded-full font-medium ${job.status === "Active"
-                ? "bg-green-100 text-green-700"
-                : "bg-gray-100 text-gray-600"
+              <span
+                className={`px-4 py-1.5 text-sm rounded-full font-semibold uppercase tracking-wide ${
+                  job.status === "Active"
+                    ? "bg-green-100 text-green-700 ring-1 ring-green-200"
+                    : "bg-gray-100 text-gray-600 ring-1 ring-gray-200"
                 }`}
-            >
-              {job.status || "Active"}
-            </span>
-          </div>
-
-          {/* Job Info Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-5 h-5 text-blue-500" />
-              <span>
-                {job.location?.city}, {job.location?.state || "N/A"}
+              >
+                {job.status || "Active"}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-gray-600">
-              <Clock className="w-5 h-5 text-purple-500" />
-              <span>
-                {job.experienceRequired
-                  ? `${job.experienceRequired.minYears}-${job.experienceRequired.maxYears} yrs`
-                  : "Experience N/A"}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 text-gray-600">
-              <DollarSign className="w-5 h-5 text-green-500" />
-              <span>
-                {job.salary
-                  ? `${job.salary.min} - ${job.salary.max} ${job.salary.currency} (${job.salary.period})`
-                  : "Salary N/A"}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 text-gray-600">
-              <Home className="w-5 h-5 text-indigo-500" />
-              <span>{job.isRemote ? "Remote" : "On-site"}</span>
+            <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-600">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-blue-500" />
+                <span>
+                  <strong>Location:</strong>{" "}
+                  {job.location?.city}, {job.location?.state || "N/A"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-indigo-500" />
+                <span>
+                  <strong>Type:</strong> {job.jobType || "N/A"}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Job Details */}
-          <div className="border-t border-gray-200 pt-6 space-y-4">
-            <p>
-              <span className="font-semibold text-gray-800">Specialization:</span>{" "}
-              {job.specialization || "N/A"}
-            </p>
+          {/* Key Information */}
+          <div className="bg-gray-50 p-6 rounded-xl mb-10 border border-gray-100 shadow-inner">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <Layers className="w-5 h-5 text-blue-600" />
+              Key Information
+            </h2>
 
-            <p>
-              <span className="font-semibold text-gray-800">Job Type:</span>{" "}
-              {job.jobType || "N/A"}
-            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+              <DetailItem
+                icon={<DollarSign className="w-5 h-5 text-green-600" />}
+                label="Salary Range"
+                value={
+                  job.salary
+                    ? `${job.salary.min} - ${job.salary.max} ${job.salary.currency} (${job.salary.period})`
+                    : "N/A"
+                }
+              />
+              <DetailItem
+                icon={<Clock className="w-5 h-5 text-purple-600" />}
+                label="Experience Required"
+                value={
+                  job.experienceRequired
+                    ? `${job.experienceRequired.minYears}-${job.experienceRequired.maxYears} yrs`
+                    : "N/A"
+                }
+              />
+              <DetailItem
+                icon={<Home className="w-5 h-5 text-red-600" />}
+                label="Work Arrangement"
+                value={job.isRemote ? "Remote" : "On-site"}
+              />
+              <DetailItem
+                icon={<Tag className="w-5 h-5 text-orange-600" />}
+                label="Specialization"
+                value={job.specialization || "N/A"}
+              />
+              <DetailItem
+                icon={<Clock className="w-5 h-5 text-cyan-600" />}
+                label="Shift"
+                value={job.shift || "N/A"}
+              />
 
-            <p>
-              <span className="font-semibold text-gray-800">Shift:</span>{" "}
-              {job.shift || "N/A"}
-            </p>
+            </div>
+          </div>
 
-            <div>
-              <span className="font-semibold text-gray-800">Description:</span>
-              <p className="mt-1 text-gray-600 whitespace-pre-line">
-                {job.description || "No description provided."}
-              </p>
+          {/* Description */}
+          <div className="space-y-5">
+            <h2 className="text-xl font-semibold text-gray-800 border-b pb-3 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-gray-600" />
+              Job Description
+            </h2>
+            <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+              {job.description || "No description provided."}
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-end items-center gap-4 mt-8">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 border-t mt-10">
             <button
               onClick={() => router.push("/dashboard/employee/jobs")}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium transition"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border border-gray-300 bg-white text-gray-700 font-semibold transition hover:bg-gray-100"
             >
-              <ChevronLeft size={18} />
-              Back
+              <ChevronLeft size={20} />
+              Back to Jobs
             </button>
 
             <button
-              onClick={() =>
-                router.push(`/dashboard/employee/jobs/edit/${id}`)
-              }
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2.5 rounded-full font-medium shadow-md transition-transform hover:scale-105"
+              onClick={() => router.push(`/dashboard/employee/jobs/edit/${id}`)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-full font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition-all"
             >
+              <Edit2 size={20} />
               Edit Job
             </button>
           </div>
