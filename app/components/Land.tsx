@@ -172,7 +172,7 @@ const Land = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
-        className="relative z-10 flex justify-center px-4 -mt-[10vh] sm:-mt-[14vh] md:-mt-[16vh] lg:-mt-[18vh]"
+        className="relative z-10 flex justify-center px-4 -mt-[5vh] sm:-mt-[14vh] md:-mt-[16vh] lg:-mt-[18vh]"
       >
         <div className="w-full max-w-4xl">
           <div className="relative">
@@ -185,6 +185,8 @@ const Land = () => {
           </div>
         </div>
       </motion.div>
+
+
 
 
       {/* CATEGORY OVERVIEW */}
