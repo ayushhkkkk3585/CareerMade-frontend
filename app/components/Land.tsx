@@ -172,10 +172,14 @@ const Land = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
-        className="relative -mt-35 sm:-mt-32 md:-mt-30 z-10 flex justify-center px-4"
+        className="relative -mt-[40vh]  sm:-mt-[12vh] z-10 flex justify-center px-4"
       >
         <div className="w-full max-w-4xl">
-          <img src="/newer.png" alt="Doctor consultation" className="w-full h-auto" />
+          <img
+            src="/newer.png"
+            alt="Doctor consultation"
+            className="w-full h-auto object-contain"
+          />
         </div>
       </motion.div>
 
