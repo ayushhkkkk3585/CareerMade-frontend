@@ -7,29 +7,27 @@ import {
   Trash2,
   Eye,
   Plus,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// ✅ Type definitions
 interface Location {
   city?: string;
   state?: string;
 }
-
 interface Experience {
   minYears?: number;
   maxYears?: number;
 }
-
 interface Salary {
   min?: number;
   max?: number;
   currency?: string;
 }
-
 interface Job {
   _id: string;
   title?: string;
@@ -39,7 +37,6 @@ interface Job {
   experienceRequired?: Experience;
   salary?: Salary;
 }
-
 interface EmployerProfile {
   _id: string;
   name: string;
@@ -53,8 +50,15 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   const headerColors = ["#1A0152", "#9333EA", "#16A34A", "#0F172A"];
+
+  // 🔹 Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const jobsPerPage = 6;
+
+  const totalPages = Math.ceil(jobs.length / jobsPerPage);
+  const startIndex = (currentPage - 1) * jobsPerPage;
+  const currentJobs = jobs.slice(startIndex, startIndex + jobsPerPage);
 
   // ✅ Fetch all jobs
   useEffect(() => {
@@ -69,9 +73,10 @@ export default function JobsPage() {
           return;
         }
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=20`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=20`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
         const data = await res.json();
         if (res.ok) {
@@ -100,9 +105,10 @@ export default function JobsPage() {
 
     const fetchProfile = async (): Promise<void> => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         const data = await res.json();
 
         if (res.ok) {
@@ -134,10 +140,13 @@ export default function JobsPage() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await res.json();
 
       if (res.ok) {
@@ -152,14 +161,12 @@ export default function JobsPage() {
     }
   };
 
-  // ✅ Format salary for display
   const formatSalary = (amount?: number): string => {
     if (!amount) return "—";
     if (amount >= 100000) return `${(amount / 100000).toFixed(1)}L`;
     return amount.toLocaleString();
   };
 
-  // ✅ Loading State
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
@@ -230,112 +237,150 @@ export default function JobsPage() {
               </button>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {jobs.map((job, index) => {
-                const headerColor = headerColors[index % headerColors.length];
-                return (
-                  <div
-                    key={job._id}
-                    className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 p-6 relative"
-                  >
-                    {/* ===== Colored Header & Logo ===== */}
-                    <div className="relative mb-5">
-                      <div
-                        className="w-full h-20 rounded-lg"
-                        style={{ backgroundColor: headerColor }}
-                      ></div>
-                      <div className="absolute -bottom-6 left-6">
-                        <div className="w-14 h-14 rounded-full bg-white p-1 shadow-md flex items-center justify-center">
-                          <div
-                            className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
-                            style={{ backgroundColor: headerColor }}
-                          >
-                            <img
-                              src="/card.png"
-                              alt="Hospital Logo"
-                              className="w-2/4 h-2/4 object-contain"
-                            />
+            <>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {currentJobs.map((job, index) => {
+                  const headerColor = headerColors[index % headerColors.length];
+                  return (
+                    <div
+                      key={job._id}
+                      className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 p-6 relative"
+                    >
+                      <div className="relative mb-5">
+                        <div
+                          className="w-full h-20 rounded-lg"
+                          style={{ backgroundColor: headerColor }}
+                        ></div>
+                        <div className="absolute -bottom-6 left-6">
+                          <div className="w-14 h-14 rounded-full bg-white p-1 shadow-md flex items-center justify-center">
+                            <div
+                              className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+                              style={{ backgroundColor: headerColor }}
+                            >
+                              <img
+                                src="/card.png"
+                                alt="Hospital Logo"
+                                className="w-2/4 h-2/4 object-contain"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* ===== Job Info ===== */}
-                    <div className="mt-8 mb-3">
-                      <h3 className="text-xl font-bold leading-tight mb-1">
-                        {job.title || "Untitled"}
-                      </h3>
-                      <p className="text-sm text-gray-500 font-medium">
-                        {/* {job.organizationName || "Hospital"} */}Hospital
-                      </p>
-                    </div>
-
-                    {/* ===== Location, Experience, Salary ===== */}
-                    <div className="space-y-2 mb-3 text-sm text-gray-600">
-                      <div>
-                        📍 {job.location?.city || "—"},{" "}
-                        {job.location?.state || ""}
+                      <div className="mt-8 mb-3">
+                        <h3 className="text-xl font-bold leading-tight mb-1">
+                          {job.title || "Untitled"}
+                        </h3>
+                        <p className="text-sm text-gray-500 font-medium">
+                          Hospital
+                        </p>
                       </div>
-                      <div>
-                        💼 {job.experienceRequired?.minYears || "—"}–
-                        {job.experienceRequired?.maxYears || "—"} yrs
+
+                      <div className="space-y-2 mb-3 text-sm text-gray-600">
+                        <div>
+                          📍 {job.location?.city || "—"},{" "}
+                          {job.location?.state || ""}
+                        </div>
+                        <div>
+                          💼 {job.experienceRequired?.minYears || "—"}–
+                          {job.experienceRequired?.maxYears || "—"} yrs
+                        </div>
+                        <div>
+                          💰 ₹{formatSalary(job.salary?.min)}–
+                          ₹{formatSalary(job.salary?.max)}{" "}
+                          {job.salary?.currency}
+                        </div>
                       </div>
-                      <div>
-                        💰 ₹{formatSalary(job.salary?.min)}–
-                        ₹{formatSalary(job.salary?.max)} {job.salary?.currency}
+
+                      <div className="mb-5 pb-5 border-b border-gray-100">
+                        <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md">
+                          {job.specialization || "Not specified"}
+                        </span>
                       </div>
-                    </div>
-
-                    {/* ===== Specialization ===== */}
-                    <div className="mb-5 pb-5 border-b border-gray-100">
-                      <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md">
-                        {job.specialization || "Not specified"}
-                      </span>
-                    </div>
-
-                    {/* ===== Buttons ===== */}
-                    <button
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/employee/jobs/${job._id}/applications`
-                        )
-                      }
-                      className="w-full mb-2 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:opacity-90"
-                      style={{ backgroundColor: headerColor }}
-                    >
-                      View Applications
-                    </button>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        onClick={() =>
-                          router.push(`/dashboard/employee/jobs/view/${job._id}`)
-                        }
-                        className="border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-[#CBA2FF] hover:text-[#1A0152] py-2.5"
-                      >
-                        <Eye className="w-5 h-5 mx-auto" /> View
-                      </button>
 
                       <button
                         onClick={() =>
-                          router.push(`/dashboard/employee/jobs/edit/${job._id}`)
+                          router.push(
+                            `/dashboard/employee/jobs/${job._id}/applications`
+                          )
                         }
-                        className="border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-[#CBA2FF] hover:text-[#1A0152] py-2.5"
+                        className="w-full mb-2 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:opacity-90"
+                        style={{ backgroundColor: headerColor }}
                       >
-                        <Pencil className="w-5 h-5 mx-auto" /> Edit
+                        View Applications
                       </button>
 
-                      <button
-                        onClick={() => handleDelete(job._id)}
-                        className="border border-red-200 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-300 py-2.5"
-                      >
-                        <Trash2 className="w-5 h-5 mx-auto" /> Delete
-                      </button>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          onClick={() =>
+                            router.push(
+                              `/dashboard/employee/jobs/view/${job._id}`
+                            )
+                          }
+                          className="border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-[#CBA2FF] hover:text-[#1A0152] py-2.5"
+                        >
+                          <Eye className="w-5 h-5 mx-auto" /> View
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            router.push(
+                              `/dashboard/employee/jobs/edit/${job._id}`
+                            )
+                          }
+                          className="border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-[#CBA2FF] hover:text-[#1A0152] py-2.5"
+                        >
+                          <Pencil className="w-5 h-5 mx-auto" /> Edit
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(job._id)}
+                          className="border border-red-200 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-300 py-2.5"
+                        >
+                          <Trash2 className="w-5 h-5 mx-auto" /> Delete
+                        </button>
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+
+              {/* 🔹 PAGINATION */}
+              {totalPages > 1 && (
+                <div className="flex flex-wrap items-center justify-center gap-3 mt-10">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                   className="px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`px-3 py-2 text-sm rounded-md ${currentPage === i + 1
+                        ? "bg-[#8F59ED] text-white font-semibold"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
+
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    className="px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
