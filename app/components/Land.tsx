@@ -27,7 +27,7 @@ const Land = () => {
   return (
     <>
       {/* font can also be poppins */}
-      <div className="min-h-screen p-3 bg-[#cdb7f3e7] pb-20 overflow-hidden">
+      <div className="sm:min-h-screen p-3 bg-[#cdb7f3e7] pb-20 overflow-hidden">
         {/* HEADER */}
         <motion.header
           initial={{ y: -40, opacity: 0 }}
