@@ -148,12 +148,13 @@ const Register = () => {
                     whileHover={{ scale: 1.05, rotate: 2 }}
                     className="flex items-center mb-8 space-x-3"
                 >
-                    <div className="bg-[#8F59ED] p-2 rounded-lg shadow-md">
+                    {/* <div className="bg-[#155DFC] p-2 rounded-lg shadow-md">
                         <Stethoscope className="w-6 h-6 text-white" />
                     </div>
                     <span className="text-3xl font-bold text-gray-900 tracking-tight">
                         CareerMade
-                    </span>
+                    </span> */}
+                    <img src="/logo.png" alt="CareerMade" className="h-7" />
                 </motion.div>
 
                 {/* Heading */}
@@ -182,7 +183,7 @@ const Register = () => {
                             required
                             minLength={2}
                             maxLength={50}
-                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700 transition-all bg-white"
+                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700 transition-all bg-white"
                         />
                     </div>
 
@@ -198,7 +199,7 @@ const Register = () => {
                             required
                             minLength={2}
                             maxLength={50}
-                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700 bg-white transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700 bg-white transition-all"
                         />
                     </div>
 
@@ -213,7 +214,7 @@ const Register = () => {
                             placeholder="Email address"
                             required
                             autoComplete="email"
-                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700 bg-white transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700 bg-white transition-all"
                         />
                     </div>
 
@@ -229,7 +230,7 @@ const Register = () => {
                             required
                             pattern="^\+?[1-9]\d{0,15}$"
                             title="Digits only, optional leading +, cannot start with 0"
-                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700 bg-white transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700 bg-white transition-all"
                         />
                     </div>
 
@@ -243,7 +244,7 @@ const Register = () => {
                             onChange={handleChange}
                             placeholder="Password"
                             required
-                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700 bg-white transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700 bg-white transition-all"
                         />
                     </div>
 
@@ -253,7 +254,7 @@ const Register = () => {
                         value={formData.role}
                         onChange={handleChange}
                         required
-                        className="w-full py-3 px-4 rounded-full border border-gray-300 bg-white focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700"
+                        className="w-full py-3 px-4 rounded-full border border-gray-300 bg-white focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700"
                     >
                         {/* Only allow roles accepted by backend */}
                         <option value="jobseeker">Job Seeker</option>
@@ -266,7 +267,7 @@ const Register = () => {
                         whileTap={{ scale: 0.97 }}
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#8F59ED] hover:bg-[#693eb4] text-white py-3 rounded-full font-semibold transition-all duration-300 shadow-md"
+                        className="w-full bg-gradient-to-r from-[#155DFC] to-[#00B8DB] text-white py-3 rounded-full font-semibold transition-all duration-300 shadow-md"
                     >
                         {loading ? "Registering..." : "Register"}
                     </motion.button>
@@ -295,7 +296,7 @@ const Register = () => {
                     {/* Footer */}
                     <p className="text-center text-sm text-gray-600 mt-2">
                         Already have an account?{" "}
-                        <a href="/login" className="text-[#8F59ED] font-medium hover:underline">
+                        <a href="/login" className="text-[#155DFC] font-medium hover:underline">
                             Login here
                         </a>
                     </p>
@@ -310,9 +311,9 @@ const Register = () => {
                 className="hidden md:flex md:w-1/2  justify-center items-center"
             >
                 <img
-                    src="/register.png"
+                    src="/newbg.png"
                     alt="Register illustration"
-                    className="w-3/4 h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                    className=" h-auto mb-20  hover:scale-105 transition-transform duration-500"
                 />
             </motion.div>
         </div>

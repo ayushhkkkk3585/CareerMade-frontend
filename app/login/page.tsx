@@ -79,7 +79,7 @@ const Login = () => {
         className="hidden md:flex md:w-1/2 items-center justify-center"
       >
         <img
-          src="/login.png"
+          src="/Vector.png"
           alt="Login illustration"
           className="w-3/4 h-auto hover:scale-105 transition-transform duration-500"
         />
@@ -97,10 +97,11 @@ const Login = () => {
           whileHover={{ scale: 1.05, rotate: 2 }}
           className="flex items-center mb-6 space-x-2"
         >
-          <div className="bg-[#8F59ED] p-2 rounded-lg shadow-md">
+          {/* <div className="bg-[#8F59ED] p-2 rounded-lg shadow-md">
             <Stethoscope className="w-6 h-6 text-white" />
           </div>
-          <span className="text-2xl font-bold text-gray-900">CareerMade</span>
+          <span className="text-2xl font-bold text-gray-900">CareerMade</span> */}
+          <img src="/logo.png" alt="CareerMade" className="h-7" />
         </motion.div>
 
         {/* Heading */}
@@ -127,7 +128,7 @@ const Login = () => {
           {/* Email */}
           <div className="relative group">
             <Mail
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#8F59ED] transition-colors"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#155DFC] transition-colors"
               size={18}
             />
             <input
@@ -137,14 +138,14 @@ const Login = () => {
               onChange={handleChange}
               placeholder="Email address"
               required
-              className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700 transition-all"
+              className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700 transition-all"
             />
           </div>
 
           {/* Password */}
           <div className="relative group">
             <Lock
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#8F59ED] transition-colors"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#155DFC] transition-colors"
               size={18}
             />
             <input
@@ -154,7 +155,7 @@ const Login = () => {
               onChange={handleChange}
               placeholder="Password"
               required
-              className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#8F59ED] focus:ring-2 focus:ring-[#cdb7f3] outline-none text-gray-700 transition-all"
+              className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC] outline-none text-gray-700 transition-all"
             />
           </div>
 
@@ -169,7 +170,7 @@ const Login = () => {
             whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={loading}
-            className="w-full bg-[#8F59ED] hover:bg-[#693eb4] text-white py-3 rounded-full font-medium transition shadow-md disabled:opacity-70"
+            className="w-full bg-gradient-to-r from-[#155DFC] to-[#00B8DB] text-white py-3 rounded-full font-medium transition shadow-md disabled:opacity-70"
           >
             {loading ? "Signing In..." : "Sign In"}
           </motion.button>
@@ -191,7 +192,7 @@ const Login = () => {
           {/* Footer Link */}
           <p className="text-center text-sm text-gray-600">
             Don’t have an account?{" "}
-            <a href="/register" className="text-[#8F59ED] hover:underline">
+            <a href="/register" className="text-[#155DFC] hover:underline">
               Register here
             </a>
           </p>
