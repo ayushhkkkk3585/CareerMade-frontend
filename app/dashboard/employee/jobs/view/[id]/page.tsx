@@ -181,7 +181,7 @@ export default function JobViewPage() {
 
             <button
               onClick={() => router.push(`/dashboard/employee/jobs/edit/${id}`)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-full font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition-all"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#8F59ED] text-white px-6 py-2.5 rounded-full font-semibold shadow-md hover:bg-[#7449c0] hover:shadow-lg transition-all"
             >
               <Edit2 size={20} />
               Edit Job

@@ -27,7 +27,7 @@ const Land = () => {
   return (
     <>
       {/* font can also be poppins */}
-      <div className="min-h-screen p-3 bg-[#cdb7f3e7] pb-20 overflow-hidden">
+      <div className="sm:min-h-screen p-3 bg-[#cdb7f3e7] pb-20 overflow-hidden">
         {/* HEADER */}
         <motion.header
           initial={{ y: -40, opacity: 0 }}
@@ -330,11 +330,11 @@ const Land = () => {
                 <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <span className="text-lg sm:text-xl font-bold text-white">
-                DocJob
+                CareerMade
               </span>
             </div>
             <p className="text-xs sm:text-sm text-gray-400">
-              © 2025 DocJob. All rights reserved.
+              © 2025 CareerMade. All rights reserved.
             </p>
           </div>
         </div>
