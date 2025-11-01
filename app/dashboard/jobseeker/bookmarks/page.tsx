@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
-import { ArrowLeft, Bookmark } from "lucide-react";
+import { ArrowLeft, Bookmark, Plus } from "lucide-react";
 
 
 export default function SavedJobs() {
@@ -44,13 +44,37 @@ export default function SavedJobs() {
   return (
     <>
       <Navbar />
-      <div className="flex justify-center mt-10">
-        <div className="w-full max-w-6xl px-6">
+      <div className="w-full relative bg-[#002B6B] text-white overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-90"
+          style={{ backgroundImage: "url('/new1.png')" }}
+        ></div>
+
+        {/* Overlay (optional subtle gradient for text contrast) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          {/* Left Text */}
+          <div className="max-w-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+              Saved{" "}
+              <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+                Jobs
+              </span>
+            </h1>
+            <p className="text-base sm:text-lg text-blue-100 mt-3">
+              Find Your Saved Jobs.
+            </p>
+          </div>
+
+          {/* Right Button */}
           <button
             onClick={() => router.push("/dashboard/jobseeker")}
-            className="flex items-center text-[#8F59ED] hover:text-[#7c4dd4] transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
+            <ArrowLeft className="w-5 h-5" />
             Back
           </button>
         </div>
@@ -58,7 +82,7 @@ export default function SavedJobs() {
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-            <Bookmark className="w-6 h-6 text-purple-600" />
+            <Bookmark className="w-6 h-6 text-[#00A3FF]" />
             Saved Jobs
           </h1>
           <p className="text-sm text-gray-500">
@@ -114,7 +138,7 @@ export default function SavedJobs() {
                           e.stopPropagation();
                           router.push(`/dashboard/jobseeker/jobs/${job._id}/view`);
                         }}
-                        className="text-sm text-purple-600 hover:underline"
+                        className="text-sm text-[#00A3FF] hover:underline"
                       >
                         View →
                       </button>

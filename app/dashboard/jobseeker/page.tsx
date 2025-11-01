@@ -1,431 +1,403 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+
+import { useEffect, useState } from "react";
+import {
+  MapPin,
+  Calendar,
+  DollarSign,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+} from "lucide-react";
 import Navbar from "@/app/components/Navbar";
-import { Briefcase, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SPECIALIZATIONS = [
-  "General Medicine",
-  "Cardiology",
-  "Neurology",
-  "Orthopedics",
-  "Pediatrics",
-  "Gynecology",
-  "Dermatology",
-  "Psychiatry",
-  "Radiology",
-  "Anesthesiology",
-  "Emergency Medicine",
-  "Internal Medicine",
-  "Surgery",
-  "Oncology",
-  "Pathology",
-  "Ophthalmology",
-  "ENT",
-  "Urology",
-  "Gastroenterology",
-  "Pulmonology",
-  "Endocrinology",
-  "Rheumatology",
-  "Nephrology",
-  "Hematology",
-  "Infectious Disease",
-  "Physical Therapy",
-  "Occupational Therapy",
-  "Speech Therapy",
-  "Nursing",
-  "Pharmacy",
-  "Medical Technology",
-  "Other",
+  "General Medicine", "Cardiology", "Neurology", "Orthopedics", "Pediatrics",
+  "Gynecology", "Dermatology", "Psychiatry", "Radiology", "Anesthesiology",
+  "Emergency Medicine", "Surgery", "Oncology", "Pathology", "Ophthalmology",
+  "ENT", "Urology", "Gastroenterology", "Pulmonology", "Endocrinology",
+  "Rheumatology", "Nephrology", "Hematology", "Infectious Disease",
 ];
 
-interface Job {
-  _id: string;
-  title?: string;
-  organizationName?: string;
-  location?: {
-    city?: string;
-    state?: string;
-  };
-  experienceRequired?: {
-    minYears?: number;
-    maxYears?: number;
-  };
-  salary?: {
-    min?: number;
-    max?: number;
-    currency?: string;
-  };
-  specialization?: string;
-}
+const LOCATIONS = [
+  "Mumbai", "Delhi NCR", "Bangalore", "Pune", "Hyderabad",
+  "Chennai", "Kolkata", "Ahmedabad",
+];
 
-export default function JobSeekerLayout() {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [selectedSpecialization, setSelectedSpecialization] = useState("");
-  const [loading, setLoading] = useState(true);
+export default function JobSeekerJobs() {
   const router = useRouter();
-  const headerColors = ["#1A0152", "#9333EA", "#16A34A", "#0F172A"];
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
+  const [filters, setFilters] = useState({
+    specialization: "",
+    location: "",
+    salary: "",
+    years: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [mobileFilters, setMobileFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Pagination state (client-side)
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const jobsPerPage = 6; // adjust if needed
+  const jobsPerPage = 5;
 
-  // Fetch all jobs once (client-side pagination)
+  // ✅ Fetch jobs
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const jobList = data.data?.items || data.items || [];
-        setJobs(jobList);
-        setFilteredJobs(jobList);
-        setCurrentPage(1);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch jobs:", err);
-        setJobs([]);
-        setFilteredJobs([]);
-      })
-      .finally(() => setLoading(false));
+    const fetchJobs = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=50`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setJobs(data.data?.items || data.items || []);
+          setFilteredJobs(data.data?.items || data.items || []);
+        } else {
+          toast.error(data.message || "Failed to fetch jobs");
+        }
+      } catch {
+        toast.error("Something went wrong fetching jobs");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
   }, []);
 
-  // Filter jobs by specialization (resets page)
+  // ✅ Apply filters and search
   useEffect(() => {
-    if (selectedSpecialization) {
-      const filtered = jobs.filter(
-        (job) =>
-          job.specialization &&
-          job.specialization.toLowerCase() ===
-          selectedSpecialization.toLowerCase()
+    let filtered = [...jobs];
+
+    // Search bar
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (j) =>
+          j.title?.toLowerCase().includes(q) ||
+          j.specialization?.toLowerCase().includes(q) ||
+          j.location?.city?.toLowerCase().includes(q) ||
+          j.location?.state?.toLowerCase().includes(q)
       );
-      setFilteredJobs(filtered);
-      setCurrentPage(1);
-    } else {
-      setFilteredJobs(jobs);
-      setCurrentPage(1);
     }
-  }, [selectedSpecialization, jobs]);
 
-  // derived pagination values
-  const totalJobs = filteredJobs.length;
-  const totalPages = Math.max(1, Math.ceil(totalJobs / jobsPerPage));
-  // clamp currentPage in case filteredJobs changed
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [totalPages, currentPage]);
+    // Filters
+    if (filters.specialization)
+      filtered = filtered.filter(
+        (j) =>
+          j.specialization?.toLowerCase() ===
+          filters.specialization.toLowerCase()
+      );
 
-  const startIndex = (currentPage - 1) * jobsPerPage;
-  const currentJobs = filteredJobs.slice(startIndex, startIndex + jobsPerPage);
+    if (filters.location)
+      filtered = filtered.filter((j) => {
+        const city = j.location?.city?.toLowerCase() || "";
+        const state = j.location?.state?.toLowerCase() || "";
+        const filterVal = filters.location.toLowerCase();
+        return city.includes(filterVal) || state.includes(filterVal);
+      });
+
+    if (filters.years)
+      filtered = filtered.filter(
+        (j) => (j.experienceRequired?.minYears || 0) >= Number(filters.years)
+      );
+
+    if (filters.salary)
+      filtered = filtered.filter(
+        (j) => (j.salary?.max || 0) / 100000 >= Number(filters.salary)
+      );
+
+    setFilteredJobs(filtered);
+    setCurrentPage(1);
+  }, [filters, searchQuery, jobs]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  const start = (currentPage - 1) * jobsPerPage;
+  const currentJobs = filteredJobs.slice(start, start + jobsPerPage);
+
+  const formatSalary = (amt?: number) => {
+    if (!amt) return "—";
+    return `₹${(amt / 100000).toFixed(1)} LPA`;
+  };
 
   return (
     <>
       <Navbar />
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
-      <div className="min-h-screen bg-gray-50">
-        {/* Header Section */}
-        <div className="border-b mx-auto max-w-7xl border-gray-100 px-4 sm:px-6 lg:px-8 py-6">
-          <div className="w-full bg-[#1A0152] text-white relative rounded-xl overflow-hidden shadow-md">
-            <div
-              className="absolute inset-0 bg-no-repeat bg-cover bg-center opacity-40"
-              style={{ backgroundImage: "url('/bg.png')" }}
-            ></div>
+      {/* ===== HEADER ===== */}
+      <div className=" bg-gray-50">
+        {/* ===== HEADER SECTION ===== */}
+        <div className="w-full relative bg-[#002B6B] text-white overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-90"
+            style={{ backgroundImage: "url('/new1.png')" }}
+          ></div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div>
-                <h1 className="text-3xl font-semibold leading-tight">
-                  Job{" "}
-                  <span className="italic text-[#CBA2FF] font-light">
-                    Seeker Dashboard
-                  </span>
-                </h1>
-                <p className="text-sm text-gray-200 mt-1">
-                  Explore opportunities, track your applications, and manage your
-                  profile.
-                </p>
-              </div>
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
 
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => router.push("/dashboard/jobseeker/jobs")}
-                  className="px-5 py-2.5 bg-[#CBA2FF] hover:bg-[#B482FF] text-[#1A0152] rounded-lg text-sm font-semibold transition-all shadow-md"
-                >
-                  Browse Jobs
-                </button>
-                <button
-                  onClick={() => router.push("/dashboard/jobseeker/applications")}
-                  className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-all shadow-md"
-                >
-                  My Applications
-                </button>
-              </div>
+          {/* Header Content */}
+          <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            {/* Left Text Section */}
+            <div className="max-w-2xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+                Job{" "}
+                <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+                  Seeker Dashboard
+                </span>
+              </h1>
+              <p className="text-base sm:text-lg text-blue-100 mt-3">
+                Explore verified opportunities from India’s leading hospitals and healthcare facilities.
+              </p>
+            </div>
+
+            {/* Right Buttons Section */}
+            <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
+              {/* Browse Jobs */}
+              {/* <button
+                onClick={() => router.push("/dashboard/jobseeker/jobs")}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+              >
+                Browse Jobs
+              </button> */}
+
+              {/* My Applications */}
+              {/* <button
+                onClick={() => router.push("/dashboard/jobseeker/applications")}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+              >
+                My Applications
+              </button> */}
+              <button
+                onClick={() => router.push("/dashboard/jobseeker/applications")}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+              >
+                My Applications
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Recent Jobs Section */}
-        <div className="max-w-7xl mx-auto px-4 pb-20">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-            {/* Heading */}
-            <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-purple-600" />
-              Recent Jobs
-            </h2>
+      {/* ===== MAIN CONTENT ===== */}
+      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8 relative">
+        {/* ===== FILTERS ===== */}
+        <div
+          className={`lg:static absolute z-20 bg-white lg:bg-transparent border lg:border-none shadow-lg lg:shadow-none p-5 rounded-lg lg:p-0 transition-all duration-300 ${mobileFilters
+            ? "top-20 left-0 right-0 mx-4 opacity-100"
+            : "hidden lg:block opacity-0 lg:opacity-100"
+            }`}
+        >
+          <div className="flex items-center justify-between mb-4 lg:hidden">
+            <h2 className="font-semibold text-lg">Filters</h2>
+            <button
+              onClick={() => setMobileFilters(false)}
+              className="text-sm text-blue-600"
+            >
+              Close ✕
+            </button>
+          </div>
 
-            {/* Filter Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-              <label
-                htmlFor="specialization"
-                className="text-sm font-medium text-gray-700 sm:whitespace-nowrap"
-              >
-                Filter by specialization
-              </label>
-              <div className="relative w-full sm:w-40 md:w-56">
-                <select
-                  id="specialization"
-                  value={selectedSpecialization}
-                  onChange={(e) => setSelectedSpecialization(e.target.value)}
-                  className="w-full appearance-none px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm transition-all cursor-pointer"
-                >
-                  <option value="">All Specializations</option>
-                  {SPECIALIZATIONS.map((spec) => (
-                    <option key={spec} value={spec}>
-                      {spec}
-                    </option>
-                  ))}
-                </select>
+          <h2 className="text-lg font-semibold mb-4 hidden lg:block">Filters</h2>
 
-                {/* Dropdown Icon */}
-                <svg
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
+          {/* Specialization */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Specialization
+            </label>
+            <select
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.specialization}
+              onChange={(e) =>
+                setFilters({ ...filters, specialization: e.target.value })
+              }
+            >
+              <option value="">All</option>
+              {SPECIALIZATIONS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Location */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location
+            </label>
+            <select
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.location}
+              onChange={(e) =>
+                setFilters({ ...filters, location: e.target.value })
+              }
+            >
+              <option value="">All</option>
+              {LOCATIONS.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Salary */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Minimum Salary (in LPA)
+            </label>
+            <input
+              type="number"
+              placeholder="e.g. 5"
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.salary}
+              onChange={(e) =>
+                setFilters({ ...filters, salary: e.target.value })
+              }
+            />
+          </div>
+
+          {/* Experience */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Minimum Years of Experience
+            </label>
+            <input
+              type="number"
+              placeholder="e.g. 3"
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.years}
+              onChange={(e) =>
+                setFilters({ ...filters, years: e.target.value })
+              }
+            />
+          </div>
+        </div>
+
+        {/* ===== JOB CARDS + SEARCH ===== */}
+        <div className="lg:col-span-3">
+          {/* MOBILE FILTER BUTTON */}
+          <button
+            onClick={() => setMobileFilters(true)}
+            className="lg:hidden flex items-center gap-2 text-blue-600 font-semibold mb-6"
+          >
+            <Filter className="w-5 h-5" /> Filters
+          </button>
+
+          {/* SEARCH BAR */}
+          <div className="mb-8">
+            <div className="relative max-w-lg mx-auto lg:mx-0">
+              <input
+                type="text"
+                placeholder="Search by title, specialization, or location..."
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
             </div>
           </div>
 
           {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <p className="text-gray-500 animate-pulse">Loading jobs...</p>
+            <div className="text-center py-20 text-gray-500">
+              Loading jobs...
             </div>
           ) : filteredJobs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Briefcase className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">
-                No jobs found
-              </h3>
-              <p className="text-sm text-gray-500 mb-6">
-                Try changing the specialization filter or browse all listings.
-              </p>
-              <button
-                onClick={() => router.push("/dashboard/jobseeker/jobs")}
-                className="px-5 py-2.5 bg-[#8F59ED] hover:bg-[#7c4dd4] text-white rounded-lg text-sm font-medium transition-colors"
-              >
-                Browse Jobs
-              </button>
+            <div className="text-center py-20 text-gray-500">
+              No matching jobs found
             </div>
           ) : (
-            <>
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {currentJobs.map((job, index) => {
-                  const headerColor = headerColors[index % headerColors.length];
-                  return (
-                    <div
-                      key={job._id}
-                      onClick={() =>
-                        router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)
-                      }
-                      className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 p-6 w-full relative cursor-pointer"
-                    >
-                      {/* ===== Job Card ===== */}
-                      <div className="relative mb-5">
-                        <div
-                          className="w-full h-20 rounded-lg"
-                          style={{ backgroundColor: headerColor }}
-                        ></div>
-                        <div className="absolute -bottom-6 left-6">
-                          <div className="w-14 h-14 rounded-full bg-white p-1 shadow-md flex items-center justify-center">
-                            <div
-                              className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
-                              style={{ backgroundColor: headerColor }}
-                            >
-                              <img
-                                src={"/card.png"}
-                                alt="Company Logo"
-                                className="w-2/4 h-2/4 object-contain"
-                              />
-                            </div>
-                          </div>
-                        </div>
+            <div className="space-y-6">
+              {currentJobs.map((job) => (
+                <div
+                  key={job._id}
+                  className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6"
+                >
+                  <div className="flex flex-col sm:flex-row justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {job.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {job.organizationName || "Healthcare Facility"}
+                      </p>
+                      <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
+                        <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
+                          <MapPin className="w-4 h-4 text-blue-500" />
+                          {job.location?.city}, {job.location?.state}
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full">
+                          <Calendar className="w-4 h-4 text-green-600" />
+                          {job.experienceRequired?.minYears}–{job.experienceRequired?.maxYears} yrs
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
+                          <DollarSign className="w-4 h-4 text-yellow-600" />
+                          {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
+                        </span>
                       </div>
-
-                      <div className="flex items-start justify-between mt-8 mb-3">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-bold leading-tight mb-1">
-                            {job.title || "Job Title"}
-                          </h3>
-                          <p className="text-sm text-gray-500 font-medium">
-                            {job.organizationName || "Hospital"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 mb-3">
-                        {job.location && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <svg
-                              className="w-4 h-4 text-gray-400 flex-shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg>
-                            <span className="font-medium">
-                              {job.location.city || "—"}, {job.location.state || ""}
-                            </span>
-                          </div>
-                        )}
-
-                        {job.experienceRequired && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <svg
-                              className="w-4 h-4 text-gray-400 flex-shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 6V4a2 2 0 00-2-2h-4a2"
-                              />
-                            </svg>
-                            <span className="font-medium">
-                              {job.experienceRequired.minYears || "—"}–
-                              {job.experienceRequired.maxYears || "—"} years
-                            </span>
-                          </div>
-                        )}
-
-                        {job.salary && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <svg
-                              className="w-4 h-4 text-gray-400 flex-shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343"
-                              />
-                            </svg>
-                            <span className="font-medium">
-                              💰 {job.salary?.min} - {job.salary?.max} {job.salary?.currency}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-5 pb-5 border-b border-gray-100">
-                        {job.specialization ? (
-                          <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md">
-                            {job.specialization}
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1.5 bg-gray-50 text-gray-400 text-xs font-semibold rounded-md">
-                            Not specified
-                          </span>
-                        )}
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/dashboard/jobseeker/jobs/${job._id}/view`);
-                        }}
-                        className="w-full rounded-xl"
-                        style={{ backgroundColor: headerColor }}
-                      >
-                        <div className="text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md hover:opacity-90">
-                          <span>View Details</span>
-                        </div>
-                      </button>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex flex-wrap justify-center items-center gap-3 mt-10">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    className="px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                     <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  {[...Array(totalPages)].map((_, i) => (
                     <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`px-3 py-2 text-sm rounded-md ${currentPage === i + 1
-                        ? "bg-[#8F59ED] text-white font-semibold"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
+                      onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
+                      className="mt-4 sm:mt-0 h-fit px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
                     >
-                      {i + 1}
+                      View Details
                     </button>
-                  ))}
+                  </div>
 
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    className="px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                      {job.specialization || "General"}
+                    </span>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
+                      Full-time
+                    </span>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
+                      On-site
+                    </span>
+                  </div>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
+          )}
+
+          {/* PAGINATION */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="p-2 rounded-md bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1.5 rounded-md text-sm ${currentPage === i + 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="p-2 rounded-md bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           )}
         </div>
       </div>

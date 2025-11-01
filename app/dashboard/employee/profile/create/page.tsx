@@ -145,7 +145,7 @@ export default function EmployerProfileCreatePage() {
           </div>
           <button
             onClick={() => router.push("/dashboard/employee/profile/view")}
-            className="mt-4 sm:mt-0 px-4 py-2.5 bg-[#8F59ED] text-white rounded-lg text-sm font-medium hover:bg-[#7a48d1] transition-all"
+            className="mt-4 sm:mt-0 px-4 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-lg text-sm font-medium  transition-all"
           >
             View Profile
           </button>
@@ -316,7 +316,7 @@ export default function EmployerProfileCreatePage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-[#8F59ED] text-white rounded-lg font-medium hover:bg-[#7a48d1] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-lg font-medium  transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading
                 ? "Saving..."

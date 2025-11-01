@@ -59,12 +59,8 @@ export default function Navbar() {
             whileHover={{ scale: 1.05 }}
             onClick={() => router.push("/")}
           >
-            <div className="bg-[#8F59ED] p-2 rounded-lg">
-              <Stethoscope className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl sm:text-2xl font-bold text-gray-900">
-              CareerMade
-            </span>
+            
+            <img src="/logo.png" alt="CareerMade" className="h-7" />
           </motion.div>
 
           {/* Desktop Buttons */}

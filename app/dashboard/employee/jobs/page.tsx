@@ -2,19 +2,24 @@
 
 import { useEffect, useState } from "react";
 import {
+  MapPin,
   Briefcase,
-  Pencil,
-  Trash2,
-  Eye,
-  Plus,
+  Calendar,
+  DollarSign,
   ChevronLeft,
   ChevronRight,
+  Filter,
+  Plus,
+  Search,
+  Trash2,
+  Pencil,
+  Users,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Footer from "@/app/components/Footer";
 interface Location {
   city?: string;
   state?: string;
@@ -37,6 +42,7 @@ interface Job {
   experienceRequired?: Experience;
   salary?: Salary;
 }
+
 interface EmployerProfile {
   _id: string;
   name: string;
@@ -44,89 +50,39 @@ interface EmployerProfile {
   companyName?: string;
 }
 
-export default function JobsPage() {
+const SPECIALIZATIONS = [
+  "General Medicine", "Cardiology", "Neurology", "Orthopedics", "Pediatrics",
+  "Gynecology", "Dermatology", "Psychiatry", "Radiology", "Anesthesiology",
+  "Emergency Medicine", "Internal Medicine", "Surgery", "Oncology", "Pathology",
+  "Ophthalmology", "ENT", "Urology", "Gastroenterology", "Pulmonology",
+  "Endocrinology", "Rheumatology", "Nephrology", "Hematology", "Infectious Disease",
+  "Physical Therapy", "Occupational Therapy", "Speech Therapy", "Nursing",
+  "Pharmacy", "Medical Technology", "Other",
+];
+
+const LOCATIONS = [
+  "Mumbai", "Delhi NCR", "Bangalore", "Pune", "Hyderabad",
+  "Chennai", "Kolkata", "Ahmedabad",
+];
+
+export default function JobListing() {
   const router = useRouter();
-  const [profile, setProfile] = useState<EmployerProfile | null>(null);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const headerColors = ["#1A0152", "#9333EA", "#16A34A", "#0F172A"];
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [filters, setFilters] = useState({
+    specialization: "",
+    location: "",
+    salary: "",
+    years: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [mobileFilters, setMobileFilters] = useState(false);
 
-  // 🔹 Pagination state
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const jobsPerPage = 6;
 
-  const totalPages = Math.ceil(jobs.length / jobsPerPage);
-  const startIndex = (currentPage - 1) * jobsPerPage;
-  const currentJobs = jobs.slice(startIndex, startIndex + jobsPerPage);
+  const jobsPerPage = 5;
 
-  // ✅ Fetch all jobs
-  useEffect(() => {
-    const fetchJobs = async (): Promise<void> => {
-      try {
-        const token =
-          typeof window !== "undefined"
-            ? localStorage.getItem("accessToken")
-            : null;
-        if (!token) {
-          toast.error("Please login first");
-          return;
-        }
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=20`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        const data = await res.json();
-        if (res.ok) {
-          setJobs(data.data?.items || data.items || []);
-        } else {
-          toast.error(data.message || "Failed to fetch jobs");
-        }
-      } catch (err) {
-        console.error("Error fetching jobs:", err);
-        toast.error("Something went wrong while fetching jobs");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
-
-  // ✅ Fetch employer profile
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    const fetchProfile = async (): Promise<void> => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const data = await res.json();
-
-        if (res.ok) {
-          setProfile(data.data.employer);
-        } else {
-          setError(data.message || "Profile not found");
-        }
-      } catch {
-        setError("Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [router]);
-
-  // ✅ Handle delete
   const handleDelete = async (id: string): Promise<void> => {
     if (!confirm("Are you sure you want to delete this job?")) return;
 
@@ -160,230 +116,389 @@ export default function JobsPage() {
       toast.error("Something went wrong while deleting the job");
     }
   };
+  // ✅ Fetch jobs
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=50`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setJobs(data.data?.items || data.items || []);
+          setFilteredJobs(data.data?.items || data.items || []);
+        } else {
+          toast.error(data.message || "Failed to fetch jobs");
+        }
+      } catch (e) {
+        toast.error("Something went wrong fetching jobs");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
 
-  const formatSalary = (amount?: number): string => {
-    if (!amount) return "—";
-    if (amount >= 100000) return `${(amount / 100000).toFixed(1)}L`;
-    return amount.toLocaleString();
+  // ✅ Filtering Logic
+  useEffect(() => {
+    let filtered = [...jobs];
+
+    // ✅ Filter by specialization
+    if (filters.specialization)
+      filtered = filtered.filter(
+        (j) =>
+          j.specialization?.toLowerCase() ===
+          filters.specialization.toLowerCase()
+      );
+
+    // ✅ Filter by location (match city or state, India default)
+    if (filters.location)
+      filtered = filtered.filter((j) => {
+        const city = j.location?.city?.toLowerCase() || "";
+        const state = j.location?.state?.toLowerCase() || "";
+        const filterVal = filters.location.toLowerCase();
+        return city.includes(filterVal) || state.includes(filterVal);
+      });
+
+    // ✅ Filter by years of experience
+    if (filters.years)
+      filtered = filtered.filter(
+        (j) => (j.experienceRequired?.minYears || 0) >= Number(filters.years)
+      );
+
+    // ✅ Filter by salary (LPA comparison)
+    if (filters.salary)
+      filtered = filtered.filter(
+        (j) => (j.salary?.max || 0) / 100000 >= Number(filters.salary)
+      );
+
+    setFilteredJobs(filtered);
+    setCurrentPage(1);
+  }, [filters, jobs]);
+
+
+  // ✅ Pagination
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  const start = (currentPage - 1) * jobsPerPage;
+  const currentJobs = filteredJobs.slice(start, start + jobsPerPage);
+
+  // ✅ Salary Formatter
+  const formatSalary = (amt?: number) => {
+    if (!amt) return "—";
+    return `₹${(amt / 100000).toFixed(1)} LPA`;
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-200 border-t-[#8F59ED] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading jobs...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
       <Navbar />
       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
-      <div className="min-h-screen max-w-7xl mx-auto bg-white">
-        {/* ===== HEADER ===== */}
-        <div className="border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-6">
-          <div className="w-full bg-[#1A0152] text-white relative rounded-xl overflow-hidden">
-            <div
-              className="absolute inset-0 bg-no-repeat bg-cover bg-center opacity-40"
-              style={{ backgroundImage: "url('/bg.png')" }}
-            ></div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div>
-                <h1 className="text-3xl font-semibold leading-tight">
-                  Job{" "}
-                  <span className="italic text-[#CBA2FF] font-light">
-                    Postings
-                  </span>
-                </h1>
-                <p className="text-sm text-gray-200 mt-1">
-                  Manage and track your job listings effortlessly
-                </p>
-              </div>
+      {/* HEADER */}
+      <div className="w-full relative bg-[#002B6B] text-white overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-90"
+          style={{ backgroundImage: "url('/new1.png')" }}
+        ></div>
 
-              <button
-                onClick={() => router.push("/dashboard/employee/jobs/create")}
-                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#CBA2FF] hover:bg-[#B482FF] text-[#1A0152] rounded-lg text-sm font-semibold transition-all shadow-lg"
-              >
-                <Plus className="w-4 h-4" />
-                Create Job
-              </button>
-            </div>
+        {/* Overlay (optional subtle gradient for text contrast) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          {/* Left Text */}
+          <div className="max-w-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+              Find Your Perfect{" "}
+              <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+                Healthcare Role
+              </span>
+            </h1>
+            <p className="text-base sm:text-lg text-blue-100 mt-3">
+              Explore verified opportunities from India’s leading hospitals and
+              healthcare facilities.
+            </p>
+          </div>
+
+          {/* Right Button */}
+          <button
+            onClick={() => router.push("/dashboard/employee/jobs/create")}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+          >
+            <Plus className="w-5 h-5" />
+            Create Job
+          </button>
+        </div>
+      </div>
+
+
+
+      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8 relative">
+        {/* ===== FILTERS ===== */}
+        <div
+          className={`lg:static absolute z-20 bg-white lg:bg-transparent border lg:border-none shadow-lg lg:shadow-none p-5 rounded-lg lg:p-0 transition-all duration-300 ${mobileFilters
+            ? "top-20 left-0 right-0 mx-4 opacity-100"
+            : "hidden lg:block opacity-0 lg:opacity-100"
+            }`}
+        >
+          <div className="flex items-center justify-between mb-4 lg:hidden">
+            <h2 className="font-semibold text-lg">Filters</h2>
+            <button
+              onClick={() => setMobileFilters(false)}
+              className="text-sm text-blue-600"
+            >
+              Close ✕
+            </button>
+          </div>
+
+          <h2 className="text-lg font-semibold mb-4 hidden lg:block">Filters</h2>
+
+          {/* Specialization */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Specialization
+            </label>
+            <select
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.specialization}
+              onChange={(e) =>
+                setFilters({ ...filters, specialization: e.target.value })
+              }
+            >
+              <option value="">All</option>
+              {SPECIALIZATIONS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Location */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location
+            </label>
+            <select
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.location}
+              onChange={(e) =>
+                setFilters({ ...filters, location: e.target.value })
+              }
+            >
+              <option value="">All</option>
+              {LOCATIONS.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Salary */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Minimum Salary (in LPA)
+            </label>
+            <input
+              type="number"
+              placeholder="e.g. 5"
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.salary}
+              onChange={(e) =>
+                setFilters({ ...filters, salary: e.target.value })
+              }
+            />
+          </div>
+
+          {/* Experience */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Minimum Years of Experience
+            </label>
+            <input
+              type="number"
+              placeholder="e.g. 3"
+              className="w-full border rounded-lg px-3 py-2 text-gray-700"
+              value={filters.years}
+              onChange={(e) =>
+                setFilters({ ...filters, years: e.target.value })
+              }
+            />
           </div>
         </div>
 
+        {/* MOBILE FILTER BUTTON */}
+        <button
+          onClick={() => setMobileFilters(true)}
+          className="lg:hidden flex items-center gap-2 text-blue-600 font-semibold mb-6"
+        >
+          <Filter className="w-5 h-5" /> Filters
+        </button>
+
+
         {/* ===== JOB CARDS ===== */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          {jobs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                <Briefcase className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">
-                No jobs posted yet
-              </h3>
-              <p className="text-sm text-gray-500 mb-6">
-                Create your first job posting to start receiving applications
-              </p>
-              <button
-                onClick={() => router.push("/dashboard/employee/jobs/create")}
-                className="px-5 py-2.5 bg-[#8F59ED] hover:bg-[#7c4dd4] text-white rounded-lg text-sm font-medium transition-colors"
-              >
-                Create Job
-              </button>
+        <div className="lg:col-span-3">
+          {/* ===== SEARCH BAR ===== */}
+          <div className="mb-8 w-full">
+            <div className="relative w-full sm:max-w-md lg:max-w-lg">
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search by title, specialization, or location..."
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                onChange={(e) => {
+                  const value = e.target.value.toLowerCase();
+                  const filtered = jobs.filter(
+                    (j) =>
+                      j.title?.toLowerCase().includes(value) ||
+                      j.specialization?.toLowerCase().includes(value) ||
+                      j.location?.city?.toLowerCase().includes(value) ||
+                      j.location?.state?.toLowerCase().includes(value)
+                  );
+                  setFilteredJobs(filtered);
+                }}
+              />
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-20 text-gray-500">
+              Loading jobs...
+            </div>
+          ) : filteredJobs.length === 0 ? (
+            <div className="text-center py-20 text-gray-500">
+              No matching jobs found
             </div>
           ) : (
-            <>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {currentJobs.map((job, index) => {
-                  const headerColor = headerColors[index % headerColors.length];
-                  return (
-                    <div
-                      key={job._id}
-                      className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 p-6 relative"
-                    >
-                      <div className="relative mb-5">
-                        <div
-                          className="w-full h-20 rounded-lg"
-                          style={{ backgroundColor: headerColor }}
-                        ></div>
-                        <div className="absolute -bottom-6 left-6">
-                          <div className="w-14 h-14 rounded-full bg-white p-1 shadow-md flex items-center justify-center">
-                            <div
-                              className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
-                              style={{ backgroundColor: headerColor }}
-                            >
-                              <img
-                                src="/card.png"
-                                alt="Hospital Logo"
-                                className="w-2/4 h-2/4 object-contain"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-8 mb-3">
-                        <h3 className="text-xl font-bold leading-tight mb-1">
-                          {job.title || "Untitled"}
-                        </h3>
-                        <p className="text-sm text-gray-500 font-medium">
-                          Hospital
-                        </p>
-                      </div>
-
-                      <div className="space-y-2 mb-3 text-sm text-gray-600">
-                        <div>
-                          📍 {job.location?.city || "—"},{" "}
-                          {job.location?.state || ""}
-                        </div>
-                        <div>
-                          💼 {job.experienceRequired?.minYears || "—"}–
-                          {job.experienceRequired?.maxYears || "—"} yrs
-                        </div>
-                        <div>
-                          💰 ₹{formatSalary(job.salary?.min)}–
-                          ₹{formatSalary(job.salary?.max)}{" "}
-                          {job.salary?.currency}
-                        </div>
-                      </div>
-
-                      <div className="mb-5 pb-5 border-b border-gray-100">
-                        <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md">
-                          {job.specialization || "Not specified"}
+            <div className="space-y-6">
+              {currentJobs.map((job) => (
+                <div
+                  key={job._id}
+                  className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6"
+                >
+                  <div className="flex flex-col sm:flex-row justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {job.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {job.organizationName || "Healthcare Facility"}
+                      </p>
+                      <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
+                        <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
+                          <MapPin className="w-4 h-4 text-blue-500" />
+                          {job.location?.city}, {job.location?.state}
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full">
+                          <Calendar className="w-4 h-4 text-green-600" />
+                          {job.experienceRequired?.minYears}–{job.experienceRequired?.maxYears} yrs
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
+                          <DollarSign className="w-4 h-4 text-yellow-600" />
+                          {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
                         </span>
                       </div>
-
-                      <button
-                        onClick={() =>
-                          router.push(
-                            `/dashboard/employee/jobs/${job._id}/applications`
-                          )
-                        }
-                        className="w-full mb-2 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:opacity-90"
-                        style={{ backgroundColor: headerColor }}
-                      >
-                        View Applications
-                      </button>
-
-                      <div className="grid grid-cols-3 gap-2">
-                        <button
-                          onClick={() =>
-                            router.push(
-                              `/dashboard/employee/jobs/view/${job._id}`
-                            )
-                          }
-                          className="border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-[#CBA2FF] hover:text-[#1A0152] py-2.5"
-                        >
-                          <Eye className="w-5 h-5 mx-auto" /> View
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            router.push(
-                              `/dashboard/employee/jobs/edit/${job._id}`
-                            )
-                          }
-                          className="border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-[#CBA2FF] hover:text-[#1A0152] py-2.5"
-                        >
-                          <Pencil className="w-5 h-5 mx-auto" /> Edit
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(job._id)}
-                          className="border border-red-200 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-300 py-2.5"
-                        >
-                          <Trash2 className="w-5 h-5 mx-auto" /> Delete
-                        </button>
-                      </div>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* 🔹 PAGINATION */}
-              {totalPages > 1 && (
-                <div className="flex flex-wrap items-center justify-center gap-3 mt-10">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((p) => p - 1)}
-                   className="px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  <div className="flex flex-wrap gap-2">
-                    {Array.from({ length: totalPages }).map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`px-3 py-2 text-sm rounded-md ${currentPage === i + 1
-                        ? "bg-[#8F59ED] text-white font-semibold"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
+                    <button
+                      onClick={() =>
+                        router.push(`/dashboard/employee/jobs/view/${job._id}`)
+                      }
+                      className="mt-4 sm:mt-0 h-fit px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+                    >
+                      View Details
+                    </button>
                   </div>
 
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                    className="px-4 py-2 bg-gray-100 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                      {job.specialization || "General"}
+                    </span>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
+                      Full-time
+                    </span>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
+                      On-site
+                    </span>
+                  </div>
+
+                  <div className="mt-5 flex justify-end items-center gap-3">
+                    {/* View Applications */}
+                    <button
+                      onClick={() =>
+                        router.push(`/dashboard/employee/jobs/${job._id}/applications`)
+                      }
+                      title="View Applications"
+                      className="p-2.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                    >
+                      <Users className="w-5 h-5" />
+                    </button>
+
+                    {/* Edit */}
+                    <button
+                      onClick={() =>
+                        router.push(`/dashboard/employee/jobs/edit/${job._id}`)
+                      }
+                      title="Edit Job"
+                      className="p-2.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-[#1A0152] transition"
+                    >
+                      <Pencil className="w-5 h-5" />
+                    </button>
+
+                    {/* Delete */}
+                    <button
+                      onClick={() => handleDelete(job._id)}
+                      title="Delete Job"
+                      className="p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
-              )}
-            </>
+              ))}
+
+            </div>
+          )}
+
+          {/* PAGINATION */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="p-2 rounded-md bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1.5 rounded-md text-sm ${currentPage === i + 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="p-2 rounded-md bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }
