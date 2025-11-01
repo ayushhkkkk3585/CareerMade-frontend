@@ -1,18 +1,50 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Briefcase, ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { 
+  Briefcase, 
+  ArrowLeft, 
+  MapPin, 
+  DollarSign, 
+  Home, 
+  Clock, 
+  Tag, 
+  Layers, 
+  FileText,
+  Zap
+} from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
+
+const FormSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
+  <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-100 shadow-inner">
+    <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
+      {icon}
+      {title}
+    </h2>
+    <div className="space-y-6">
+      {children}
+    </div>
+  </div>
+);
+
+const FormField = ({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) => (
+  <div className={className}>
+    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+      {label}
+    </label>
+    {children}
+  </div>
+);
 
 export default function EditJobPage() {
   const router = useRouter();
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [formData, setFormData] = useState<any>({
+  const [formData, setFormData] = useState({
     title: "",
     specialization: "",
     description: "",
@@ -122,71 +154,103 @@ export default function EditJobPage() {
     }
   };
 
-  if (loading) return <p className="p-6">Loading job details...</p>;
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.title.trim()) newErrors.title = 'Job title is required';
+    if (!formData.description.trim()) newErrors.description = 'Job description is required';
+    if (formData.experienceRequired.minYears && isNaN(Number(formData.experienceRequired.minYears))) 
+      newErrors.minExp = 'Must be a valid number';
+    if (formData.experienceRequired.maxYears && isNaN(Number(formData.experienceRequired.maxYears)))
+      newErrors.maxExp = 'Must be a valid number';
+    if (formData.salary.min && isNaN(Number(formData.salary.min)))
+      newErrors.minSalary = 'Must be a valid number';
+    if (formData.salary.max && isNaN(Number(formData.salary.max)))
+      newErrors.maxSalary = 'Must be a valid number';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen text-gray-600 text-lg bg-gray-50">
+      <Zap className="w-6 h-6 animate-spin mr-2 text-blue-500" />
+      Loading job details...
+    </div>
+  );
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-white mx-4">
-        {/* Header */}
-        <div className="border-b border-gray-100">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <Link href="/dashboard/employee/jobs">
-              <button className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors">
-                <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm font-medium">Back</span>
-              </button>
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#8F59ED] rounded-lg flex items-center justify-center">
-                <Briefcase className="text-white w-5 h-5" />
+      <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 flex justify-center">
+        <div className="bg-white w-full max-w-4xl rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          {/* Header */}
+          <div className="border-b border-gray-100 px-6 py-6 sm:px-8">
+            <button 
+              onClick={() => router.push('/dashboard/employee/jobs')}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm font-medium">Back to Jobs</span>
+            </button>
+            
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Briefcase className="text-white w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  Edit Job
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Edit Job Posting
                 </h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Update the details below to modify your job posting
+                <p className="text-sm text-gray-500 mt-1">
+                  Update the job details below. All fields are required unless marked optional.
                 </p>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Form */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border border-gray-200 rounded-lg shadow-sm my-5">
-          <div className="space-y-8">
-            {/* Basic Info */}
-            <section>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Basic Information
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Job Title"
-                  className="px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8F59ED]"
-                />
-                <input
-                  name="specialization"
-                  value={formData.specialization}
-                  onChange={handleChange}
-                  placeholder="Specialization"
-                  className="px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8F59ED]"
-                />
+          {/* Form */}
+          <div className="p-6 sm:p-8">
+            <FormSection title="Job Information" icon={<Layers className="w-5 h-5 text-blue-600" />}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField label="Job Title *">
+                  <input
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2.5 border ${
+                      errors.title ? 'border-red-300' : 'border-gray-300'
+                    } rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    placeholder="e.g. Doctor"
+                  />
+                  {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+                </FormField>
+
+                <FormField label="Specialization *">
+                  <input
+                    name="specialization"
+                    value={formData.specialization}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g. Nursing"
+                  />
+                </FormField>
               </div>
 
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={4}
-                className="w-full mt-4 px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8F59ED]"
-                placeholder="Job Description"
-              />
-            </section>
+              <FormField label="Job Description *">
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={5}
+                  className={`w-full px-4 py-2.5 border ${
+                    errors.description ? 'border-red-300' : 'border-gray-300'
+                  } rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  placeholder="Detailed job description, responsibilities, and requirements..."
+                />
+                {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+              </FormField>
+            </FormSection>
 
             {/* Job Type & Shift */}
             <section>
@@ -200,12 +264,12 @@ export default function EditJobPage() {
                   onChange={handleChange}
                   className="px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#8F59ED]"
                 >
-                  <option value="Full-time">Full-time</option>
-                  <option value="Part-time">Part-time</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Freelance">Freelance</option>
-                  <option value="Internship">Internship</option>
-                  <option value="Volunteer">Volunteer</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Volunteer">Volunteer</option>
                 </select>
 
                 <select
@@ -214,10 +278,10 @@ export default function EditJobPage() {
                   onChange={handleChange}
                   className="px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#8F59ED]"
                 >
-                  <option value="Day">Day</option>
-                  <option value="Night">Night</option>
-                  <option value="Rotating">Rotating</option>
-                  <option value="Flexible">Flexible</option>
+                  <option value="Day">Day Shift</option>
+                    <option value="Night">Night Shift</option>
+                    <option value="Rotating">Rotational Shift</option>
+                    <option value="Flexible">Flexible Hours</option>
                 </select>
               </div>
             </section>
