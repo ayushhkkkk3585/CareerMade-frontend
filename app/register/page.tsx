@@ -152,7 +152,7 @@ const Register = () => {
                         <Stethoscope className="w-6 h-6 text-white" />
                     </div>
                     <span className="text-3xl font-bold text-gray-900 tracking-tight">
-                        DocJob
+                        CareerMade
                     </span>
                 </motion.div>
 
@@ -161,7 +161,7 @@ const Register = () => {
                     Create Your Account
                 </h2>
                 <p className="text-gray-600 mb-8 text-center max-w-sm leading-relaxed">
-                    Join the DocJob community and start connecting with the best doctors
+                    Join the CareerMade community and start connecting with the best doctors
                     and employers.
                 </p>
 

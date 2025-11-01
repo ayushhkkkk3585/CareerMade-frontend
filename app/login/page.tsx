@@ -100,7 +100,7 @@ const Login = () => {
           <div className="bg-[#8F59ED] p-2 rounded-lg shadow-md">
             <Stethoscope className="w-6 h-6 text-white" />
           </div>
-          <span className="text-2xl font-bold text-gray-900">DocJob</span>
+          <span className="text-2xl font-bold text-gray-900">CareerMade</span>
         </motion.div>
 
         {/* Heading */}

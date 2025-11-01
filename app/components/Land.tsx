@@ -330,11 +330,11 @@ const Land = () => {
                 <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <span className="text-lg sm:text-xl font-bold text-white">
-                DocJob
+                CareerMade
               </span>
             </div>
             <p className="text-xs sm:text-sm text-gray-400">
-              © 2025 DocJob. All rights reserved.
+              © 2025 CareerMade. All rights reserved.
             </p>
           </div>
         </div>
