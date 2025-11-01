@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
-import { Bookmark } from "lucide-react";
+import { ArrowLeft, Bookmark } from "lucide-react";
+
 
 export default function SavedJobs() {
   const [savedJobs, setSavedJobs] = useState([]);
@@ -29,7 +30,7 @@ export default function SavedJobs() {
   if (!savedJobs.length)
     return (
       <>
-        <Navbar />
+
         <div className="p-8 text-center">
           <Bookmark className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 text-lg">You haven’t saved any jobs yet.</p>
@@ -43,6 +44,17 @@ export default function SavedJobs() {
   return (
     <>
       <Navbar />
+      <div className="flex justify-center mt-10">
+        <div className="w-full max-w-6xl px-6">
+          <button
+            onClick={() => router.push("/dashboard/jobseeker")}
+            className="flex items-center text-[#8F59ED] hover:text-[#7c4dd4] transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back
+          </button>
+        </div>
+      </div>
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">

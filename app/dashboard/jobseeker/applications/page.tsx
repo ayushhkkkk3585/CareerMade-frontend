@@ -2,10 +2,12 @@
 import Navbar from "@/app/components/Navbar";
 import { useEffect, useState } from "react";
 import { Briefcase } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function MyApplications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -42,6 +44,34 @@ export default function MyApplications() {
                 <p className="text-sm text-gray-200 mt-1">
                   Track your submitted job applications and their current status
                 </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => router.push("/dashboard/jobseeker")}
+                  className="px-5 py-2.5 bg-[#CBA2FF] hover:bg-[#B482FF] text-[#1A0152] rounded-lg text-sm font-semibold transition-all shadow-md flex items-center justify-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  Back to Dashboard
+                </button>
+                {/* <button
+                  onClick={() => router.push("/dashboard/jobseeker/applications")}
+                  className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-all shadow-md"
+                >
+                  My Applications
+                </button> */}
               </div>
             </div>
           </div>
@@ -110,10 +140,10 @@ export default function MyApplications() {
                         <td className="px-6 py-4 text-sm">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-medium ${app.status === "Accepted"
-                                ? "bg-green-50 text-green-700"
-                                : app.status === "Rejected"
-                                  ? "bg-red-50 text-red-700"
-                                  : "bg-yellow-50 text-yellow-700"
+                              ? "bg-green-50 text-green-700"
+                              : app.status === "Rejected"
+                                ? "bg-red-50 text-red-700"
+                                : "bg-yellow-50 text-yellow-700"
                               }`}
                           >
                             {app.status || "Pending"}

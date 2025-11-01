@@ -9,10 +9,13 @@ import {
   Loader2,
   File,
   Save,
+  ArrowLeft,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
+import { useRouter } from "next/navigation";
 
 export default function JobSeekerDashboard() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [resume, setResume] = useState<any>(null);
@@ -147,6 +150,18 @@ export default function JobSeekerDashboard() {
   return (
     <>
       <Navbar />
+      <div className="flex justify-center mt-10">
+        <div className="w-full max-w-6xl px-6">
+          <button
+            onClick={() => router.push("/dashboard/jobseeker")}
+            className="flex items-center text-[#8F59ED] hover:text-[#7c4dd4] transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back
+          </button>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-8 my-10 border border-gray-100">
         {/* HEADER */}
         <div className="flex items-center gap-3 border-b pb-4 mb-6">
