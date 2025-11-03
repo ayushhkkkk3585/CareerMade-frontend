@@ -261,15 +261,27 @@ export default function MyApplications() {
 
                         <td className="px-6 py-4 text-sm">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${app.status === "Accepted"
-                              ? "bg-green-50 text-green-700"
-                              : app.status === "Rejected"
+                            className={`px-3 py-1 rounded-full text-xs font-semibold
+                              ${app.status === "Applied"
+                                ? "bg-blue-50 text-blue-700"
+                                : app.status === "Under Review"
+                                ? "bg-yellow-50 text-yellow-700"
+                                : app.status === "Interview"
+                                ? "bg-purple-50 text-purple-700"
+                                : app.status === "Offered"
+                                ? "bg-green-50 text-green-700"
+                                : app.status === "Rejected"
                                 ? "bg-red-50 text-red-700"
-                                : "bg-yellow-50 text-yellow-700"
+                                : app.status === "Withdrawn"
+                                ? "bg-gray-100 text-gray-700"
+                                : app.status === "Hired"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-slate-100 text-slate-700"
                               }`}
                           >
                             {app.status || "Pending"}
                           </span>
+
                         </td>
                       </tr>
                     );
