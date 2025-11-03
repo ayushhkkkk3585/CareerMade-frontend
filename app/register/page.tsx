@@ -267,7 +267,7 @@ const Register = () => {
                         whileTap={{ scale: 0.97 }}
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-[#155DFC] to-[#00B8DB] text-white py-3 rounded-full font-semibold transition-all duration-300 shadow-md"
+                        className="w-full bg-linear-to-r from-[#155DFC] to-[#00B8DB] text-white py-3 rounded-full font-semibold transition-all duration-300 shadow-md"
                     >
                         {loading ? "Registering..." : "Register"}
                     </motion.button>
