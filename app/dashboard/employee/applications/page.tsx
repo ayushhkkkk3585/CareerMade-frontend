@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import GradientLoader from "@/app/components/GradientLoader";
+import toast from "react-hot-toast";
 
 export default function EmployerApplicationsPage() {
   const [applications, setApplications] = useState<any[]>([]);
@@ -24,7 +25,7 @@ export default function EmployerApplicationsPage() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch applications:", err);
+        toast.error("Failed to fetch applications:", err);
         setLoading(false);
       });
   }, []);

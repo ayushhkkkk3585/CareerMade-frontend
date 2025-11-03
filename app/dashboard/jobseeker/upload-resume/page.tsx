@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function UploadResume() {
   const [resume, setResume] = useState<any>(null);
@@ -35,9 +36,9 @@ export default function UploadResume() {
 
     if (res.ok) {
       setResume(data.data.resume);
-      alert("Resume uploaded!");
+      toast.success("Resume uploaded!");
     } else {
-      alert(data.message || "Upload failed");
+      toast.error(data.message || "Upload failed");
     }
   };
 
@@ -51,7 +52,7 @@ export default function UploadResume() {
     setLoading(false);
     if (res.ok) {
       setResume(null);
-      alert("Resume deleted");
+      toast.success("Resume deleted");
     }
   };
 

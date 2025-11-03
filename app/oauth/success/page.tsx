@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 
 function OAuthHandler() {
   const router = useRouter();
@@ -31,6 +32,7 @@ function OAuthHandler() {
         router.replace("/dashboard");
       }
     } catch (e) {
+      toast.error("Failed to process OAuth response.");
       setError("Failed to process OAuth response.");
       setProcessing(false);
     }

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
+import toast from "react-hot-toast";
 
 export default function EmployerProfileCreatePage() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function EmployerProfileCreatePage() {
     e.preventDefault();
     setLoading(true);
     const token = localStorage.getItem("accessToken");
-    if (!token) return alert("Please log in again");
+    if (!token) return toast.error("Please log in again");
 
     const payload = {
       organizationName: formData.organizationName,
@@ -116,14 +117,14 @@ export default function EmployerProfileCreatePage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(isEditing ? "Profile updated successfully!" : "Profile created successfully!");
+        toast.success(isEditing ? "Profile updated successfully!" : "Profile created successfully!");
         router.push("/dashboard/employee/profile");
       } else {
-        alert(data.message || "Failed to save profile");
+        toast.error(data.message || "Failed to save profile");
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong while saving the profile.");
+      toast.error("Something went wrong while saving the profile.");
     } finally {
       setLoading(false);
     }
