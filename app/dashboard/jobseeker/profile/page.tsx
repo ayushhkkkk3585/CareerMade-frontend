@@ -21,6 +21,7 @@ import {
   Trophy,
 } from "lucide-react";
 import GradientLoader from "@/app/components/GradientLoader";
+import { toast } from "react-hot-toast";
 
 export default function JobSeekerDashboard() {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function JobSeekerDashboard() {
         setResume(seeker.resume || null);
         setCoverLetter(seeker.coverLetter || null);
       })
-      .catch(() => console.error("Failed to fetch profile"))
+      .catch(() => toast.error("Failed to fetch profile"))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -83,9 +84,9 @@ export default function JobSeekerDashboard() {
         if (type === "resume") setResume(data.data.resume);
         else setCoverLetter(data.data.coverLetter);
         alert(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
-      } else alert(data.message || "Upload failed");
+      } else toast.error(data.message || "Upload failed");
     } catch (err) {
-      alert("Error uploading file");
+      toast.error("Error uploading file");
     }
   };
 
@@ -105,9 +106,9 @@ export default function JobSeekerDashboard() {
         if (type === "resume") setResume(null);
         else setCoverLetter(null);
         alert(`${type} deleted!`);
-      } else alert("Failed to delete");
+      } else toast.success("Failed to delete");
     } catch (err) {
-      alert("Error deleting file");
+      toast.error("Error deleting file");
     }
   };
 

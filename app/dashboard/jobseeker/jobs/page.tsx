@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import { MapPin, Briefcase, Bookmark } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 type Job = {
   _id: string;

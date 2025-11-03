@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Stethoscope, User, Mail, Lock, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Register = () => {
     const router = useRouter();
@@ -102,9 +103,11 @@ const Register = () => {
                     setMessage(errs.join("\n"));
                 } else {
                     setMessage(data.message || "Registration failed.");
+                    // toast.error(data.message || "Registration failed.");
                 }
             } else {
                 setMessage("✅ " + data.message);
+                // toast.success("✅ " + data.message);
 
 
                 // ✅ Store tokens & user info in localStorage
@@ -113,7 +116,7 @@ const Register = () => {
                 localStorage.setItem("user", JSON.stringify(data.data.user));
 
                 console.log("Registration success:", data);
-                alert("Registration successful!");
+                toast.error("Registration successful!");
                 router.push("/login");
                 // localStorage.setItem("user data",User)  
 
@@ -128,6 +131,7 @@ const Register = () => {
             }
         } catch (err) {
             console.error("Error:", err);
+            toast.error("Server error. Please try again later.");
             setMessage("Server error. Please try again later.");
         } finally {
             setLoading(false);

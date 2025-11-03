@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Stethoscope, Mail, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const router = useRouter();
@@ -63,6 +64,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
+      toast.error("Something went wrong. Please try again.");
       setErrorMsg("Something went wrong. Please try again.");
       setLoading(false);
     }

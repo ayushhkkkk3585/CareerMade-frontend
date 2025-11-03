@@ -16,6 +16,7 @@ import {
 import { useRouter, useParams } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import GradientLoader from "@/app/components/GradientLoader";
+import toast from "react-hot-toast";
 
 const FormSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
   <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-100 shadow-inner">
@@ -113,7 +114,7 @@ export default function EditJobPage() {
 
   const handleSubmit = async () => {
     const token = localStorage.getItem("accessToken");
-    if (!token) return alert("Please log in again.");
+    if (!token) return toast.error("Please log in again.");
 
     // Clean empty strings
     const payload = {
@@ -148,8 +149,8 @@ export default function EditJobPage() {
       alert("✅ Job updated successfully!");
       router.push("/dashboard/employee/jobs");
     } catch (err) {
-      console.error("Update job error:", err);
-      alert("Failed to update job");
+      // console.error("Update job error:", err);
+      toast.error("Failed to update job");
     } finally {
       setUpdating(false);
     }

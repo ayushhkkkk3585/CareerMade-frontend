@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function UploadCoverLetter() {
   const [coverLetter, setCoverLetter] = useState<any>(null);
@@ -35,9 +36,9 @@ export default function UploadCoverLetter() {
 
     if (res.ok) {
       setCoverLetter(data.data.coverLetter);
-      alert("Cover letter uploaded!");
+      toast.success("Cover letter uploaded!");
     } else {
-      alert(data.message || "Upload failed");
+      toast.error(data.message || "Upload failed");
     }
   };
 
@@ -51,7 +52,7 @@ export default function UploadCoverLetter() {
     setLoading(false);
     if (res.ok) {
       setCoverLetter(null);
-      alert("Cover letter deleted");
+      toast.success("Cover letter deleted");
     }
   };
 

@@ -16,6 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import GradientLoader from "@/app/components/GradientLoader";
+import toast from "react-hot-toast";
 
 const FormSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
   <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-100 shadow-inner">
@@ -154,7 +155,7 @@ export default function CreateJobPage() {
     
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      alert("Please log in again to continue.");
+      toast.error("Please log in again to continue.");
       return;
     }
 

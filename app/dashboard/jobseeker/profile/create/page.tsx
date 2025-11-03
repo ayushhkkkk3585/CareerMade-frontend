@@ -17,6 +17,7 @@ import {
   Phone,
 } from "lucide-react";
 import GradientLoader from "@/app/components/GradientLoader";
+import { toast } from "react-hot-toast";
 
 export default function JobSeekerDashboard() {
   const router = useRouter();
@@ -112,7 +113,7 @@ export default function JobSeekerDashboard() {
         setResume(seeker.resume || null);
         setCoverLetter(seeker.coverLetter || null);
       })
-      .catch(() => console.error("Failed to fetch profile"))
+      .catch(() => toast.error("Failed to fetch profile"))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -142,10 +143,10 @@ export default function JobSeekerDashboard() {
         }
       );
       const data = await res.json();
-      if (res.ok) alert("Profile updated!");
-      else alert(data.message || "Update failed");
+      if (res.ok) toast.error("Profile updated!");
+      else toast.error(data.message || "Update failed");
     } catch {
-      alert("Error updating profile");
+      toast.error("Error updating profile");
     } finally {
       setSaving(false);
     }
@@ -173,8 +174,8 @@ export default function JobSeekerDashboard() {
     if (res.ok) {
       if (type === "resume") setResume(data.data.resume);
       else setCoverLetter(data.data.coverLetter);
-      alert(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
-    } else alert(data.message || "Upload failed");
+      toast.error(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
+    } else toast.error(data.message || "Upload failed");
   };
 
   // File delete
@@ -191,8 +192,8 @@ export default function JobSeekerDashboard() {
     if (res.ok) {
       if (type === "resume") setResume(null);
       else setCoverLetter(null);
-      alert(`${type} deleted!`);
-    } else alert("Failed to delete");
+      toast.error(`${type} deleted!`);
+    } else toast.error("Failed to delete");
   };
 
   // ---------------- LOADING STATES ----------------
