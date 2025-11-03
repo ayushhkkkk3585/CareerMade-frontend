@@ -498,7 +498,7 @@ export default function JobListing() {
           )}
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

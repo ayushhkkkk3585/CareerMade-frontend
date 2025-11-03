@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
@@ -12,7 +11,14 @@ import {
   Upload,
   Trash2,
   Loader2,
-  Save,
+  Mail,
+  Phone,
+  Award,
+  BookOpen,
+  Briefcase,
+  Code,
+  Book,
+  Trophy,
 } from "lucide-react";
 
 export default function JobSeekerDashboard() {
@@ -21,67 +27,7 @@ export default function JobSeekerDashboard() {
   const [loading, setLoading] = useState(true);
   const [resume, setResume] = useState<any>(null);
   const [coverLetter, setCoverLetter] = useState<any>(null);
-  const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
-
-  // helper UI state & nested update helpers (same approach as create page)
-  const specializationsOptions = [
-    'General Medicine','Cardiology','Neurology','Orthopedics','Pediatrics','Gynecology','Dermatology','Psychiatry','Radiology','Anesthesiology','Emergency Medicine','Internal Medicine','Surgery','Oncology','Pathology','Ophthalmology','ENT','Urology','Gastroenterology','Pulmonology','Endocrinology','Rheumatology','Nephrology','Hematology','Infectious Disease','Physical Therapy','Occupational Therapy','Speech Therapy','Nursing','Pharmacy','Medical Technology','Other'
-  ];
-
-  const updateProfileAtPath = (path: string, value: any) => {
-    setProfile((prev: any) => {
-      const base = prev ? JSON.parse(JSON.stringify(prev)) : {};
-      const parts = path.split('.');
-      let cur: any = base;
-      for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-        const isIndex = /^\d+$/.test(part);
-        if (i === parts.length - 1) {
-          if (isIndex) {
-            const idx = parseInt(part, 10);
-            if (!Array.isArray(cur)) cur = [];
-            cur[idx] = value;
-          } else {
-            cur[part] = value;
-          }
-        } else {
-          if (isIndex) {
-            const idx = parseInt(part, 10);
-            if (!Array.isArray(cur)) cur = [];
-            if (!cur[idx]) cur[idx] = {};
-            cur = cur[idx];
-          } else {
-            if (!cur[part]) {
-              const next = parts[i + 1];
-              cur[part] = /^\d+$/.test(next) ? [] : {};
-            }
-            cur = cur[part];
-          }
-        }
-      }
-      return base;
-    });
-  };
-
-  const toggleArrayValue = (path: string, value: string) => {
-    setProfile((prev: any) => {
-      const base = prev ? JSON.parse(JSON.stringify(prev)) : {};
-      const parts = path.split('.');
-      let arrParent: any = base;
-      for (let i = 0; i < parts.length - 1; i++) {
-        const p = parts[i];
-        if (!arrParent[p]) arrParent[p] = {};
-        arrParent = arrParent[p];
-      }
-      const key = parts[parts.length - 1];
-      if (!Array.isArray(arrParent[key])) arrParent[key] = [];
-      const idx = arrParent[key].indexOf(value);
-      if (idx === -1) arrParent[key].push(value);
-      else arrParent[key].splice(idx, 1);
-      return base;
-    });
-  };
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -103,7 +49,6 @@ export default function JobSeekerDashboard() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         const seeker = data.data?.jobSeeker || data;
         setProfile(seeker);
         setResume(seeker.resume || null);
@@ -112,41 +57,6 @@ export default function JobSeekerDashboard() {
       .catch(() => console.error("Failed to fetch profile"))
       .finally(() => setLoading(false));
   }, [token]);
-
-  // Handle input change
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setProfile((prev: any) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Save profile
-  const handleSave = async (e: any) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/profile`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(profile),
-        }
-      );
-      const data = await res.json();
-      if (res.ok) alert("Profile updated!");
-      else alert(data.message || "Update failed");
-    } catch {
-      alert("Error updating profile");
-    } finally {
-      setSaving(false);
-    }
-  };
 
   // File upload
   const handleFileUpload = async (e: any, type: "resume" | "coverLetter") => {
@@ -160,18 +70,22 @@ export default function JobSeekerDashboard() {
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`;
 
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      if (type === "resume") setResume(data.data.resume);
-      else setCoverLetter(data.data.coverLetter);
-      alert(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
-    } else alert(data.message || "Upload failed");
+      const data = await res.json();
+      if (res.ok) {
+        if (type === "resume") setResume(data.data.resume);
+        else setCoverLetter(data.data.coverLetter);
+        alert(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
+      } else alert(data.message || "Upload failed");
+    } catch (err) {
+      alert("Error uploading file");
+    }
   };
 
   // File delete
@@ -181,22 +95,25 @@ export default function JobSeekerDashboard() {
       type === "resume"
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/resume`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/jobseeker/cover-letter`;
-    const res = await fetch(endpoint, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      if (type === "resume") setResume(null);
-      else setCoverLetter(null);
-      alert(`${type} deleted!`);
-    } else alert("Failed to delete");
+    try {
+      const res = await fetch(endpoint, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        if (type === "resume") setResume(null);
+        else setCoverLetter(null);
+        alert(`${type} deleted!`);
+      } else alert("Failed to delete");
+    } catch (err) {
+      alert("Error deleting file");
+    }
   };
 
-  // ---------------- LOADING STATES ----------------
   if (loading)
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
-        <Loader2 className="animate-spin w-8 h-8 text-indigo-600" />
+        <Loader2 className="animate-spin w-8 h-8 text-[#007BFF]" />
       </div>
     );
 
@@ -213,7 +130,6 @@ export default function JobSeekerDashboard() {
       </div>
     );
 
-  // ---------------- UI ----------------
   return (
     <>
       <Navbar />
@@ -232,18 +148,27 @@ export default function JobSeekerDashboard() {
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Job Seeker{" "}
                 <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
-                  Dashboard
+                  Profile
                 </span>
               </h1>
               <p className="text-base sm:text-lg text-blue-100 mt-3">
-                Manage your profile, resume, and cover letter to apply for jobs seamlessly.
+                View and manage your professional profile
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
               <button
-                onClick={() => router.push("/dashboard/jobseeker")}
+                onClick={() =>
+                  router.push("/dashboard/jobseeker/profile/create")
+                }
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+              >
+                <Edit className="w-5 h-5" />
+                Edit Profile
+              </button>
+              <button
+                onClick={() => router.push("/dashboard/jobseeker")}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Back
@@ -257,365 +182,352 @@ export default function JobSeekerDashboard() {
       <div className="min-h-screen bg-gray-50 py-10 px-4">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* ===== LEFT COLUMN ===== */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col items-center text-center">
-            {/* Profile Icon */}
-            <div className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-              <User2 className="w-12 h-12 text-gray-400" />
-            </div>
+          <div className="space-y-6">
+            {/* Profile Card */}
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col items-center text-center">
+              <div className="w-28 h-28 rounded-full bg-linear-to-r from-[#007BFF] to-[#00CFFF] flex items-center justify-center mb-4">
+                <User2 className="w-12 h-12 text-white" />
+              </div>
 
-            <h2 className="text-lg font-semibold text-gray-900">
-              {user?.firstName} {user?.lastName}
-            </h2>
-            <p className="text-sm text-gray-500 mb-2">{user?.email}</p>
-            <p className="text-sm text-gray-500 mb-2">{user?.phone}</p>
-
-            <div className="w-full border-t border-gray-200 my-4"></div>
-
-            {/* ===== Edit Profile Button ===== */}
-            <button
-              onClick={() =>
-                router.push("/dashboard/jobseeker/profile/edit")
-              }
-              className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-lg text-sm font-medium shadow-md transition-all"
-            >
-              <Edit className="w-4 h-4" />
-              Edit Profile
-            </button>
-          </div>
-
-          {/* ===== RIGHT COLUMN ===== */}
-          <div className="md:col-span-2 bg-white rounded-2xl shadow-sm p-8 border border-gray-100 space-y-8">
-            {/* ===== PROFILE FORM ===== */}
-            <form onSubmit={handleSave} className="space-y-5">
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                Professional Information
+              <h2 className="text-xl font-bold text-gray-900">
+                {user?.firstName} {user?.lastName}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="text-sm text-gray-600">Title</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={profile.title || ""}
-                    onChange={(e) => updateProfileAtPath('title', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. Registered Nurse"
-                  />
-                </div>
+              <p className="text-sm text-[#007BFF] font-medium mt-1">
+                {profile?.title || "Healthcare Professional"}
+              </p>
 
-                {/* Specializations (multi) */}
-                <div>
-                  <label className="text-sm text-gray-600">Specializations</label>
-                  <div className="mt-2 max-h-40 overflow-auto border rounded p-2">
-                    {specializationsOptions.map((opt) => (
-                      <label key={opt} className="flex items-center gap-2 text-sm mb-1">
-                        <input
-                          type="checkbox"
-                          checked={Array.isArray(profile.specializations) ? profile.specializations.includes(opt) : false}
-                          onChange={() => toggleArrayValue('specializations', opt)}
-                          className="w-4 h-4"
-                        />
-                        <span>{opt}</span>
-                      </label>
-                    ))}
-                    {Array.isArray(profile.specializations) && profile.specializations.includes('Other') && (
-                      <input
-                        type="text"
-                        value={profile.specializationsOther || ''}
-                        onChange={(e) => updateProfileAtPath('specializationsOther', e.target.value)}
-                        className="mt-2 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                        placeholder="Please specify other specialization"
-                      />
-                    )}
-                  </div>
+              <div className="flex flex-col items-center gap-2 mt-4 w-full">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Mail className="w-4 h-4" />
+                  {user?.email}
                 </div>
-
-                <div>
-                  <label className="text-sm text-gray-600">Total Experience (years)</label>
-                  <input
-                    type="number"
-                    value={profile.experience?.totalYears ?? ''}
-                    onChange={(e) => updateProfileAtPath('experience.totalYears', e.target.value === '' ? undefined : Number(e.target.value))}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. 3"
-                    min={0}
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="text-sm text-gray-600">Bio</label>
-                  <textarea
-                    name="bio"
-                    value={profile.bio || ""}
-                    onChange={(e) => updateProfileAtPath('bio', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none min-h-[90px]"
-                    placeholder="Write something about yourself..."
-                  />
-                </div>
-
-                {/* Education (single entry) */}
-                <div>
-                  <label className="text-sm text-gray-600">Highest Degree</label>
-                  <input
-                    type="text"
-                    value={profile.education?.[0]?.degree || ''}
-                    onChange={(e) => updateProfileAtPath('education.0.degree', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. MBBS"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Field</label>
-                  <input
-                    type="text"
-                    value={profile.education?.[0]?.field || ''}
-                    onChange={(e) => updateProfileAtPath('education.0.field', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. Pediatrics"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Institution</label>
-                  <input
-                    type="text"
-                    value={profile.education?.[0]?.institution || ''}
-                    onChange={(e) => updateProfileAtPath('education.0.institution', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. ABC Medical College"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Year of Completion</label>
-                  <input
-                    type="number"
-                    value={profile.education?.[0]?.yearOfCompletion ?? ''}
-                    onChange={(e) => updateProfileAtPath('education.0.yearOfCompletion', e.target.value === '' ? undefined : Number(e.target.value))}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    min={1950}
-                    max={new Date().getFullYear() + 5}
-                  />
-                </div>
-
-                {/* Work Experience (single) */}
-                <div>
-                  <label className="text-sm text-gray-600">Recent Position</label>
-                  <input
-                    type="text"
-                    value={profile.workExperience?.[0]?.position || ''}
-                    onChange={(e) => updateProfileAtPath('workExperience.0.position', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. Charge Nurse"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Company / Hospital</label>
-                  <input
-                    type="text"
-                    value={profile.workExperience?.[0]?.company || ''}
-                    onChange={(e) => updateProfileAtPath('workExperience.0.company', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. City Hospital"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Location</label>
-                  <input
-                    type="text"
-                    value={profile.workExperience?.[0]?.location || ''}
-                    onChange={(e) => updateProfileAtPath('workExperience.0.location', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="City, State"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Start Date</label>
-                  <input
-                    type="date"
-                    value={profile.workExperience?.[0]?.startDate ? new Date(profile.workExperience[0].startDate).toISOString().slice(0,10) : ''}
-                    onChange={(e) => updateProfileAtPath('workExperience.0.startDate', e.target.value ? new Date(e.target.value) : undefined)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">End Date</label>
-                  <input
-                    type="date"
-                    value={profile.workExperience?.[0]?.endDate ? new Date(profile.workExperience[0].endDate).toISOString().slice(0,10) : ''}
-                    onChange={(e) => updateProfileAtPath('workExperience.0.endDate', e.target.value ? new Date(e.target.value) : undefined)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                  />
-                </div>
-
-                {/* Skills (comma separated) full width */}
-                <div className="sm:col-span-2">
-                  <label className="text-sm text-gray-600">Skills (comma separated)</label>
-                  <input
-                    type="text"
-                    value={(Array.isArray(profile.skills) ? profile.skills.map((s:any)=>s.name).join(', ') : '')}
-                    onChange={(e) => {
-                      const arr = e.target.value.split(',').map((s:any)=>s.trim()).filter(Boolean).map((n:string)=>({ name: n, level: 'Intermediate' }));
-                      updateProfileAtPath('skills', arr);
-                    }}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. IV cannulation, patient assessment, CPR"
-                  />
-                </div>
-
-                {/* Job Preferences: one location and job types */}
-                <div>
-                  <label className="text-sm text-gray-600">Preferred City</label>
-                  <input
-                    type="text"
-                    value={profile.jobPreferences?.preferredLocations?.[0]?.city || ''}
-                    onChange={(e) => updateProfileAtPath('jobPreferences.preferredLocations.0.city', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. Mumbai"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Preferred State</label>
-                  <input
-                    type="text"
-                    value={profile.jobPreferences?.preferredLocations?.[0]?.state || ''}
-                    onChange={(e) => updateProfileAtPath('jobPreferences.preferredLocations.0.state', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g. Maharashtra"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Preferred Country</label>
-                  <input
-                    type="text"
-                    value={profile.jobPreferences?.preferredLocations?.[0]?.country || 'India'}
-                    onChange={(e) => updateProfileAtPath('jobPreferences.preferredLocations.0.country', e.target.value)}
-                    className="mt-1 border rounded-lg w-full p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="text-sm text-gray-600">Preferred Job Types</label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {['Full-time','Part-time','Contract','Freelance','Internship','Volunteer'].map((jt)=> (
-                      <label key={jt} className="flex items-center gap-2 text-sm">
-                        <input type="checkbox" checked={profile.jobPreferences?.preferredJobTypes?.includes(jt)} onChange={()=>toggleArrayValue('jobPreferences.preferredJobTypes', jt)} className="w-4 h-4" />
-                        <span>{jt}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Privacy settings and profile completion */}
-                <div className="sm:col-span-2 border-t pt-4">
-                  <h3 className="text-sm font-medium text-gray-700">Privacy Settings</h3>
-                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label className="flex items-center gap-2"><input type="checkbox" checked={profile.privacySettings?.showContactInfo ?? true} onChange={(e)=>updateProfileAtPath('privacySettings.showContactInfo', e.target.checked)} className="w-4 h-4"/> Show contact info</label>
-                    <label className="flex items-center gap-2"><input type="checkbox" checked={profile.privacySettings?.showCurrentSalary ?? false} onChange={(e)=>updateProfileAtPath('privacySettings.showCurrentSalary', e.target.checked)} className="w-4 h-4"/> Show current salary</label>
-                    <label className="flex items-center gap-2"><input type="checkbox" checked={profile.privacySettings?.showProfileToEmployers ?? true} onChange={(e)=>updateProfileAtPath('privacySettings.showProfileToEmployers', e.target.checked)} className="w-4 h-4"/> Show profile to employers</label>
-                    <label className="flex items-center gap-2"><input type="checkbox" checked={profile.privacySettings?.allowDirectMessages ?? true} onChange={(e)=>updateProfileAtPath('privacySettings.allowDirectMessages', e.target.checked)} className="w-4 h-4"/> Allow direct messages</label>
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="text-sm text-gray-600">Profile Completion</label>
-                  <div className="mt-1 text-sm text-indigo-700 font-medium">{profile.profileCompletion ?? 0}%</div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Phone className="w-4 h-4" />
+                  {user?.phone || "N/A"}
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={saving}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white px-6 py-2.5 rounded-lg shadow-md transition-all"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="animate-spin w-4 h-4" /> Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" /> Save Profile
-                  </>
-                )}
-              </button>
-            </form>
+              <div className="w-full border-t border-gray-200 my-5"></div>
 
-            {/* ===== DOCUMENTS ===== */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {/* Resume */}
-              <div className="p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-indigo-600" />
-                  Resume
-                </h2>
-                {resume ? (
-                  <div className="mt-3 text-sm">
+              {/* Profile Completion Progress */}
+              <div className="w-full">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    Profile Completion
+                  </span>
+                  <span className="text-sm font-bold text-[#007BFF]">
+                    {profile?.profileCompletion ?? 0}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-linear-to-r from-[#007BFF] to-[#00CFFF] h-2.5 rounded-full transition-all"
+                    style={{ width: `${profile?.profileCompletion ?? 0}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500 mt-2">
+                Complete your profile to increase visibility
+              </p>
+            </div>
+
+            {/* Resume Card */}
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <FileText className="w-5 h-5 text-[#007BFF]" />
+                Resume
+              </h3>
+              {resume ? (
+                <div className="space-y-3">
+                  <div className="p-3 bg-indigo-50 rounded-lg">
                     <a
                       href={resume.url}
                       target="_blank"
-                      className="text-indigo-600 underline"
+                      rel="noopener noreferrer"
+                      className="text-[#007BFF] hover:text-indigo-800 font-medium text-sm break-all"
                     >
                       {resume.filename}
                     </a>
-                    <button
-                      onClick={() => handleDelete("resume")}
-                      className="ml-4 text-red-500 hover:underline"
-                    >
-                      <Trash2 className="inline w-4 h-4 mr-1" /> Delete
-                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Uploaded:{" "}
+                      {new Date(resume.uploadedAt).toLocaleDateString()}
+                    </p>
                   </div>
-                ) : (
-                  <label className="flex items-center justify-center w-full px-4 py-3 mt-4 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                    <Upload className="w-5 h-5 text-gray-600 mr-2" />
-                    <span className="text-sm text-gray-600">
-                      Upload Resume (PDF/DOC)
-                    </span>
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload(e, "resume")}
-                    />
-                  </label>
-                )}
-              </div>
+                  <button
+                    onClick={() => handleDelete("resume")}
+                    className="w-full text-red-500 hover:text-red-700 text-sm font-medium py-2 hover:bg-red-50 rounded-lg transition"
+                  >
+                    <Trash2 className="inline w-4 h-4 mr-2" /> Delete Resume
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full px-4 py-6 border-2 border-dashed border-indigo-200 rounded-lg cursor-pointer hover:bg-indigo-50 transition group">
+                  <Upload className="w-8 h-8 text-indigo-400 group-hover:text-[#007BFF] mb-2" />
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-[#007BFF]">
+                    Upload Resume
+                  </span>
+                  <span className="text-xs text-gray-500">PDF, DOC, DOCX</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    onChange={(e) => handleFileUpload(e, "resume")}
+                  />
+                </label>
+              )}
+            </div>
 
-              {/* Cover Letter */}
-              <div className="p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <File className="w-5 h-5 text-indigo-600" />
-                  Cover Letter
-                </h2>
-                {coverLetter ? (
-                  <div className="mt-3 text-sm">
+            {/* Cover Letter Card */}
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <File className="w-5 h-5 text-[#007BFF]" />
+                Cover Letter
+              </h3>
+              {coverLetter ? (
+                <div className="space-y-3">
+                  <div className="p-3 bg-indigo-50 rounded-lg">
                     <a
                       href={coverLetter.url}
                       target="_blank"
-                      className="text-indigo-600 underline"
+                      rel="noopener noreferrer"
+                      className="text-[#007BFF] hover:text-indigo-800 font-medium text-sm break-all"
                     >
                       {coverLetter.filename}
                     </a>
-                    <button
-                      onClick={() => handleDelete("coverLetter")}
-                      className="ml-4 text-red-500 hover:underline"
-                    >
-                      <Trash2 className="inline w-4 h-4 mr-1" /> Delete
-                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Uploaded:{" "}
+                      {new Date(coverLetter.uploadedAt).toLocaleDateString()}
+                    </p>
                   </div>
-                ) : (
-                  <label className="flex items-center justify-center w-full px-4 py-3 mt-4 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                    <Upload className="w-5 h-5 text-gray-600 mr-2" />
-                    <span className="text-sm text-gray-600">
-                      Upload Cover Letter (PDF/DOC)
-                    </span>
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload(e, "coverLetter")}
-                    />
-                  </label>
+                  <button
+                    onClick={() => handleDelete("coverLetter")}
+                    className="w-full text-red-500 hover:text-red-700 text-sm font-medium py-2 hover:bg-red-50 rounded-lg transition"
+                  >
+                    <Trash2 className="inline w-4 h-4 mr-2" /> Delete Cover
+                    Letter
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full px-4 py-6 border-2 border-dashed border-indigo-200 rounded-lg cursor-pointer hover:bg-indigo-50 transition group">
+                  <Upload className="w-8 h-8 text-[#007BFF] group-hover:text-[#007BFF] mb-2" />
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-[#007BFF]">
+                    Upload Cover Letter
+                  </span>
+                  <span className="text-xs text-gray-500">PDF, DOC, DOCX</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    onChange={(e) => handleFileUpload(e, "coverLetter")}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
+          {/* ===== RIGHT COLUMN ===== */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Professional Summary */}
+            {profile?.bio && (
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Professional Summary
+                </h3>
+                <p className="text-gray-700 leading-relaxed text-sm">
+                  {profile.bio}
+                </p>
+              </div>
+            )}
+
+            {/* Work Experience */}
+            {profile?.workExperience && profile.workExperience.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-[#007BFF]" />
+                  Work Experience
+                </h3>
+                <div className="space-y-4">
+                  {profile.workExperience.map((exp: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="border-l-4 border-[#007BFF] pl-4 py-2"
+                    >
+                      <h4 className="font-semibold text-gray-900">
+                        {exp.position}
+                      </h4>
+                      <p className="text-[#007BFF] text-sm font-medium">
+                        {exp.company}
+                      </p>
+                      <p className="text-gray-600 text-sm">
+                        📍 {exp.location}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        {exp.startDate
+                          ? new Date(exp.startDate).toLocaleDateString(
+                              "en-US",
+                              { year: "numeric", month: "short" }
+                            )
+                          : ""}{" "}
+                        -{" "}
+                        {exp.endDate
+                          ? new Date(exp.endDate).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                            })
+                          : "Present"}
+                      </p>
+                      {exp.description && (
+                        <p className="text-gray-700 text-sm mt-2">
+                          {exp.description}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Education & Certifications */}
+            {(profile?.education?.length > 0 ||
+              profile?.certifications?.length > 0) && (
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-[#007BFF]" />
+                  Education & Certifications
+                </h3>
+
+                {/* Education */}
+                {profile?.education && profile.education.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-700 mb-3 text-sm">
+                      Education
+                    </h4>
+                    <div className="space-y-3">
+                      {profile.education.map((edu: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="p-3 bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 bg-[#007BFF] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                              <Book className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="font-semibold text-gray-900 text-sm">
+                                {edu.degree} in {edu.field}
+                              </h5>
+                              <p className="text-gray-700 text-sm">
+                                {edu.institution}
+                              </p>
+                              <p className="text-gray-500 text-xs mt-1">
+                                {edu.yearOfCompletion}
+                                {edu.grade && ` • Grade: ${edu.grade}`}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Certifications */}
+                {profile?.certifications && profile.certifications.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3 text-sm">
+                      Certifications
+                    </h4>
+                    <div className="space-y-3">
+                      {profile.certifications.map((cert: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="p-3 bg-linear-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                              <Trophy className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="font-semibold text-gray-900 text-sm">
+                                {cert.name}
+                              </h5>
+                              <p className="text-gray-700 text-sm">
+                                {cert.issuingOrganization}
+                              </p>
+                              <p className="text-gray-500 text-xs mt-1">
+                                Issued:{" "}
+                                {new Date(cert.issueDate).toLocaleDateString(
+                                  "en-US",
+                                  { year: "numeric", month: "short" }
+                                )}
+                                {cert.expiryDate &&
+                                  ` • Expires: ${new Date(
+                                    cert.expiryDate
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                  })}`}
+                              </p>
+                              {cert.credentialUrl && (
+                                <a
+                                  href={cert.credentialUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#007BFF] hover:underline text-xs mt-1 inline-block"
+                                >
+                                  View Credential
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
+            )}
+
+            {/* Skills */}
+            {profile?.skills && profile.skills.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Code className="w-5 h-5 text-[#007BFF]" />
+                  Skills & Expertise
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.skills.map((skill: any, idx: number) => (
+                    <span
+                      key={idx}
+                      className="inline-block px-4 py-2 bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
+                    >
+                      {skill.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Specializations */}
+            {profile?.specializations && profile.specializations.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-[#007BFF]" />
+                  Specializations
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.specializations.map((spec: any, idx: number) => (
+                    <span
+                      key={idx}
+                      className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium"
+                    >
+                      {spec}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

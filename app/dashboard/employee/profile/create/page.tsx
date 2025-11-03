@@ -133,7 +133,7 @@ export default function EmployerProfileCreatePage() {
     <>
      <Navbar />
 
-      <div className="max-w-4xl mx-auto p-6 sm:p-8 mt-8 bg-white rounded-2xl shadow-md border border-gray-100">
+      <div className="max-w-4xl mx-auto p-6 sm:p-8 mt-8 mb-5 bg-white rounded-2xl shadow-md border border-gray-100">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">
@@ -144,10 +144,11 @@ export default function EmployerProfileCreatePage() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/dashboard/employee/profile/view")}
+            onClick={() => router.push("/dashboard/employee/profile/")}
             className="mt-4 sm:mt-0 px-4 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-lg text-sm font-medium  transition-all"
           >
-            View Profile
+            
+            Go Back
           </button>
         </div>
 
@@ -316,7 +317,7 @@ export default function EmployerProfileCreatePage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-lg font-medium  transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 bg-linear-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-lg font-medium  transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading
                 ? "Saving..."

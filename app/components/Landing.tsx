@@ -656,7 +656,7 @@ export default function CareerMadeLanding() {
                     </div>
                 </div>
             </footer> */}
-            <Footer />
+            {/* <Footer /> */}
         </div>
     );
 }
