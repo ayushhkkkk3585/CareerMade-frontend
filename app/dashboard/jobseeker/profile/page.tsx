@@ -84,7 +84,7 @@ export default function JobSeekerDashboard() {
         if (type === "resume") setResume(data.data.resume);
         else setCoverLetter(data.data.coverLetter);
         alert(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
-      } else toast.error(data.message || "Upload failed");
+      } else toast.success(data.message || "Upload failed");
     } catch (err) {
       toast.error("Error uploading file");
     }

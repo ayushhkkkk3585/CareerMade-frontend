@@ -143,7 +143,7 @@ export default function JobSeekerDashboard() {
         }
       );
       const data = await res.json();
-      if (res.ok) toast.error("Profile updated!");
+      if (res.ok) toast.success("Profile updated!");
       else toast.error(data.message || "Update failed");
     } catch {
       toast.error("Error updating profile");
@@ -174,7 +174,7 @@ export default function JobSeekerDashboard() {
     if (res.ok) {
       if (type === "resume") setResume(data.data.resume);
       else setCoverLetter(data.data.coverLetter);
-      toast.error(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
+      toast.success(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
     } else toast.error(data.message || "Upload failed");
   };
 
@@ -192,7 +192,7 @@ export default function JobSeekerDashboard() {
     if (res.ok) {
       if (type === "resume") setResume(null);
       else setCoverLetter(null);
-      toast.error(`${type} deleted!`);
+      toast.success(`${type} deleted!`);
     } else toast.error("Failed to delete");
   };
 
