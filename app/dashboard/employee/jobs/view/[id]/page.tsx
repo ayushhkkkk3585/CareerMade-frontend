@@ -17,6 +17,7 @@ import {
   Globe,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
+import GradientLoader from "@/app/components/GradientLoader";
 
 const DetailItem = ({
   icon,
@@ -58,11 +59,10 @@ export default function JobViewPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading)
+ if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-600 text-lg bg-gray-50">
-        <Zap className="w-6 h-6 animate-spin mr-2 text-blue-500" />
-        Loading job details...
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
       </div>
     );
 

@@ -14,6 +14,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
+import GradientLoader from "@/app/components/GradientLoader";
 
 type User = {
   firstName?: string;
@@ -159,9 +160,8 @@ export default function ApplicationDetailPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="max-w-7xl mx-auto p-6">Loading…</div>
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
       </div>
     );
 

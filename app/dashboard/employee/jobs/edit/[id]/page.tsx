@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
+import GradientLoader from "@/app/components/GradientLoader";
 
 const FormSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
   <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-100 shadow-inner">
@@ -172,12 +173,12 @@ export default function EditJobPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen text-gray-600 text-lg bg-gray-50">
-      <Zap className="w-6 h-6 animate-spin mr-2 text-blue-500" />
-      Loading job details...
-    </div>
-  );
+ if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
+      </div>
+    );
 
   return (
     <>

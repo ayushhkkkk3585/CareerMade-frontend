@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import GradientLoader from "@/app/components/GradientLoader";
 
 export default function EmployerApplicationsPage() {
   const [applications, setApplications] = useState<any[]>([]);
@@ -28,7 +29,12 @@ export default function EmployerApplicationsPage() {
       });
   }, []);
 
-  if (loading) return <p className="p-4">Loading applications...</p>;
+ if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
+      </div>
+    );
 
   return (
     <div className="p-6">

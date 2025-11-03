@@ -20,6 +20,7 @@ import {
   Book,
   Trophy,
 } from "lucide-react";
+import GradientLoader from "@/app/components/GradientLoader";
 
 export default function JobSeekerDashboard() {
   const router = useRouter();
@@ -110,10 +111,10 @@ export default function JobSeekerDashboard() {
     }
   };
 
-  if (loading)
+if (loading)
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <Loader2 className="animate-spin w-8 h-8 text-[#007BFF]" />
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
       </div>
     );
 

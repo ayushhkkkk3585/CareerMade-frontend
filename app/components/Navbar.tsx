@@ -60,7 +60,7 @@ export default function Navbar() {
             onClick={() => router.push("/")}
           >
             
-            <img src="/logo.png" alt="CareerMade" className="h-7" />
+            <img src="/logo.png" alt="CareerMade" className="h-13" />
           </motion.div>
 
           {/* Desktop Buttons */}

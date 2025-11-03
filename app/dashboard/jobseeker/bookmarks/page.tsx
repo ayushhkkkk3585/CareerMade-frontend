@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import { ArrowLeft, Bookmark, Plus } from "lucide-react";
+import GradientLoader from "@/app/components/GradientLoader";
 
 
 export default function SavedJobs() {
@@ -20,10 +21,10 @@ export default function SavedJobs() {
       .finally(() => setLoading(false));
   }, [])
 
-  if (loading)
+   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-gray-500 animate-pulse">Loading saved jobs...</p>
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
       </div>
     );
 

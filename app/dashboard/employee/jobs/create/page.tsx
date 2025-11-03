@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
+import GradientLoader from "@/app/components/GradientLoader";
 
 const FormSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
   <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-100 shadow-inner">
@@ -209,13 +210,12 @@ export default function CreateJobPage() {
     }
   };
 
-  if (loading) {
+ if (loading)
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#155DFC]"></div>
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
       </div>
     );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

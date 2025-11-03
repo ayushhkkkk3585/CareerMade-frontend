@@ -16,6 +16,7 @@ import {
   Mail,
   Phone,
 } from "lucide-react";
+import GradientLoader from "@/app/components/GradientLoader";
 
 export default function JobSeekerDashboard() {
   const router = useRouter();
@@ -195,10 +196,10 @@ export default function JobSeekerDashboard() {
   };
 
   // ---------------- LOADING STATES ----------------
-  if (loading)
+ if (loading)
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <Loader2 className="animate-spin w-8 h-8 text-indigo-600" />
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
       </div>
     );
 

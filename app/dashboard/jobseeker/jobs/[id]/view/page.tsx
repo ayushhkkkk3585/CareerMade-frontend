@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { MapPin, Briefcase, DollarSign, Clock, Building2 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
+import GradientLoader from "@/app/components/GradientLoader";
 
 export default function JobViewPage() {
     const { id } = useParams();
@@ -188,13 +189,19 @@ export default function JobViewPage() {
         }
     };
 
+    // if (loading)
+    //     return (
+    //         <div className="flex items-center justify-center h-[70vh]">
+    //             <div className="text-center">
+    //                 <div className="w-10 h-10 border-4 border-gray-200 border-t-[#8F59ED] rounded-full animate-spin mx-auto mb-4" />
+    //                 <p className="text-gray-600">Loading job details...</p>
+    //             </div>
+    //         </div>
+    //     );
     if (loading)
         return (
-            <div className="flex items-center justify-center h-[70vh]">
-                <div className="text-center">
-                    <div className="w-10 h-10 border-4 border-gray-200 border-t-[#8F59ED] rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">Loading job details...</p>
-                </div>
+            <div className="h-screen flex items-center justify-center bg-white">
+                <GradientLoader />
             </div>
         );
 
@@ -207,7 +214,7 @@ export default function JobViewPage() {
 
     return (
         <>
-        <Navbar/>
+            <Navbar />
             <div className="max-w-4xl mx-auto px-6 py-10">
                 {/* Job Header */}
                 <div className="border-b border-gray-200 pb-6 mb-6">

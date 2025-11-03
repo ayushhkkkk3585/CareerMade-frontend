@@ -7,7 +7,7 @@ const Footer = () => {
                 <div className="grid md:grid-cols-4 gap-8 mb-8">
                     <div>
                         <div className="text-2xl font-bold text-white mb-4">
-                            <img src="/logo.png" alt="CareerMade" className="h-7" />
+                            <img src="/logo.png" alt="CareerMade" className="h-13" />
                         </div>
                         <p className="text-sm mb-4">
                             Empowering healthcare professionals to find their dream careers

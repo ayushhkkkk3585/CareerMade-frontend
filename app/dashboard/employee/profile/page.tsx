@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import { ArrowLeft, User2, Edit } from "lucide-react";
+import GradientLoader from "@/app/components/GradientLoader";
 
 export default function ViewEmployerProfile() {
   const router = useRouter();
@@ -30,10 +31,10 @@ export default function ViewEmployerProfile() {
       .finally(() => setLoading(false));
   }, [router]);
 
-  if (loading)
+ if (loading)
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <p className="text-gray-600 text-lg">Loading profile...</p>
+      <div className="h-screen flex items-center justify-center bg-white">
+        <GradientLoader />
       </div>
     );
 
