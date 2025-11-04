@@ -139,7 +139,7 @@ export default function JobsManagement() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/jobs/${jobId}/status`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}/status`,
         {
           method: "PATCH",
           headers: {
