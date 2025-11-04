@@ -103,7 +103,7 @@ const Login = () => {
             <Stethoscope className="w-6 h-6 text-white" />
           </div>
           <span className="text-2xl font-bold text-gray-900">CareerMade</span> */}
-          <img src="/logo.png" alt="CareerMade" className="h-7" />
+          <img src="/logo.png" alt="CareerMade" className="h-13" />
         </motion.div>
 
         {/* Heading */}

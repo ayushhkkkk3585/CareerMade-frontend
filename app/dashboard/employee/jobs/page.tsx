@@ -41,6 +41,10 @@ interface Job {
   location?: Location;
   experienceRequired?: Experience;
   salary?: Salary;
+  jobType?: "Full-time" | "Part-time" | "Contract" | "Freelance" | "Internship" | "Volunteer";
+  status?: "Active" | "Pending" | "Flagged" | "Archived" | "Closed";
+  description?: string;
+  createdAt?: string;
 }
 
 interface EmployerProfile {
@@ -368,53 +372,64 @@ export default function JobListing() {
           </div>
 
           {loading ? (
-            <div className="text-center py-20 text-gray-500">
-              Loading jobs...
-            </div>
+            <div className="text-center py-20 text-gray-500">Loading jobs...</div>
           ) : filteredJobs.length === 0 ? (
-            <div className="text-center py-20 text-gray-500">
-              No matching jobs found
-            </div>
+            <div className="text-center py-20 text-gray-500">No matching jobs found</div>
           ) : (
             <div className="space-y-6">
               {currentJobs.map((job) => (
                 <div
                   key={job._id}
-                  className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6"
+                  className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6 relative"
                 >
-                  <div className="flex flex-col sm:flex-row justify-between">
+                  {/* Top Section */}
+                  <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-xl font-semibold text-gray-900">
                         {job.title}
                       </h3>
                       <p className="text-sm text-gray-600 mt-1">
                         {job.organizationName || "Healthcare Facility"}
                       </p>
-                      <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
-                        <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
-                          <MapPin className="w-4 h-4 text-blue-500" />
-                          {job.location?.city}, {job.location?.state}
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full">
-                          <Calendar className="w-4 h-4 text-green-600" />
-                          {job.experienceRequired?.minYears}–{job.experienceRequired?.maxYears} yrs
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
-                          <DollarSign className="w-4 h-4 text-yellow-600" />
-                          {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
-                        </span>
-                      </div>
                     </div>
-                    <button
-                      onClick={() =>
-                        router.push(`/dashboard/employee/jobs/view/${job._id}`)
-                      }
-                      className="mt-4 sm:mt-0 h-fit px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+
+                    {/* Status Tag */}
+                    <span
+                      className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide ${job.status === "Active"
+                        ? "bg-green-100 text-green-700"
+                        : job.status === "Pending"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
+                        }`}
                     >
-                      View Details
-                    </button>
+                      {job.status || "Active"}
+                    </span>
                   </div>
 
+                  {/* Job Highlights */}
+                  <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
+                    <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
+                      <MapPin className="w-4 h-4 text-blue-500" />
+                      {job.location?.city}, {job.location?.state}
+                    </span>
+                    <span className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full">
+                      <Calendar className="w-4 h-4 text-green-600" />
+                      {job.experienceRequired?.minYears}–{job.experienceRequired?.maxYears} yrs
+                    </span>
+                    <span className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
+                      <DollarSign className="w-4 h-4 text-yellow-600" />
+                      {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
+                    </span>
+                  </div>
+
+                  {/* Divider + Short Description */}
+                  <div className="border-t mt-4 pt-4 text-sm text-gray-700 leading-relaxed">
+                    {job.description
+                      ? job.description.slice(0, 100) + "..."
+                      : "A great opportunity to lead and grow with a skilled healthcare team."}
+                  </div>
+
+                  {/* Tags */}
                   <div className="mt-4 flex flex-wrap gap-2">
                     <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
                       {job.specialization || "General"}
@@ -427,43 +442,62 @@ export default function JobListing() {
                     </span>
                   </div>
 
-                  <div className="mt-5 flex justify-end items-center gap-3">
-                    {/* View Applications */}
-                    <button
-                      onClick={() =>
-                        router.push(`/dashboard/employee/jobs/${job._id}/applications`)
-                      }
-                      title="View Applications"
-                      className="p-2.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
-                    >
-                      <Users className="w-5 h-5" />
-                    </button>
+                  {/* Bottom Section (All in one line) */}
+                  <div className="flex justify-between items-center mt-6 flex-wrap gap-3">
+                    {/* Posted Date */}
+                    <p className="text-xs text-gray-500">
+                      Posted on {new Date(job.createdAt).toLocaleDateString()}
+                    </p>
 
-                    {/* Edit */}
-                    <button
-                      onClick={() =>
-                        router.push(`/dashboard/employee/jobs/edit/${job._id}`)
-                      }
-                      title="Edit Job"
-                      className="p-2.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-[#1A0152] transition"
-                    >
-                      <Pencil className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                      {/* View Details */}
+                      <button
+                        onClick={() =>
+                          router.push(`/dashboard/employee/jobs/view/${job._id}`)
+                        }
+                        className="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+                      >
+                        View Details
+                      </button>
 
-                    {/* Delete */}
-                    <button
-                      onClick={() => handleDelete(job._id)}
-                      title="Delete Job"
-                      className="p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                      {/* View Applications */}
+                      <button
+                        onClick={() =>
+                          router.push(`/dashboard/employee/jobs/${job._id}/applications`)
+                        }
+                        title="View Applications"
+                        className="p-2.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                      >
+                        <Users className="w-5 h-5" />
+                      </button>
+
+                      {/* Edit */}
+                      <button
+                        onClick={() =>
+                          router.push(`/dashboard/employee/jobs/edit/${job._id}`)
+                        }
+                        title="Edit Job"
+                        className="p-2.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-[#1A0152] transition"
+                      >
+                        <Pencil className="w-5 h-5" />
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                        onClick={() => handleDelete(job._id)}
+                        title="Delete Job"
+                        className="p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
-
             </div>
           )}
+
+
 
           {/* PAGINATION */}
           {totalPages > 1 && (

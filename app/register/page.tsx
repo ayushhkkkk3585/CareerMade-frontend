@@ -158,7 +158,7 @@ const Register = () => {
                     <span className="text-3xl font-bold text-gray-900 tracking-tight">
                         CareerMade
                     </span> */}
-                    <img src="/logo.png" alt="CareerMade" className="h-7" />
+                    <img src="/logo.png" alt="CareerMade" className="h-13" />
                 </motion.div>
 
                 {/* Heading */}

@@ -9,11 +9,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  CheckCircle,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { motion } from "framer-motion";
 
 const SPECIALIZATIONS = [
   "General Medicine", "Cardiology", "Neurology", "Orthopedics", "Pediatrics",
@@ -131,57 +133,50 @@ export default function JobSeekerJobs() {
       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
       {/* ===== HEADER ===== */}
-      <div className=" bg-gray-50">
-        {/* ===== HEADER SECTION ===== */}
-        <div className="w-full relative bg-[#002B6B] text-white overflow-hidden">
+      <div className="bg-gray-50">
+        <div className="relative w-full bg-[#002B6B] text-white overflow-hidden">
           {/* Background Image */}
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-90"
+            className="absolute inset-0 bg-cover bg-center opacity-90 scale-105 blur-[1px]"
             style={{ backgroundImage: "url('/new1.png')" }}
           ></div>
 
           {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/95 via-[#002b6b]/70 to-transparent"></div>
 
           {/* Header Content */}
-          <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            {/* Left Text Section */}
-            <div className="max-w-2xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-2xl"
+            >
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
                 Job{" "}
                 <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
                   Seeker Dashboard
                 </span>
               </h1>
-              <p className="text-base sm:text-lg text-blue-100 mt-3">
-                Explore verified opportunities from India’s leading hospitals and healthcare facilities.
+              <p className="text-base sm:text-lg text-blue-100 mt-3 leading-relaxed">
+                Explore verified opportunities from India’s leading hospitals
+                and healthcare facilities.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Right Buttons Section */}
-            <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
-              {/* Browse Jobs */}
-              {/* <button
-                onClick={() => router.push("/dashboard/jobseeker/jobs")}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
-              >
-                Browse Jobs
-              </button> */}
-
-              {/* My Applications */}
-              {/* <button
-                onClick={() => router.push("/dashboard/jobseeker/applications")}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
-              >
-                My Applications
-              </button> */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto"
+            >
               <button
                 onClick={() => router.push("/dashboard/jobseeker/applications")}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-7 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all hover:scale-[1.03] active:scale-[0.98]"
               >
                 My Applications
               </button>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -307,7 +302,7 @@ export default function JobSeekerJobs() {
           </div>
 
           {loading ? (
-            <div className="text-center py-20 text-gray-500">
+            <div className="text-center py-20 text-gray-500 animate-pulse">
               Loading jobs...
             </div>
           ) : filteredJobs.length === 0 ? (
@@ -319,39 +314,54 @@ export default function JobSeekerJobs() {
               {currentJobs.map((job) => (
                 <div
                   key={job._id}
-                  className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6"
+                  className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6 relative"
                 >
-                  <div className="flex flex-col sm:flex-row justify-between">
+                  {/* Top section with title + status */}
+                  <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {job.title}
-                      </h3>
+                      <h3 className="text-xl font-semibold text-gray-900">{job.title}</h3>
                       <p className="text-sm text-gray-600 mt-1">
                         {job.organizationName || "Healthcare Facility"}
                       </p>
-                      <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
-                        <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
-                          <MapPin className="w-4 h-4 text-blue-500" />
-                          {job.location?.city}, {job.location?.state}
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full">
-                          <Calendar className="w-4 h-4 text-green-600" />
-                          {job.experienceRequired?.minYears}–{job.experienceRequired?.maxYears} yrs
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
-                          <DollarSign className="w-4 h-4 text-yellow-600" />
-                          {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
-                        </span>
-                      </div>
                     </div>
-                    <button
-                      onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
-                      className="mt-4 sm:mt-0 h-fit px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+
+                    {/* Status tag */}
+                    <span
+                      className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide ${job.status === "Active"
+                          ? "bg-green-100 text-green-700"
+                          : job.status === "Pending"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
                     >
-                      View Details
-                    </button>
+                      {job.status || "Active"}
+                    </span>
                   </div>
 
+                  {/* Job details */}
+                  <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
+                    <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
+                      <MapPin className="w-4 h-4 text-blue-500" />
+                      {job.location?.city}, {job.location?.state}
+                    </span>
+                    <span className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full">
+                      <Calendar className="w-4 h-4 text-green-600" />
+                      {job.experienceRequired?.minYears}–{job.experienceRequired?.maxYears} yrs
+                    </span>
+                    <span className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
+                      <DollarSign className="w-4 h-4 text-yellow-600" />
+                      {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
+                    </span>
+                  </div>
+
+                  {/* Divider and description */}
+                  <div className="border-t mt-4 pt-4 text-sm text-gray-700 leading-relaxed">
+                    {job.description
+                      ? job.description.slice(0, 100) + "..."
+                      : "Join a reputed healthcare team making an impact in patient care."}
+                  </div>
+
+                  {/* Bottom tags */}
                   <div className="mt-4 flex flex-wrap gap-2">
                     <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
                       {job.specialization || "General"}
@@ -363,10 +373,26 @@ export default function JobSeekerJobs() {
                       On-site
                     </span>
                   </div>
+
+                  {/* Bottom section with date + button */}
+                  <div className="flex justify-between items-center mt-6">
+                    <p className="text-xs text-gray-500">
+                      Posted on {new Date(job.createdAt).toLocaleDateString()}
+                    </p>
+                    <button
+                      onClick={() =>
+                        router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)
+                      }
+                      className="px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
+
 
           {/* PAGINATION */}
           {totalPages > 1 && (
