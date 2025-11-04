@@ -446,7 +446,7 @@ export default function JobListing() {
                   <div className="flex justify-between items-center mt-6 flex-wrap gap-3">
                     {/* Posted Date */}
                     <p className="text-xs text-gray-500">
-                      Posted on {new Date(job.createdAt).toLocaleDateString()}
+                      Posted on {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : "N/A"}
                     </p>
 
                     <div className="flex items-center gap-3">
