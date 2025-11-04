@@ -60,7 +60,7 @@ const Login = () => {
       } else if (user.role === "employer") {
         router.push("/dashboard/employee/jobs");
       } else {
-        router.push("/dashboard"); // fallback
+        router.push("/dashboard/admin"); // fallback
       }
     } catch (error) {
       console.error("Login error:", error);
