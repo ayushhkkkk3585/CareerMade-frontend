@@ -42,7 +42,7 @@ export default function Navbar() {
   };
 
   const handleSavedJobsClick = () => router.push("/dashboard/jobseeker/bookmarks");
-  const handleCreateJobClick = () => router.push("/dashboard/employee/jobs/create");
+  const handleResume = () => router.push("/dashboard/jobseeker/resume");
 
   return (
     <motion.header
@@ -59,7 +59,7 @@ export default function Navbar() {
             whileHover={{ scale: 1.05 }}
             onClick={() => router.push("/")}
           >
-            
+
             <img src="/logo.png" alt="CareerMade" className="h-13" />
           </motion.div>
 
@@ -91,14 +91,14 @@ export default function Navbar() {
                 >
                   Saved Jobs
                 </motion.button>
-                {/* <motion.button
+                <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={handleCreateJobClick}
-                  className="bg-[#8F59ED] hover:bg-[#693eb4] text-white px-4 py-2 rounded-full font-medium shadow-md"
+                  onClick={handleResume}
+                  className="text-gray-700 font-medium"
                 >
-                  Create Job
-                </motion.button> */}
+                  Resumes
+                </motion.button>
               </>
             )}
             <motion.button
@@ -159,14 +159,14 @@ export default function Navbar() {
                   >
                     Saved Jobs
                   </motion.button>
-                  {/* <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleCreateJobClick}
-                  className="bg-[#8F59ED] hover:bg-[#693eb4] text-white px-4 py-2 rounded-full font-medium shadow-md"
-                >
-                  Create Job
-                </motion.button> */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleResume}
+                    className="text-gray-700 font-medium"
+                  >
+                    Resumes
+                  </motion.button>
                 </>
               )}
 
