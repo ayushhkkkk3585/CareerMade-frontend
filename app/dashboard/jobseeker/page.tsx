@@ -225,18 +225,15 @@ export default function JobSeekerJobs() {
       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
       {/* ===== HEADER ===== */}
-      <div className="bg-gray-400">
+      {/* <div className="bg-gray-400">
         <div className="relative w-full bg-[#002B6B] text-white overflow-hidden">
-          {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center opacity-90 scale-105 blur-[1px]"
             style={{ backgroundImage: "url('/new1.png')" }}
           ></div>
 
-          {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/95 via-[#002b6b]/70 to-transparent"></div>
 
-          {/* Header Content */}
           <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -271,7 +268,7 @@ export default function JobSeekerJobs() {
             </motion.div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ===== MAIN CONTENT ===== */}
       <div className=" max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-5 gap-8 relative">
@@ -642,12 +639,12 @@ export default function JobSeekerJobs() {
           )}
         </div>
         {/* RIGHT SIDEBAR (Desktop) */}
-        <div className="hidden lg:flex flex-col gap-6">
+        <div className=" lg:flex flex-col gap-6 ">
           {/* Top organizations + Recommended Jobs */}
           {/* ===== RIGHT SIDEBAR ===== */}
-          <div className="hidden lg:flex flex-col gap-6">
+          <div className=" lg:flex flex-col gap-6">
             {/* Top Organizations */}
-            <div className="bg-white border rounded-2xl shadow-sm p-5">
+            <div className="bg-white border rounded-2xl shadow-sm p-5 mb-5">
               <h3 className="font-semibold text-lg mb-3 text-gray-800">
                 See 20 jobs matching your profile 
               </h3>
