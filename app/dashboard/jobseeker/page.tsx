@@ -274,7 +274,7 @@ export default function JobSeekerJobs() {
       </div>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className=" max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8 relative">
+      <div className=" max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-5 gap-8 relative">
         {/* ===== FILTERS ===== */}
         <div
           className={`lg:static absolute z-20 bg-white lg:bg-transparent  shadow-lg lg:shadow-none p-5 rounded-lg lg:rounded-none lg:p-0 transition-all duration-300 ${mobileFilters
@@ -640,6 +640,116 @@ export default function JobSeekerJobs() {
               </button>
             </div>
           )}
+        </div>
+        {/* RIGHT SIDEBAR (Desktop) */}
+        <div className="hidden lg:flex flex-col gap-6">
+          {/* Top organizations + Recommended Jobs */}
+          {/* ===== RIGHT SIDEBAR ===== */}
+          <div className="hidden lg:flex flex-col gap-6">
+            {/* Top Organizations */}
+            <div className="bg-white border rounded-2xl shadow-sm p-5">
+              <h3 className="font-semibold text-lg mb-3 text-gray-800">
+                See 20 jobs matching your profile 
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {/* Replace with your actual logo paths */}
+                <img src="/apollo.png" alt="Apollo" className="h-10 w-auto object-contain" />
+                <img src="/max.png" alt="Max Healthcare" className="h-10 w-auto object-contain" />
+                <img src="/fortis.png" alt="Fortis" className="h-10 w-auto object-contain" />
+                <img src="/aiims.png" alt="AIIMS" className="h-10 w-auto object-contain" />
+              </div>
+            </div>
+
+            {/* Recommended Jobs */}
+            <div className="bg-white border rounded-2xl shadow-sm p-5">
+              <h3 className="font-semibold text-lg mb-3 text-gray-800">
+                Recommended Jobs
+              </h3>
+
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500">3 days ago</p>
+                    <h4 className="font-semibold text-gray-900 text-sm">ICU Nurse</h4>
+                    <p className="text-sm text-gray-600">City General Hospital</p>
+                    <button className="mt-2 px-4 py-1.5 text-xs font-medium bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                      View
+                    </button>
+                  </div>
+                  <img
+                    src="/hos.png"
+                    alt="Hospital"
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                </div>
+              ))}
+
+              <p className="text-sm text-gray-600 mt-4">
+                Personalized job recommendations tailored to your profile and career goals in healthcare.
+              </p>
+
+              <button className="mt-3 text-blue-600 font-semibold text-sm hover:underline">
+                View More
+              </button>
+            </div>
+          </div>
+
+
+        </div>
+
+        {/* SIDEBAR (Mobile) — shows below job list */}
+        <div className="flex flex-col gap-6 lg:hidden">
+          {/* Top organizations + Recommended Jobs */}
+          {/* ===== RIGHT SIDEBAR ===== */}
+          <div className="hidden lg:flex flex-col gap-6">
+            {/* Top Organizations */}
+            <div className="bg-white border rounded-2xl shadow-sm p-5">
+              <h3 className="font-semibold text-lg mb-3 text-gray-800">
+                See 20 jobs matching your profile
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {/* Replace with your actual logo paths */}
+                <img src="/apollo.png" alt="Apollo" className="h-10 w-auto object-contain" />
+                <img src="/max.png" alt="Max Healthcare" className="h-10 w-auto object-contain" />
+                <img src="/fortis.png" alt="Fortis" className="h-10 w-auto object-contain" />
+                <img src="/aiims.png" alt="AIIMS" className="h-10 w-auto object-contain" />
+              </div>
+            </div>
+
+            {/* Recommended Jobs */}
+            <div className="bg-white border rounded-2xl shadow-sm p-5">
+              <h3 className="font-semibold text-lg mb-3 text-gray-800">
+                Recommended Jobs
+              </h3>
+
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500">3 days ago</p>
+                    <h4 className="font-semibold text-gray-900 text-sm">ICU Nurse</h4>
+                    <p className="text-sm text-gray-600">City General Hospital</p>
+                    <button className="mt-2 px-4 py-1.5 text-xs font-medium bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                      View
+                    </button>
+                  </div>
+                  <img
+                    src="/hos.png"
+                    alt="Hospital"
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                </div>
+              ))}
+
+              <p className="text-sm text-gray-600 mt-4">
+                Personalized job recommendations tailored to your profile and career goals in healthcare.
+              </p>
+
+              <button className="mt-3 text-blue-600 font-semibold text-sm hover:underline">
+                View More
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </>
