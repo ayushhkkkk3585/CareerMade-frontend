@@ -10,6 +10,14 @@ import {
   ChevronRight,
   Search,
   CheckCircle,
+  Building2,
+  Briefcase,
+  IndianRupee,
+  FileText,
+  Bookmark,
+  ChevronDown,
+  ChevronUp,
+  ArrowUpRight,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
 import { useRouter } from "next/navigation";
@@ -30,6 +38,8 @@ const LOCATIONS = [
   "Chennai", "Kolkata", "Ahmedabad",
 ];
 
+const WORK_MODES = ["On-site", "Remote", "Full-time"];
+
 export default function JobSeekerJobs() {
   const router = useRouter();
   const [jobs, setJobs] = useState<any[]>([]);
@@ -45,7 +55,64 @@ export default function JobSeekerJobs() {
   const [mobileFilters, setMobileFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Filter section expansion states
+  const [expandedSections, setExpandedSections] = useState({
+    specialty: true,
+    workMode: true,
+    experience: true,
+    location: false,
+    salary: false,
+  });
+
+  // Selected filters
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [selectedWorkModes, setSelectedWorkModes] = useState<string[]>([]);
+  const [experienceRange, setExperienceRange] = useState(0);
+  const [showAllSpecialties, setShowAllSpecialties] = useState(false);
+
   const jobsPerPage = 5;
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const toggleSpecialty = (specialty: string) => {
+    setSelectedSpecialties(prev =>
+      prev.includes(specialty)
+        ? prev.filter(s => s !== specialty)
+        : [...prev, specialty]
+    );
+  };
+
+  const toggleWorkMode = (mode: string) => {
+    setSelectedWorkModes(prev =>
+      prev.includes(mode)
+        ? prev.filter(m => m !== mode)
+        : [...prev, mode]
+    );
+  };
+
+  const getAppliedFiltersCount = () => {
+    let count = 0;
+    if (selectedSpecialties.length > 0) count++;
+    if (selectedWorkModes.length > 0) count++;
+    if (experienceRange > 0) count++;
+    if (filters.location) count++;
+    if (filters.salary) count++;
+    return count;
+  };
+
+  const clearAllFilters = () => {
+    setSelectedSpecialties([]);
+    setSelectedWorkModes([]);
+    setExperienceRange(0);
+    setFilters({
+      specialization: "",
+      location: "",
+      salary: "",
+      years: "",
+    });
+  };
 
   // ✅ Fetch jobs
   useEffect(() => {
@@ -87,35 +154,42 @@ export default function JobSeekerJobs() {
       );
     }
 
-    // Filters
-    if (filters.specialization)
-      filtered = filtered.filter(
-        (j) =>
-          j.specialization?.toLowerCase() ===
-          filters.specialization.toLowerCase()
+    // Specialty filter (multiple selection)
+    if (selectedSpecialties.length > 0) {
+      filtered = filtered.filter(j =>
+        selectedSpecialties.some(s =>
+          j.specialization?.toLowerCase() === s.toLowerCase()
+        )
       );
+    }
 
-    if (filters.location)
+    // Location filter
+    if (filters.location) {
       filtered = filtered.filter((j) => {
         const city = j.location?.city?.toLowerCase() || "";
         const state = j.location?.state?.toLowerCase() || "";
         const filterVal = filters.location.toLowerCase();
         return city.includes(filterVal) || state.includes(filterVal);
       });
+    }
 
-    if (filters.years)
+    // Experience filter
+    if (experienceRange > 0) {
       filtered = filtered.filter(
-        (j) => (j.experienceRequired?.minYears || 0) >= Number(filters.years)
+        (j) => (j.experienceRequired?.minYears || 0) >= experienceRange
       );
+    }
 
-    if (filters.salary)
+    // Salary filter
+    if (filters.salary) {
       filtered = filtered.filter(
         (j) => (j.salary?.max || 0) / 100000 >= Number(filters.salary)
       );
+    }
 
     setFilteredJobs(filtered);
     setCurrentPage(1);
-  }, [filters, searchQuery, jobs]);
+  }, [filters, searchQuery, jobs, selectedSpecialties, selectedWorkModes, experienceRange]);
 
   // Pagination
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
@@ -127,13 +201,31 @@ export default function JobSeekerJobs() {
     return `₹${(amt / 100000).toFixed(1)} LPA`;
   };
 
+  const getTimeAgo = (date: string) => {
+    const now = new Date();
+    const posted = new Date(date);
+    const diffDays = Math.floor((now.getTime() - posted.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "1 day ago";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return `${Math.floor(diffDays / 30)} months ago`;
+  };
+
+  const getSpecialtyCount = (specialty: string) => {
+    return jobs.filter(j => j.specialization?.toLowerCase() === specialty.toLowerCase()).length;
+  };
+
+  const displayedSpecialties = showAllSpecialties ? SPECIALIZATIONS : SPECIALIZATIONS.slice(0, 4);
+
   return (
     <>
       <Navbar />
       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
       {/* ===== HEADER ===== */}
-      <div className="bg-gray-50">
+      <div className="bg-gray-400">
         <div className="relative w-full bg-[#002B6B] text-white overflow-hidden">
           {/* Background Image */}
           <div
@@ -159,7 +251,7 @@ export default function JobSeekerJobs() {
                 </span>
               </h1>
               <p className="text-base sm:text-lg text-blue-100 mt-3 leading-relaxed">
-                Explore verified opportunities from India’s leading hospitals
+                Explore verified opportunities from India's leading hospitals
                 and healthcare facilities.
               </p>
             </motion.div>
@@ -182,98 +274,206 @@ export default function JobSeekerJobs() {
       </div>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8 relative">
+      <div className=" max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8 relative">
         {/* ===== FILTERS ===== */}
         <div
-          className={`lg:static absolute z-20 bg-white lg:bg-transparent border lg:border-none shadow-lg lg:shadow-none p-5 rounded-lg lg:p-0 transition-all duration-300 ${mobileFilters
+          className={`lg:static absolute z-20 bg-white lg:bg-transparent  shadow-lg lg:shadow-none p-5 rounded-lg lg:rounded-none lg:p-0 transition-all duration-300 ${mobileFilters
             ? "top-20 left-0 right-0 mx-4 opacity-100"
             : "hidden lg:block opacity-0 lg:opacity-100"
             }`}
         >
-          <div className="flex items-center justify-between mb-4 lg:hidden">
-            <h2 className="font-semibold text-lg">Filters</h2>
-            <button
-              onClick={() => setMobileFilters(false)}
-              className="text-sm text-blue-600"
-            >
-              Close ✕
-            </button>
-          </div>
+          <div className="bg-white lg:sticky lg:top-4">
+            {/* Header with Clear All */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b">
+              <h2 className="text-lg font-bold text-gray-900">All Filters</h2>
+              {getAppliedFiltersCount() > 0 && (
+                <button
+                  onClick={clearAllFilters}
+                  className="text-sm text-blue-600 font-medium hover:underline"
+                >
+                  Applied ({getAppliedFiltersCount()})
+                </button>
+              )}
+            </div>
 
-          <h2 className="text-lg font-semibold mb-4 hidden lg:block">Filters</h2>
+            {/* SPECIALTY FILTER */}
+            <div className="mb-6 pb-6 border-b">
+              <button
+                onClick={() => toggleSection('specialty')}
+                className="flex items-center justify-between w-full text-left mb-3"
+              >
+                <h3 className="text-base font-bold text-gray-900">Specialty</h3>
+                {expandedSections.specialty ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
 
-          {/* Specialization */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Specialization
-            </label>
-            <select
-              className="w-full border rounded-lg px-3 py-2 text-gray-700"
-              value={filters.specialization}
-              onChange={(e) =>
-                setFilters({ ...filters, specialization: e.target.value })
-              }
-            >
-              <option value="">All</option>
-              {SPECIALIZATIONS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
+              {expandedSections.specialty && (
+                <div className="space-y-2.5">
+                  {displayedSpecialties.map((specialty) => {
+                    const count = getSpecialtyCount(specialty);
+                    return (
+                      <label
+                        key={specialty}
+                        className="flex items-center gap-2.5 cursor-pointer group"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSpecialties.includes(specialty)}
+                          onChange={() => toggleSpecialty(specialty)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700 group-hover:text-gray-900 flex-1">
+                          {specialty}
+                        </span>
+                        <span className="text-xs text-gray-400">({count})</span>
+                      </label>
+                    );
+                  })}
+                  <button
+                    onClick={() => setShowAllSpecialties(!showAllSpecialties)}
+                    className="text-sm text-blue-600 font-medium hover:underline mt-2"
+                  >
+                    {showAllSpecialties ? "View Less" : "View More"}
+                  </button>
+                </div>
+              )}
+            </div>
 
-          {/* Location */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Location
-            </label>
-            <select
-              className="w-full border rounded-lg px-3 py-2 text-gray-700"
-              value={filters.location}
-              onChange={(e) =>
-                setFilters({ ...filters, location: e.target.value })
-              }
-            >
-              <option value="">All</option>
-              {LOCATIONS.map((loc) => (
-                <option key={loc} value={loc}>
-                  {loc}
-                </option>
-              ))}
-            </select>
-          </div>
+            {/* WORK MODE FILTER */}
+            <div className="mb-6 pb-6 border-b">
+              <button
+                onClick={() => toggleSection('workMode')}
+                className="flex items-center justify-between w-full text-left mb-3"
+              >
+                <h3 className="text-base font-bold text-gray-900">Work mode</h3>
+                {expandedSections.workMode ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
 
-          {/* Salary */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Minimum Salary (in LPA)
-            </label>
-            <input
-              type="number"
-              placeholder="e.g. 5"
-              className="w-full border rounded-lg px-3 py-2 text-gray-700"
-              value={filters.salary}
-              onChange={(e) =>
-                setFilters({ ...filters, salary: e.target.value })
-              }
-            />
-          </div>
+              {expandedSections.workMode && (
+                <div className="space-y-2.5">
+                  {WORK_MODES.map((mode) => (
+                    <label
+                      key={mode}
+                      className="flex items-center gap-2.5 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedWorkModes.includes(mode)}
+                        onChange={() => toggleWorkMode(mode)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700 group-hover:text-gray-900 flex-1">
+                        {mode}
+                      </span>
+                      <span className="text-xs text-gray-400">(0)</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          {/* Experience */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Minimum Years of Experience
-            </label>
-            <input
-              type="number"
-              placeholder="e.g. 3"
-              className="w-full border rounded-lg px-3 py-2 text-gray-700"
-              value={filters.years}
-              onChange={(e) =>
-                setFilters({ ...filters, years: e.target.value })
-              }
-            />
+            {/* EXPERIENCE FILTER */}
+            <div className="mb-6 pb-6 border-b">
+              <button
+                onClick={() => toggleSection('experience')}
+                className="flex items-center justify-between w-full text-left mb-3"
+              >
+                <h3 className="text-base font-bold text-gray-900">Experience</h3>
+                {expandedSections.experience ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
+
+              {expandedSections.experience && (
+                <div className="px-2">
+                  <div className="relative pt-6 pb-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="20"
+                      value={experienceRange}
+                      onChange={(e) => setExperienceRange(Number(e.target.value))}
+                      className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    />
+                    <div className="absolute -top-1 right-0 bg-gray-900 text-white text-xs px-2 py-1 rounded-full">
+                      {experienceRange === 20 ? 'Any' : experienceRange}
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-2">
+                    <span>0 Yrs</span>
+                    <span>Any</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* LOCATION FILTER */}
+            <div className="mb-6 pb-6 border-b">
+              <button
+                onClick={() => toggleSection('location')}
+                className="flex items-center justify-between w-full text-left mb-3"
+              >
+                <h3 className="text-base font-bold text-gray-900">Location</h3>
+                {expandedSections.location ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
+
+              {expandedSections.location && (
+                <select
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={filters.location}
+                  onChange={(e) =>
+                    setFilters({ ...filters, location: e.target.value })
+                  }
+                >
+                  <option value="">All Locations</option>
+                  {LOCATIONS.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* SALARY FILTER */}
+            <div className="mb-4">
+              <button
+                onClick={() => toggleSection('salary')}
+                className="flex items-center justify-between w-full text-left mb-3"
+              >
+                <h3 className="text-base font-bold text-gray-900">Salary</h3>
+                {expandedSections.salary ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
+
+              {expandedSections.salary && (
+                <input
+                  type="number"
+                  placeholder="Minimum Salary (LPA)"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={filters.salary}
+                  onChange={(e) =>
+                    setFilters({ ...filters, salary: e.target.value })
+                  }
+                />
+              )}
+            </div>
           </div>
         </div>
 
@@ -281,10 +481,10 @@ export default function JobSeekerJobs() {
         <div className="lg:col-span-3">
           {/* MOBILE FILTER BUTTON */}
           <button
-            onClick={() => setMobileFilters(true)}
+            onClick={() => setMobileFilters((prev) => !prev)}
             className="lg:hidden flex items-center gap-2 text-blue-600 font-semibold mb-6"
           >
-            <Filter className="w-5 h-5" /> Filters
+            <Filter className="w-5 h-5" /> {mobileFilters ? "Close Filters" : "Filters"}
           </button>
 
           {/* SEARCH BAR */}
@@ -310,89 +510,104 @@ export default function JobSeekerJobs() {
               No matching jobs found
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {currentJobs.map((job) => (
                 <div
                   key={job._id}
-                  className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6 relative"
+                  className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-5 cursor-pointer"
+                  onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
                 >
-                  {/* Top section with title + status */}
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900">{job.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {job.organizationName || "Healthcare Facility"}
-                      </p>
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Left: Icon + Content */}
+                    <div className="flex gap-4 flex-1">
+                      {/* Hospital Icon */}
+                      <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Building2 className="w-6 h-6 text-gray-600" />
+                      </div>
+
+                      {/* Job Details */}
+                      <div className="flex-1">
+                        {/* Title with Verified Badge */}
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {job.title}
+                          </h3>
+                          {job.status === "Active" && (
+                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          )}
+                        </div>
+
+                        {/* Organization Name + Type */}
+                        <p className="text-sm text-gray-600 mb-3">
+                          <span className="font-medium">{job.organizationName || "Healthcare Facility"}</span>
+                          <span className="text-gray-400 mx-1">|</span>
+                          <span className="text-gray-500">Multi-Specialty</span>
+                        </p>
+
+                        {/* Meta Information Row */}
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600 mb-3">
+                          {/* Experience */}
+                          <div className="flex items-center gap-1.5">
+                            <Briefcase className="w-4 h-4 text-gray-500" />
+                            <span>{job.experienceRequired?.minYears}-{job.experienceRequired?.maxYears} years</span>
+                          </div>
+
+                          {/* Location */}
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="w-4 h-4 text-gray-500" />
+                            <span>{job.location?.city}, {job.location?.state}</span>
+                          </div>
+
+                          {/* Salary */}
+                          <div className="flex items-center gap-1.5">
+                            <IndianRupee className="w-4 h-4 text-gray-500" />
+                            <span className="font-semibold text-gray-900">
+                              {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="flex items-start gap-1.5 mb-4">
+                          <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-gray-700 line-clamp-2">
+                            {job.description || "Join our hospital to advance your medical career and serve patients with excellence."}
+                          </p>
+                        </div>
+
+                        {/* Tags Row */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md">
+                            {job.specialization || "General"}
+                          </span>
+                          <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-md">
+                            Full-time
+                          </span>
+                          <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-md">
+                            On-site
+                          </span>
+
+                          {/* Time Posted */}
+                          <span className="ml-auto text-xs text-gray-500">
+                            {getTimeAgo(job.createdAt)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Status tag */}
-                    <span
-                      className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide ${job.status === "Active"
-                          ? "bg-green-100 text-green-700"
-                          : job.status === "Pending"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                    >
-                      {job.status || "Active"}
-                    </span>
-                  </div>
-
-                  {/* Job details */}
-                  <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-                    <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full">
-                      <MapPin className="w-4 h-4 text-blue-500" />
-                      {job.location?.city}, {job.location?.state}
-                    </span>
-                    <span className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full">
-                      <Calendar className="w-4 h-4 text-green-600" />
-                      {job.experienceRequired?.minYears}–{job.experienceRequired?.maxYears} yrs
-                    </span>
-                    <span className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
-                      <DollarSign className="w-4 h-4 text-yellow-600" />
-                      {formatSalary(job.salary?.min)} – {formatSalary(job.salary?.max)}
-                    </span>
-                  </div>
-
-                  {/* Divider and description */}
-                  <div className="border-t mt-4 pt-4 text-sm text-gray-700 leading-relaxed">
-                    {job.description
-                      ? job.description.slice(0, 100) + "..."
-                      : "Join a reputed healthcare team making an impact in patient care."}
-                  </div>
-
-                  {/* Bottom tags */}
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                      {job.specialization || "General"}
-                    </span>
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
-                      Full-time
-                    </span>
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
-                      On-site
-                    </span>
-                  </div>
-
-                  {/* Bottom section with date + button */}
-                  <div className="flex justify-between items-center mt-6">
-                    <p className="text-xs text-gray-500">
-                      Posted on {new Date(job.createdAt).toLocaleDateString()}
-                    </p>
+                    {/* Right: Bookmark Icon */}
                     <button
-                      onClick={() =>
-                        router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)
-                      }
-                      className="px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+                      className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition p-1"
+                      onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
                     >
-                      View Details
+                      <ArrowUpRight className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
-
 
           {/* PAGINATION */}
           {totalPages > 1 && (
