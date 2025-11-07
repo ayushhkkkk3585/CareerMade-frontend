@@ -83,7 +83,7 @@ export default function JobSeekerDashboard() {
       if (res.ok) {
         if (type === "resume") setResume(data.data.resume);
         else setCoverLetter(data.data.coverLetter);
-        alert(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
+        toast.success(`${type === "resume" ? "Resume" : "Cover letter"} uploaded!`);
       } else toast.success(data.message || "Upload failed");
     } catch (err) {
       toast.error("Error uploading file");
@@ -105,7 +105,7 @@ export default function JobSeekerDashboard() {
       if (res.ok) {
         if (type === "resume") setResume(null);
         else setCoverLetter(null);
-        alert(`${type} deleted!`);
+        toast.success(`${type} deleted!`);
       } else toast.success("Failed to delete");
     } catch (err) {
       toast.error("Error deleting file");

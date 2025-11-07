@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
 import GradientLoader from '@/app/components/GradientLoader';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PreviewResumePage() {
     const params = useParams();
@@ -27,7 +29,7 @@ export default function PreviewResumePage() {
             });
             setResume(response.data.data.resume);
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to load resume');
+            toast.error(err.response?.data?.message || 'Failed to load resume');
             router.push('/dashboard/jobseeker/resume');
         } finally {
             setLoading(false);
@@ -44,7 +46,7 @@ export default function PreviewResumePage() {
             });
             window.open(response.data.data.downloadUrl, '_blank');
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to download resume');
+            toast.error(err.response?.data?.message || 'Failed to download resume');
         } finally {
             setDownloading(false);
         }

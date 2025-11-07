@@ -7,6 +7,8 @@ import GradientLoader from '@/app/components/GradientLoader';
 // Assuming these icons are available or you'd use a library like 'lucide-react'
 import { FileText, PlusCircle, Trash2, Edit, Eye, Download, Star } from 'lucide-react';
 import Link from 'next/link';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Resume {
     _id: string;
@@ -63,7 +65,7 @@ export default function ResumePage() {
             } catch (err: any) {
                 // Check for specific error message or fallback
                 const errorMessage = err.response?.data?.message || 'Failed to delete resume.';
-                alert(errorMessage);
+                toast.error(errorMessage);
             }
         }
     };

@@ -107,7 +107,7 @@ export default function JobSeekerDashboard() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         const seeker = data.data?.jobSeeker || data;
         setProfile(seeker);
         setResume(seeker.resume || null);

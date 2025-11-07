@@ -31,7 +31,7 @@ export default function JobViewPage() {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then((res) => {
-                console.log("[JobView] Response", { status: res.status, ok: res.ok });
+                // console.log("[JobView] Response", { status: res.status, ok: res.ok });
                 return res
                     .json()
                     .catch((e) => {
@@ -79,7 +79,7 @@ export default function JobViewPage() {
                 const js = data?.data?.jobSeeker ?? data?.jobSeeker ?? data;
                 setResume(js?.resume ?? null);
                 setCoverLetter(js?.coverLetter ?? null);
-                console.log("[JobView] Profile files", { resume: js?.resume, coverLetter: js?.coverLetter });
+                // console.log("[JobView] Profile files", { resume: js?.resume, coverLetter: js?.coverLetter });
             })
             .catch((e) => toast.error(`[JobView] Failed to load profile: ${String(e)}`));
     }, []);

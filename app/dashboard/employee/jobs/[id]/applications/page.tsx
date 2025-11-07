@@ -172,7 +172,7 @@ export default function JobApplicationsPage() {
         });
 
         const data = await res.json();
-        console.log("Fetched applications:", data);
+        // console.log("Fetched applications:", data);
 
         if (!res.ok) {
           console.error("Error fetching applications:", data.message);

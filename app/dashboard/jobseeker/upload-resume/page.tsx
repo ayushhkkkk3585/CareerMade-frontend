@@ -20,7 +20,7 @@ export default function UploadResume() {
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fileInput = (e.currentTarget.elements.namedItem("resume") as HTMLInputElement);
-    if (!fileInput.files?.length) return alert("Please select a file.");
+    if (!fileInput.files?.length) return toast.success("Please select a file.");
 
     const formData = new FormData();
     formData.append("resume", fileInput.files[0]);

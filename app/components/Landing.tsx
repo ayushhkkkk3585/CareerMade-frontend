@@ -104,10 +104,17 @@ export default function CareerMadeLanding() {
                                 Career
                             </span>
                         </h1>
+                        <div className="mt-6 mb-5">
+                            <Link href="/view-jobs">
+                                <button className="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition font-semibold">
+                                    Explore All Jobs
+                                </button>
+                            </Link>
+                        </div>
 
 
                         {/* Search Bar */}
-                        <div className="max-w-3xl mx-auto mb-8">
+                        {/* <div className="max-w-3xl mx-auto mb-8">
                             <div className="bg-white rounded-lg shadow-lg p-3 flex flex-col md:flex-row items-center gap-3">
                                 <div className="flex-1 flex items-center w-full border-b md:border-b-0 md:border-r border-gray-200 pb-3 md:pb-0 md:pr-3">
                                     <Search className="w-5 h-5 text-gray-400 mr-2" />
@@ -134,7 +141,7 @@ export default function CareerMadeLanding() {
                                     </button>
                                 </Link>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Popular Searches */}
                         <div className="flex items-center justify-center flex-wrap gap-3 text-sm">

@@ -19,7 +19,7 @@ import Navbar from "@/app/components/Navbar";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Footer from "@/app/components/Footer";
+
 interface Location {
   city?: string;
   state?: string;

@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
 import GradientLoader from '@/app/components/GradientLoader';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function EditResumePage() {
     const params = useParams();
@@ -12,6 +14,8 @@ export default function EditResumePage() {
     const [resume, setResume] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [generating, setGenerating] = useState(false);
+
     const [activeTab, setActiveTab] = useState('personal');
 
     useEffect(() => {
@@ -31,7 +35,7 @@ export default function EditResumePage() {
             );
             setResume(response.data.data.resume);
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to load resume');
+            toast.error(err.response?.data?.message || 'Failed to load resume');
             router.push('/dashboard/jobseeker/resume');
         } finally {
             setLoading(false);
@@ -50,10 +54,9 @@ export default function EditResumePage() {
                     },
                 }
             );
-            alert('Resume saved successfully');
-            router.push('/dashboard/jobseeker/resume')
+            toast.success('Resume saved successfully');
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to save resume');
+            toast.error(err.response?.data?.message || 'Failed to save resume');
         } finally {
             setSaving(false);
         }
@@ -61,8 +64,21 @@ export default function EditResumePage() {
 
     const handleGeneratePDF = async () => {
         try {
-            setSaving(true);
-            await axios.post(
+            setGenerating(true);
+
+            // Step 1: Save first
+            await axios.put(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/resume/${params.id}`,
+                { ...resume, regeneratePdf: false },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                    },
+                }
+            );
+
+            // Step 2: Generate PDF
+            const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/resume/${params.id}/generate-pdf`,
                 {},
                 {
@@ -71,12 +87,16 @@ export default function EditResumePage() {
                     },
                 }
             );
-            alert('PDF generated successfully');
-            fetchResume();
+
+            toast.success('PDF generated successfully');
+
+            // Step 3: Redirect to preview
+            const resumeId = params.id;
+            router.push(`/dashboard/jobseeker/resume/preview/${resumeId}`);
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to generate PDF');
+            toast.error(err.response?.data?.message || 'Failed to generate PDF');
         } finally {
-            setSaving(false);
+            setGenerating(false);
         }
     };
 
@@ -91,10 +111,10 @@ export default function EditResumePage() {
                     },
                 }
             );
-            alert('Resume set as default');
+            toast.success('Resume set as default');
             fetchResume();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to set default');
+            toast.error(err.response?.data?.message || 'Failed to set default');
         }
     };
 
@@ -146,13 +166,15 @@ export default function EditResumePage() {
                         >
                             Set as Default
                         </button>
+
                         <button
                             onClick={handleGeneratePDF}
-                            disabled={saving}
+                            disabled={generating}
                             className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm disabled:bg-gray-400"
                         >
-                            {saving ? 'Generating...' : 'Generate PDF'}
+                            {generating ? 'Generating...' : 'Generate PDF'}
                         </button>
+
                         <button
                             onClick={handleSave}
                             disabled={saving}
@@ -161,6 +183,7 @@ export default function EditResumePage() {
                             {saving ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
+
                 </div>
 
                 {/* Tabs */}

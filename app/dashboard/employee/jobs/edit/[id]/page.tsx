@@ -146,7 +146,7 @@ export default function EditJobPage() {
 
       if (!res.ok) throw new Error("Failed to update job");
 
-      alert("✅ Job updated successfully!");
+      toast.success("✅ Job updated successfully!");
       router.push("/dashboard/employee/jobs");
     } catch (err) {
       // console.error("Update job error:", err);

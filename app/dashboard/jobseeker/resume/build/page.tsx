@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
 import GradientLoader from '@/app/components/GradientLoader';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function BuildResumePage() {
   const router = useRouter();
@@ -78,7 +80,7 @@ export default function BuildResumePage() {
       }));
     } catch (err: any) {
       console.error('Failed to fetch job seeker data:', err);
-      alert(err.response?.data?.message || 'Failed to load your profile');
+      toast.error(err.response?.data?.message || 'Failed to load your profile');
     } finally {
       setLoading(false);
     }
@@ -144,7 +146,7 @@ export default function BuildResumePage() {
       );
       router.push(`/dashboard/jobseeker/resume/edit/${response.data.data.resume._id}`);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to create resume');
+      toast.error(err.response?.data?.message || 'Failed to create resume');
     } finally {
       setCreating(false);
     }
@@ -162,6 +164,7 @@ export default function BuildResumePage() {
   return (
     <>
       <Navbar />
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
       <div className="p-8 max-w-4xl mx-auto">
         <div className="flex justify-start items-start mb-3">
