@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const SPECIALIZATIONS = [
   "General Medicine", "Cardiology", "Neurology", "Orthopedics", "Pediatrics",
@@ -119,24 +120,46 @@ export default function JobSeekerJobs() {
     const fetchJobs = async () => {
       try {
         const token = localStorage.getItem("accessToken");
+        const user = localStorage.getItem("user");
+
+        // 🔒 Redirect if not logged in
+        if (!token || !user) {
+          toast.error("Please log in to continue.");
+          router.push("/login");
+          return;
+        }
+
+        const parsedUser = JSON.parse(user);
+
+        // 🚫 Restrict access: Only for jobseekers
+        if (parsedUser.role !== "jobseeker") {
+          toast.error("Access denied. Jobseekers only.");
+          router.push("/login");
+          return;
+        }
+
+        // ✅ Fetch jobs if authorized
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=50`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
+
         if (res.ok) {
           setJobs(data.data?.items || data.items || []);
           setFilteredJobs(data.data?.items || data.items || []);
         } else {
           toast.error(data.message || "Failed to fetch jobs");
         }
-      } catch {
+      } catch (error) {
         toast.error("Something went wrong fetching jobs");
       } finally {
         setLoading(false);
       }
     };
+
     fetchJobs();
-  }, []);
+  }, [router]);
+
 
   // ✅ Apply filters and search
   useEffect(() => {
@@ -485,17 +508,27 @@ export default function JobSeekerJobs() {
           </button>
 
           {/* SEARCH BAR */}
-          <div className="mb-8">
-            <div className="relative max-w-lg mx-auto lg:mx-0">
+          <div className="mb-8 flex flex-col lg:flex-row lg:items-center gap-4">
+            {/* MODIFICATION: Added lg:flex-1 to make the search bar take up available space */}
+            <div className="relative w-full max-w-lg mx-auto lg:mx-0 lg:flex-1">
               <input
                 type="text"
-                placeholder="Search by title, specialization, or location..."
+                placeholder="Enter keyword / designation / companies..."
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
             </div>
+            {/* The button container (button element) */}
+            <button className="w-full lg:w-auto text-[#002B6B] font-semibold py-2 px-6 hover:underline rounded-full text-center transition-colors  mt-2 lg:mt-0 whitespace-nowrap">
+              <Link
+                href={'/dashboard/jobseeker/applications'} // Ensure leading slash for safety
+                className="flex items-center gap-1"
+              >
+                My applications <ArrowUpRight className="inline-block w-4 h-4" />
+              </Link>
+            </button>
           </div>
 
           {loading ? (
@@ -646,7 +679,7 @@ export default function JobSeekerJobs() {
             {/* Top Organizations */}
             <div className="bg-white border rounded-2xl shadow-sm p-5 mb-5">
               <h3 className="font-semibold text-lg mb-3 text-gray-800">
-                See 20 jobs matching your profile 
+                See 20 jobs matching your profile
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 {/* Replace with your actual logo paths */}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import { ArrowLeft, User2, Edit } from "lucide-react";
 import GradientLoader from "@/app/components/GradientLoader";
+import toast from "react-hot-toast";
 
 export default function ViewEmployerProfile() {
   const router = useRouter();

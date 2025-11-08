@@ -12,8 +12,24 @@ export default function EmployerApplicationsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token) return;
+    const user = localStorage.getItem("user");
 
+    if (!token || !user) {
+      toast.error("Please log in to continue.");
+      router.push("/login");
+      return;
+    }
+
+    const parsedUser = JSON.parse(user);
+
+    // Role-based access: allow only employers
+    if (parsedUser.role !== "employer") {
+      toast.error("Access denied. Employers only.");
+      router.push("/login");
+      return;
+    }
+
+    // ✅ Fetch employer applications
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/applications/employer?limit=50`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -22,15 +38,16 @@ export default function EmployerApplicationsPage() {
       .then((res) => res.json())
       .then((data) => {
         setApplications(data.data?.items || []);
-        setLoading(false);
       })
       .catch((err) => {
-        toast.error("Failed to fetch applications:", err);
-        setLoading(false);
-      });
-  }, []);
+        console.error("Error fetching applications:", err);
+        toast.error("Failed to fetch applications.");
+      })
+      .finally(() => setLoading(false));
+  }, [router]);
 
- if (loading)
+
+  if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <GradientLoader />
@@ -61,15 +78,14 @@ export default function EmployerApplicationsPage() {
               <p className="text-sm mt-1">
                 Status:{" "}
                 <span
-                  className={`font-medium ${
-                    app.status === "Applied"
+                  className={`font-medium ${app.status === "Applied"
                       ? "text-blue-600"
                       : app.status === "Interview"
-                      ? "text-yellow-600"
-                      : app.status === "Rejected"
-                      ? "text-red-600"
-                      : "text-green-600"
-                  }`}
+                        ? "text-yellow-600"
+                        : app.status === "Rejected"
+                          ? "text-red-600"
+                          : "text-green-600"
+                    }`}
                 >
                   {app.status}
                 </span>

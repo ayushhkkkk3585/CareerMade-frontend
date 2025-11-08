@@ -23,6 +23,20 @@ export default function BrowseJobs() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
+    const userData = localStorage.getItem('user'); // assuming you store user info after login
+
+    // If not logged in → redirect
+    if (!token || !userData) {
+      router.push('/login');
+      return;
+    }
+    const user = JSON.parse(userData);
+
+    // If not an jobseeker → redirect
+    if (user.role !== 'jobseeker') {
+      router.push('/login');
+      return;
+    }
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=30`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -32,7 +46,7 @@ export default function BrowseJobs() {
         setJobs(items);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [router]);
 
   return (
     <>

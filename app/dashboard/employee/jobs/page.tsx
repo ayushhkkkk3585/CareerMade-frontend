@@ -90,12 +90,10 @@ export default function JobListing() {
   const handleDelete = async (id: string): Promise<void> => {
     if (!confirm("Are you sure you want to delete this job?")) return;
 
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : null;
+    const token = localStorage.getItem("accessToken");
     if (!token) {
       toast.error("Unauthorized");
+      router.push("/login");
       return;
     }
 
@@ -122,9 +120,26 @@ export default function JobListing() {
   };
   // ✅ Fetch jobs
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const userData = localStorage.getItem("user");
+
+    if (!token || !userData) {
+      toast.error("Please login to continue");
+      router.push("/login");
+      return;
+    }
+
+    const user = JSON.parse(userData);
+
+    if (user.role !== "employer") {
+      toast.error("Access denied: Only employers can view this page");
+      router.push("/login");
+      return;
+    }
+
+    // ✅ Only fetch jobs if valid employer
     const fetchJobs = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=50`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -141,8 +156,9 @@ export default function JobListing() {
         setLoading(false);
       }
     };
+
     fetchJobs();
-  }, []);
+  }, [router]);
 
   // ✅ Filtering Logic
   useEffect(() => {
@@ -347,7 +363,7 @@ export default function JobListing() {
         <div className="lg:col-span-3">
           {/* ===== SEARCH BAR ===== */}
           <div className="mb-8 w-full">
-            <div className="relative w-full sm:max-w-md lg:max-w-lg">
+            <div className="relative w-full  sm:max-w-md lg:max-w-lg">
               <Search
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                 size={20}
@@ -369,6 +385,7 @@ export default function JobListing() {
                 }}
               />
             </div>
+          
           </div>
 
           {loading ? (

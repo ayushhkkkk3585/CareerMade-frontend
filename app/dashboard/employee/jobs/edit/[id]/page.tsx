@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  Briefcase, 
-  ArrowLeft, 
-  MapPin, 
-  DollarSign, 
-  Home, 
-  Clock, 
-  Tag, 
-  Layers, 
+import {
+  Briefcase,
+  ArrowLeft,
+  MapPin,
+  DollarSign,
+  Home,
+  Clock,
+  Tag,
+  Layers,
   FileText,
   Zap
 } from "lucide-react";
@@ -60,8 +60,24 @@ export default function EditJobPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!id || !token) return;
+    const userData = localStorage.getItem("user");
 
+    // 🔒 Check login
+    if (!token || !userData) {
+      router.push("/login");
+      return;
+    }
+
+    const user = JSON.parse(userData);
+
+    // 🔒 Check role
+    if (user.role !== "employer") {
+      router.push("/login");
+      return;
+    }
+
+    // ✅ Fetch job data
+    if (!id) return;
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -91,10 +107,10 @@ export default function EditJobPage() {
             country: job.location?.country || "India",
           },
         });
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, [id]);
+      .catch(() => toast.error("Failed to fetch job details"))
+      .finally(() => setLoading(false));
+  }, [id, router]);
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
@@ -158,10 +174,10 @@ export default function EditJobPage() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.title.trim()) newErrors.title = 'Job title is required';
     if (!formData.description.trim()) newErrors.description = 'Job description is required';
-    if (formData.experienceRequired.minYears && isNaN(Number(formData.experienceRequired.minYears))) 
+    if (formData.experienceRequired.minYears && isNaN(Number(formData.experienceRequired.minYears)))
       newErrors.minExp = 'Must be a valid number';
     if (formData.experienceRequired.maxYears && isNaN(Number(formData.experienceRequired.maxYears)))
       newErrors.maxExp = 'Must be a valid number';
@@ -174,7 +190,7 @@ export default function EditJobPage() {
     return Object.keys(newErrors).length === 0;
   };
 
- if (loading)
+  if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <GradientLoader />
@@ -188,14 +204,14 @@ export default function EditJobPage() {
         <div className="bg-white w-full max-w-4xl rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           {/* Header */}
           <div className="border-b border-gray-100 px-6 py-6 sm:px-8">
-            <button 
+            <button
               onClick={() => router.push('/dashboard/employee/jobs')}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back to Jobs</span>
             </button>
-            
+
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Briefcase className="text-white w-6 h-6" />
@@ -220,9 +236,8 @@ export default function EditJobPage() {
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2.5 border ${
-                      errors.title ? 'border-red-300' : 'border-gray-300'
-                    } rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    className={`w-full px-4 py-2.5 border ${errors.title ? 'border-red-300' : 'border-gray-300'
+                      } rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     placeholder="e.g. Doctor"
                   />
                   {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
@@ -245,9 +260,8 @@ export default function EditJobPage() {
                   value={formData.description}
                   onChange={handleChange}
                   rows={5}
-                  className={`w-full px-4 py-2.5 border ${
-                    errors.description ? 'border-red-300' : 'border-gray-300'
-                  } rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  className={`w-full px-4 py-2.5 border ${errors.description ? 'border-red-300' : 'border-gray-300'
+                    } rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                   placeholder="Detailed job description, responsibilities, and requirements..."
                 />
                 {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
@@ -266,12 +280,12 @@ export default function EditJobPage() {
                   onChange={handleChange}
                   className="px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#8F59ED]"
                 >
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Freelance">Freelance</option>
-                    <option value="Internship">Internship</option>
-                    <option value="Volunteer">Volunteer</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Freelance">Freelance</option>
+                  <option value="Internship">Internship</option>
+                  <option value="Volunteer">Volunteer</option>
                 </select>
 
                 <select
@@ -281,9 +295,9 @@ export default function EditJobPage() {
                   className="px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#8F59ED]"
                 >
                   <option value="Day">Day Shift</option>
-                    <option value="Night">Night Shift</option>
-                    <option value="Rotating">Rotational Shift</option>
-                    <option value="Flexible">Flexible Hours</option>
+                  <option value="Night">Night Shift</option>
+                  <option value="Rotating">Rotational Shift</option>
+                  <option value="Flexible">Flexible Hours</option>
                 </select>
               </div>
             </section>

@@ -17,6 +17,22 @@ export default function EditResumePage() {
     const [generating, setGenerating] = useState(false);
 
     const [activeTab, setActiveTab] = useState('personal');
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+        if (!token) {
+            toast.error("Please log in to edit your resume");
+            router.push("/login");
+            return;
+        }
+
+        if (!storedUser || storedUser.role !== "jobseeker") {
+            toast.error("Unauthorized access");
+            router.push("/login");
+            return;
+        }
+    }, [router]);
 
     useEffect(() => {
         fetchResume();

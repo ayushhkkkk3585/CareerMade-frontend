@@ -12,16 +12,47 @@ export default function SavedJobs() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/saved-jobs`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setSavedJobs(data.data?.items || []))
-      .finally(() => setLoading(false));
-  }, [])
+    const fetchSavedJobs = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const user = localStorage.getItem("user");
 
-   if (loading)
+        // 🔒 If no token or user, redirect to login
+        if (!token || !user) {
+          router.push("/login");
+          return;
+        }
+
+        const parsedUser = JSON.parse(user);
+
+        // 🚫 Only jobseekers can access this page
+        if (parsedUser.role !== "jobseeker") {
+          router.push("/login");
+          return;
+        }
+
+        // ✅ Fetch saved jobs
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/saved-jobs`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const data = await res.json();
+        setSavedJobs(data.data?.items || []);
+      } catch (error) {
+        console.error("Failed to fetch saved jobs", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSavedJobs();
+  }, [router]);
+
+
+  if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <GradientLoader />

@@ -14,20 +14,45 @@ export default function MyApplications() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
+    const fetchApplications = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const user = localStorage.getItem("user");
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/applications/me`, {
-      headers: { Authorization: ` Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+        // 🔒 Check if logged in
+        if (!token || !user) {
+          router.push("/login");
+          return;
+        }
+
+        const parsedUser = JSON.parse(user);
+
+        // 🚫 Restrict access: only for jobseekers
+        if (parsedUser.role !== "jobseeker") {
+          router.push("/login");
+          return;
+        }
+
+        // ✅ Fetch user's applications
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/applications/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json();
         const items = data.data?.items || data.items || [];
+
         setAllApplications(items);
         setApplications(items);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      } catch (error) {
+        console.error("Failed to fetch applications", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, [router]);
+
 
   // close filter dropdown on outside click
   useEffect(() => {
@@ -180,7 +205,7 @@ export default function MyApplications() {
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-gray-200 border-t-[#8F59ED] rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="w-12 h-12 border-4 border-gray-200 border-t-[#00B8DB] rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading your applications...</p>
               </div>
             </div>
@@ -197,7 +222,7 @@ export default function MyApplications() {
               </p>
               <a
                 href="/dashboard/jobseeker/jobs"
-                className="px-5 py-2.5 bg-[#8F59ED] hover:bg-[#7c4dd4] text-white rounded-lg text-sm font-medium transition-colors"
+                className="px-5 py-2.5 bg-[#00B8DB]  text-white rounded-lg text-sm font-medium transition-colors"
               >
                 Browse Jobs
               </a>
@@ -265,18 +290,18 @@ export default function MyApplications() {
                               ${app.status === "Applied"
                                 ? "bg-blue-50 text-blue-700"
                                 : app.status === "Under Review"
-                                ? "bg-yellow-50 text-yellow-700"
-                                : app.status === "Interview"
-                                ? "bg-purple-50 text-purple-700"
-                                : app.status === "Offered"
-                                ? "bg-green-50 text-green-700"
-                                : app.status === "Rejected"
-                                ? "bg-red-50 text-red-700"
-                                : app.status === "Withdrawn"
-                                ? "bg-gray-100 text-gray-700"
-                                : app.status === "Hired"
-                                ? "bg-emerald-50 text-emerald-700"
-                                : "bg-slate-100 text-slate-700"
+                                  ? "bg-yellow-50 text-yellow-700"
+                                  : app.status === "Interview"
+                                    ? "bg-purple-50 text-purple-700"
+                                    : app.status === "Offered"
+                                      ? "bg-green-50 text-green-700"
+                                      : app.status === "Rejected"
+                                        ? "bg-red-50 text-red-700"
+                                        : app.status === "Withdrawn"
+                                          ? "bg-gray-100 text-gray-700"
+                                          : app.status === "Hired"
+                                            ? "bg-emerald-50 text-emerald-700"
+                                            : "bg-slate-100 text-slate-700"
                               }`}
                           >
                             {app.status || "Pending"}

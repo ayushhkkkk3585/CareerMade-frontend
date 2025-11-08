@@ -31,8 +31,25 @@ export default function EmployerProfileCreatePage() {
   // ✅ Fetch profile on mount
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token) return;
+    const user = localStorage.getItem("user");
 
+    // If no token or user, redirect to login
+    if (!token || !user) {
+      toast.error("Please log in to continue.");
+      router.push("/login");
+      return;
+    }
+
+    const parsedUser = JSON.parse(user);
+
+    // If not employer, restrict access
+    if (parsedUser.role !== "employer") {
+      toast.error("Access denied. Employers only.");
+      router.push("/login");
+      return;
+    }
+
+    // ✅ Fetch existing employer profile (if any)
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -62,7 +79,8 @@ export default function EmployerProfileCreatePage() {
         }
       })
       .catch((err) => console.error("Error fetching profile:", err));
-  }, []);
+  }, [router]);
+
 
   // 🧠 Handle change
   const handleChange = (
@@ -132,7 +150,7 @@ export default function EmployerProfileCreatePage() {
 
   return (
     <>
-     <Navbar />
+      <Navbar />
 
       <div className="max-w-4xl mx-auto p-6 sm:p-8 mt-8 mb-5 bg-white rounded-2xl shadow-md border border-gray-100">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
@@ -148,7 +166,7 @@ export default function EmployerProfileCreatePage() {
             onClick={() => router.push("/dashboard/employee/profile/")}
             className="mt-4 sm:mt-0 px-4 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-lg text-sm font-medium  transition-all"
           >
-            
+
             Go Back
           </button>
         </div>
@@ -323,8 +341,8 @@ export default function EmployerProfileCreatePage() {
               {loading
                 ? "Saving..."
                 : isEditing
-                ? "Update Profile"
-                : "Create Profile"}
+                  ? "Update Profile"
+                  : "Create Profile"}
             </button>
           </div>
         </form>

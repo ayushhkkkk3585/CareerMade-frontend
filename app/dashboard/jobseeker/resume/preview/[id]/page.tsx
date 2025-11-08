@@ -14,6 +14,22 @@ export default function PreviewResumePage() {
     const [resume, setResume] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+        if (!token) {
+            toast.error("Please log in to preview resumes");
+            router.push("/login");
+            return;
+        }
+
+        if (!storedUser || storedUser.role !== "jobseeker") {
+            toast.error("Unauthorized access");
+            router.push("/login");
+            return;
+        }
+    }, [router]);
 
     useEffect(() => {
         fetchResume();

@@ -83,12 +83,32 @@ export default function ApplicationDetailPage() {
     const load = async () => {
       try {
         const token = localStorage.getItem("accessToken");
+        const user = localStorage.getItem("user");
+
+        // 🧱 Redirect if no login
+        if (!token || !user) {
+          toast.error("Please log in to continue.");
+          router.push("/login");
+          return;
+        }
+
+        const parsedUser = JSON.parse(user);
+
+        // 🚫 Restrict access if not employer
+        if (parsedUser.role !== "employer") {
+          toast.error("Access denied. Employers only.");
+          router.push("/login");
+          return;
+        }
+
+        // ✅ Proceed to fetch application details
         const res = await fetch(`${apiBase}/api/applications/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
+
         const json = await res.json();
         if (!res.ok)
           throw new Error(json.message || "Failed to load application");
@@ -104,8 +124,10 @@ export default function ApplicationDetailPage() {
         setLoading(false);
       }
     };
+
     if (id) load();
-  }, [id, apiBase]);
+  }, [id, apiBase, router]);
+
 
   // 🟨 Save status change
   const saveStatus = async (newStatus: string) => {

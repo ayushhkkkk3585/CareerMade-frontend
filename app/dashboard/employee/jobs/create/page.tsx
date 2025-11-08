@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { 
-  Briefcase, 
-  ArrowLeft, 
-  MapPin, 
-  DollarSign, 
-  Home, 
-  Clock, 
-  Tag, 
-  Layers, 
+import { useState, useEffect } from "react";
+import {
+  Briefcase,
+  ArrowLeft,
+  MapPin,
+  DollarSign,
+  Home,
+  Clock,
+  Tag,
+  Layers,
   FileText,
   Zap
 } from "lucide-react";
@@ -28,9 +28,9 @@ const FormSection = ({ title, icon, children }: { title: string; icon: React.Rea
   </div>
 );
 
-const FormField = ({ label, children, className = "", required = false }: { 
-  label: string; 
-  children: React.ReactNode; 
+const FormField = ({ label, children, className = "", required = false }: {
+  label: string;
+  children: React.ReactNode;
   className?: string;
   required?: boolean;
 }) => (
@@ -76,7 +76,7 @@ export default function CreateJobPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const [formData, setFormData] = useState<FormData>({
     title: "",
     specialization: "",
@@ -88,26 +88,33 @@ export default function CreateJobPage() {
     salary: { min: "", max: "", currency: "INR", period: "Annual" },
     location: { city: "", state: "", country: "India" },
   });
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      toast.error("Please log in to continue.");
+      router.push("/login"); // redirect if no token
+    }
+  }, [router]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.title.trim()) newErrors.title = 'Job title is required';
     if (!formData.specialization.trim()) newErrors.specialization = 'Specialization is required';
     if (!formData.description.trim()) newErrors.description = 'Job description is required';
-    
+
     if (formData.experienceRequired.minYears && formData.experienceRequired.maxYears) {
       if (Number(formData.experienceRequired.minYears) > Number(formData.experienceRequired.maxYears)) {
         newErrors.experience = 'Minimum years cannot be greater than maximum years';
       }
     }
-    
+
     if (formData.salary.min && formData.salary.max) {
       if (Number(formData.salary.min) > Number(formData.salary.max)) {
         newErrors.salary = 'Minimum salary cannot be greater than maximum salary';
       }
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -116,10 +123,10 @@ export default function CreateJobPage() {
     const { name, value, type } = e.target as HTMLInputElement;
     const isCheckbox = type === 'checkbox';
     const checked = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
-    
+
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
-      
+
       setFormData(prev => {
         if (parent === 'experienceRequired' || parent === 'salary' || parent === 'location') {
           return {
@@ -138,7 +145,7 @@ export default function CreateJobPage() {
         [name]: isCheckbox ? checked : value
       }));
     }
-    
+
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -150,9 +157,9 @@ export default function CreateJobPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     const token = localStorage.getItem("accessToken");
     if (!token) {
       toast.error("Please log in again to continue.");
@@ -211,7 +218,7 @@ export default function CreateJobPage() {
     }
   };
 
- if (loading)
+  if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <GradientLoader />
@@ -221,7 +228,7 @@ export default function CreateJobPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       {/* Header Banner */}
       <div className="bg-gray-50">
         <div className="w-full relative bg-[#002B6B] text-white overflow-hidden">

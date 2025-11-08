@@ -38,6 +38,22 @@ export default function BuildResumePage() {
       spacing: 'normal',
     },
   });
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (!token) {
+      toast.error("Please log in to build your resume");
+      router.push("/login");
+      return;
+    }
+
+    if (!storedUser || storedUser.role !== "jobseeker") {
+      toast.error("Unauthorized access");
+      router.push("/login");
+      return;
+    }
+  }, [router]);
 
   useEffect(() => {
     fetchJobSeekerData();

@@ -9,6 +9,7 @@ import { FileText, PlusCircle, Trash2, Edit, Eye, Download, Star } from 'lucide-
 import Link from 'next/link';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from 'next/navigation';
 
 interface Resume {
     _id: string;
@@ -30,6 +31,23 @@ export default function ResumePage() {
     const [resumes, setResumes] = useState<Resume[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const router = useRouter();
+      useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (!token) {
+      toast.error("Please log in to access your resumes");
+      router.push("/login");
+      return;
+    }
+
+    if (!storedUser || storedUser.role !== "jobseeker") {
+      toast.error("Unauthorized access");
+      router.push("/login");
+      return;
+    }
+  }, [router]);
 
     useEffect(() => {
         fetchResumes();

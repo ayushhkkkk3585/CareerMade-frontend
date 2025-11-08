@@ -33,6 +33,22 @@ export default function JobSeekerDashboard() {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const user = localStorage.getItem("user");
+
+    if (!token || !user) {
+      router.push("/login");
+      return;
+    }
+
+    const parsedUser = JSON.parse(user);
+    if (parsedUser.role !== "jobseeker") {
+      router.push("/login");
+      return;
+    }
+  }, [router]);
 
   // Fetch user from localStorage
   useEffect(() => {
@@ -112,7 +128,7 @@ export default function JobSeekerDashboard() {
     }
   };
 
-if (loading)
+  if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <GradientLoader />
@@ -367,16 +383,16 @@ if (loading)
                       <p className="text-gray-500 text-xs mt-1">
                         {exp.startDate
                           ? new Date(exp.startDate).toLocaleDateString(
-                              "en-US",
-                              { year: "numeric", month: "short" }
-                            )
+                            "en-US",
+                            { year: "numeric", month: "short" }
+                          )
                           : ""}{" "}
                         -{" "}
                         {exp.endDate
                           ? new Date(exp.endDate).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                            })
+                            year: "numeric",
+                            month: "short",
+                          })
                           : "Present"}
                       </p>
                       {exp.description && (
@@ -393,103 +409,103 @@ if (loading)
             {/* Education & Certifications */}
             {(profile?.education?.length > 0 ||
               profile?.certifications?.length > 0) && (
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-[#007BFF]" />
-                  Education & Certifications
-                </h3>
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-[#007BFF]" />
+                    Education & Certifications
+                  </h3>
 
-                {/* Education */}
-                {profile?.education && profile.education.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-700 mb-3 text-sm">
-                      Education
-                    </h4>
-                    <div className="space-y-3">
-                      {profile.education.map((edu: any, idx: number) => (
-                        <div
-                          key={idx}
-                          className="p-3 bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100"
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-[#007BFF] text-white rounded-full flex items-center justify-center text-sm font-bold">
-                              <Book className="w-4 h-4" />
-                            </div>
-                            <div className="flex-1">
-                              <h5 className="font-semibold text-gray-900 text-sm">
-                                {edu.degree} in {edu.field}
-                              </h5>
-                              <p className="text-gray-700 text-sm">
-                                {edu.institution}
-                              </p>
-                              <p className="text-gray-500 text-xs mt-1">
-                                {edu.yearOfCompletion}
-                                {edu.grade && ` • Grade: ${edu.grade}`}
-                              </p>
+                  {/* Education */}
+                  {profile?.education && profile.education.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="font-semibold text-gray-700 mb-3 text-sm">
+                        Education
+                      </h4>
+                      <div className="space-y-3">
+                        {profile.education.map((edu: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className="p-3 bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-[#007BFF] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                <Book className="w-4 h-4" />
+                              </div>
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-gray-900 text-sm">
+                                  {edu.degree} in {edu.field}
+                                </h5>
+                                <p className="text-gray-700 text-sm">
+                                  {edu.institution}
+                                </p>
+                                <p className="text-gray-500 text-xs mt-1">
+                                  {edu.yearOfCompletion}
+                                  {edu.grade && ` • Grade: ${edu.grade}`}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Certifications */}
-                {profile?.certifications && profile.certifications.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-gray-700 mb-3 text-sm">
-                      Certifications
-                    </h4>
-                    <div className="space-y-3">
-                      {profile.certifications.map((cert: any, idx: number) => (
-                        <div
-                          key={idx}
-                          className="p-3 bg-linear-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100"
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                              <Trophy className="w-4 h-4" />
-                            </div>
-                            <div className="flex-1">
-                              <h5 className="font-semibold text-gray-900 text-sm">
-                                {cert.name}
-                              </h5>
-                              <p className="text-gray-700 text-sm">
-                                {cert.issuingOrganization}
-                              </p>
-                              <p className="text-gray-500 text-xs mt-1">
-                                Issued:{" "}
-                                {new Date(cert.issueDate).toLocaleDateString(
-                                  "en-US",
-                                  { year: "numeric", month: "short" }
+                  {/* Certifications */}
+                  {profile?.certifications && profile.certifications.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3 text-sm">
+                        Certifications
+                      </h4>
+                      <div className="space-y-3">
+                        {profile.certifications.map((cert: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className="p-3 bg-linear-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                <Trophy className="w-4 h-4" />
+                              </div>
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-gray-900 text-sm">
+                                  {cert.name}
+                                </h5>
+                                <p className="text-gray-700 text-sm">
+                                  {cert.issuingOrganization}
+                                </p>
+                                <p className="text-gray-500 text-xs mt-1">
+                                  Issued:{" "}
+                                  {new Date(cert.issueDate).toLocaleDateString(
+                                    "en-US",
+                                    { year: "numeric", month: "short" }
+                                  )}
+                                  {cert.expiryDate &&
+                                    ` • Expires: ${new Date(
+                                      cert.expiryDate
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                    })}`}
+                                </p>
+                                {cert.credentialUrl && (
+                                  <a
+                                    href={cert.credentialUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[#007BFF] hover:underline text-xs mt-1 inline-block"
+                                  >
+                                    View Credential
+                                  </a>
                                 )}
-                                {cert.expiryDate &&
-                                  ` • Expires: ${new Date(
-                                    cert.expiryDate
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                  })}`}
-                              </p>
-                              {cert.credentialUrl && (
-                                <a
-                                  href={cert.credentialUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[#007BFF] hover:underline text-xs mt-1 inline-block"
-                                >
-                                  View Credential
-                                </a>
-                              )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              )}
 
             {/* Skills */}
             {profile?.skills && profile.skills.length > 0 && (

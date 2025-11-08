@@ -89,6 +89,24 @@ export default function JobSeekerDashboard() {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  useEffect(() => {
+    const storedUser =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("user") || "{}")
+        : null;
+
+    if (!token) {
+      toast.error("Please log in to access your dashboard");
+      router.push("/login");
+      return;
+    }
+
+    if (!storedUser || storedUser.role !== "jobseeker") {
+      toast.error("Unauthorized access");
+      router.push("/login");
+      return;
+    }
+  }, [token, router]);
 
   // Fetch user from localStorage
   useEffect(() => {
@@ -197,7 +215,7 @@ export default function JobSeekerDashboard() {
   };
 
   // ---------------- LOADING STATES ----------------
- if (loading)
+  if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <GradientLoader />

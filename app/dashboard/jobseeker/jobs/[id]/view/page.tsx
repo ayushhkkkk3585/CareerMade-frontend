@@ -5,10 +5,12 @@ import { MapPin, Briefcase, DollarSign, Clock, Building2, ArrowLeft, FileText, T
 import Navbar from "@/app/components/Navbar";
 import GradientLoader from "@/app/components/GradientLoader";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 
 export default function JobViewPage() {
     const { id } = useParams();
+    const router = useRouter();
     const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
@@ -16,6 +18,20 @@ export default function JobViewPage() {
     const [coverLetter, setCoverLetter] = useState<any>(null);
     const [uploadingResume, setUploadingResume] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
+    
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        const user = localStorage.getItem("user");
+        if (!token || !user) {
+            router.push("/login");
+            return;
+        }
+        const parsedUser = JSON.parse(user);
+        if (parsedUser.role !== "jobseeker") {
+            router.push("/login");
+            return;
+        }
+    }, [router]);
 
     useEffect(() => {
         const token = localStorage.getItem("accessToken");

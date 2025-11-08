@@ -162,6 +162,15 @@ export default function JobApplicationsPage() {
       return;
     }
 
+    const parsedUser = JSON.parse(user);
+
+    // Role check — only allow employers
+    if (parsedUser.role !== "employer") {
+      toast.error("Access denied. Employers only.");
+      router.push("/login");
+      return;
+    }
+
     const fetchApplications = async () => {
       try {
         const res = await fetch(`${apiBase}/api/applications/job/${jobId}`, {
@@ -172,7 +181,6 @@ export default function JobApplicationsPage() {
         });
 
         const data = await res.json();
-        // console.log("Fetched applications:", data);
 
         if (!res.ok) {
           console.error("Error fetching applications:", data.message);
@@ -191,6 +199,7 @@ export default function JobApplicationsPage() {
 
     if (jobId) fetchApplications();
   }, [jobId, router, apiBase]);
+
 
   const updateApplicationStatus = async (applicationId: string, newStatus: string) => {
     try {
@@ -309,8 +318,8 @@ export default function JobApplicationsPage() {
               onClick={() => router.back()}
               className="px-5 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] bg-white/10 hover:bg-white/20 text-black rounded-full text-sm font-semibold transition-all shadow-md"
             >
-              
-               Back to Dashboard
+
+              Back to Dashboard
             </button>
 
           </div>

@@ -45,8 +45,25 @@ export default function JobViewPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!id || !token) return;
+    const userData = localStorage.getItem("user");
 
+    // 🔒 Authentication check
+    if (!token || !userData) {
+      router.push("/login");
+      return;
+    }
+
+    const user = JSON.parse(userData);
+
+    // 🔒 Role-based access control
+    if (user.role !== "employer") {
+      router.push("/login");
+      return;
+    }
+
+    if (!id) return;
+
+    // ✅ Fetch job details
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -57,9 +74,9 @@ export default function JobViewPage() {
       })
       .catch((err) => console.error("Error fetching job:", err))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, router]);
 
- if (loading)
+  if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <GradientLoader />
@@ -86,11 +103,10 @@ export default function JobViewPage() {
               </h1>
 
               <span
-                className={`px-4 py-1.5 text-sm rounded-full font-semibold uppercase tracking-wide ${
-                  job.status === "Active"
+                className={`px-4 py-1.5 text-sm rounded-full font-semibold uppercase tracking-wide ${job.status === "Active"
                     ? "bg-green-100 text-green-700 ring-1 ring-green-200"
                     : "bg-gray-100 text-gray-600 ring-1 ring-gray-200"
-                }`}
+                  }`}
               >
                 {job.status || "Active"}
               </span>
