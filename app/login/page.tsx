@@ -81,7 +81,7 @@ const Login = () => {
         className="hidden md:flex md:w-1/2 items-center justify-center"
       >
         <img
-          src="/Vector.png"
+          src="/gem.png"
           alt="Login illustration"
           className="w-3/4 h-auto hover:scale-105 transition-transform duration-500"
         />
