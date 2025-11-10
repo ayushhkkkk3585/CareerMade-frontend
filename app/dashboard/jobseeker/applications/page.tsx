@@ -183,7 +183,7 @@ export default function MyApplications() {
 
   // Get status color and icon
   const getStatusConfig = (status: string) => {
-    const configs: Record<string, { color: string; bgColor: string; icon: JSX.Element }> = {
+    const configs: Record<string, { color: string; bgColor: string; icon: React.ReactElement }> = {
       Applied: {
         color: "text-blue-700",
         bgColor: "bg-blue-50",
