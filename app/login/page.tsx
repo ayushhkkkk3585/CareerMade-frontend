@@ -73,12 +73,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-white overflow-hidden">
+      {/* Mobile Top Logo */}
+      <div className="flex md:hidden w-full justify-center pt-6">
+        <img src="/logo.png" alt="CareerMade" className="h-10" />
+      </div>
       {/* Left Section - Image */}
       <motion.div
         initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : -40 }}
         transition={{ duration: 0.8 }}
-        className="hidden md:flex md:w-1/2 items-center justify-center"
+        className="order-1 md:order-1 flex w-full md:w-1/2 items-center justify-center mb-6 md:mb-0"
       >
         <img
           src="/gem.png"
@@ -92,12 +96,12 @@ const Login = () => {
         initial={{ opacity: 0, x: 40 }}
         animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 40 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="flex flex-col h-screen justify-center items-center md:w-1/2 p-6 sm:p-10"
+        className="order-2 md:order-2 flex flex-col md:h-screen justify-center items-center w-full md:w-1/2 p-6 sm:p-10"
       >
-        {/* Logo */}
+        {/* Logo (desktop only) */}
         <motion.div
           whileHover={{ scale: 1.05, rotate: 2 }}
-          className="flex items-center mb-6 space-x-2"
+          className="hidden md:flex items-center mb-6 space-x-2"
         >
           {/* <div className="bg-[#8F59ED] p-2 rounded-lg shadow-md">
             <Stethoscope className="w-6 h-6 text-white" />

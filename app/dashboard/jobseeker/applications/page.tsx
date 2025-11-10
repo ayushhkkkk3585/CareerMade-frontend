@@ -19,6 +19,14 @@ import {
   Heart,
   TrendingUp,
   Award,
+  Building2,
+  Mail,
+  Phone,
+  Globe,
+  Target,
+  BookOpen,
+  Zap,
+  Star,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -240,7 +248,7 @@ export default function MyApplications() {
                 Monitor your job application status and upcoming interviews in real-time.
               </p>
             </div>
-            <button
+            {/* <button
               onClick={() => router.push("/dashboard/jobseeker")}
               className="px-5 py-2.5 bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] text-[#1A0152] rounded-full text-sm font-semibold shadow-md flex items-center gap-2 hover:shadow-lg transition flex-shrink-0"
             >
@@ -259,7 +267,7 @@ export default function MyApplications() {
                 />
               </svg>
               Back to Dashboard
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -605,11 +613,115 @@ export default function MyApplications() {
                       </div>
                     )}
 
-                    {/* Job Description */}
+                    {/* Company Information Card */}
+                    <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 bg-white rounded-lg shadow-sm">
+                          <Building2 className="w-6 h-6 text-[#00A3FF]" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-900 text-lg mb-2">
+                            {selectedApp.job?.organizationName}
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-3">
+                            {selectedApp.job?.department} Department
+                          </p>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-700">
+                              <MapPin className="w-4 h-4 text-gray-500" />
+                              <span className="truncate">{formatAddress(selectedApp.job?.location)}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-700">
+                              <Briefcase className="w-4 h-4 text-gray-500" />
+                              <span>{selectedApp.job?.jobType}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Important Dates Card */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Calendar className="w-4 h-4 text-green-600" />
+                          <p className="text-xs font-semibold text-green-900">Applied On</p>
+                        </div>
+                        <p className="text-sm font-bold text-gray-900">
+                          {new Date(selectedApp.appliedAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">{daysSinceApplied(selectedApp.appliedAt)}</p>
+                      </div>
+
+                      {selectedApp.job?.applicationDeadline && (
+                        <div className="p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-100">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Clock className="w-4 h-4 text-orange-600" />
+                            <p className="text-xs font-semibold text-orange-900">Deadline</p>
+                          </div>
+                          <p className="text-sm font-bold text-gray-900">
+                            {new Date(selectedApp.job.applicationDeadline).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            {Math.ceil(
+                              (new Date(selectedApp.job.applicationDeadline).getTime() - Date.now()) /
+                                (1000 * 60 * 60 * 24)
+                            )}{" "}
+                            days left
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Application Insights */}
+                    <div className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                      <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Target className="w-5 h-5 text-purple-600" />
+                        Application Insights
+                      </h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
+                            <Eye className="w-6 h-6 text-purple-600" />
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">Status</p>
+                          <p className="text-sm font-bold text-gray-900">{selectedApp.status}</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
+                            <TrendingUp className="w-6 h-6 text-purple-600" />
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">Experience</p>
+                          <p className="text-sm font-bold text-gray-900">{selectedApp.job?.experienceLevel}</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
+                            <DollarSign className="w-6 h-6 text-purple-600" />
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">Salary Range</p>
+                          <p className="text-xs font-bold text-gray-900">
+                            {selectedApp.job?.salary?.currency} {selectedApp.job?.salary?.min.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Job Description - Full Content */}
                     {selectedApp.job?.description && (
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-3">Job Description</h3>
-                        <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                      <div className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                          <BookOpen className="w-5 h-5 text-[#00A3FF]" />
+                          Job Description
+                        </h3>
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                           {selectedApp.job.description}
                         </p>
                       </div>
@@ -617,13 +729,18 @@ export default function MyApplications() {
 
                     {/* Requirements */}
                     {selectedApp.job?.requirements && selectedApp.job.requirements.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-3">Requirements</h3>
-                        <ul className="space-y-2 max-h-40 overflow-y-auto">
+                      <div className="p-5 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl border border-cyan-100">
+                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-cyan-600" />
+                          Requirements
+                        </h3>
+                        <ul className="space-y-3">
                           {selectedApp.job.requirements.map((req, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 flex gap-2">
-                              <span className="text-[#00B8DB] font-bold flex-shrink-0">•</span>
-                              <span>{req}</span>
+                            <li key={idx} className="flex gap-3 items-start">
+                              <div className="mt-1 w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                                <Star className="w-3 h-3 text-cyan-600" />
+                              </div>
+                              <span className="text-sm text-gray-700 leading-relaxed flex-1">{req}</span>
                             </li>
                           ))}
                         </ul>
@@ -632,26 +749,63 @@ export default function MyApplications() {
 
                     {/* Responsibilities */}
                     {selectedApp.job?.responsibilities && selectedApp.job.responsibilities.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-3">Responsibilities</h3>
-                        <ul className="space-y-2 max-h-40 overflow-y-auto">
+                      <div className="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-100">
+                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <Zap className="w-5 h-5 text-amber-600" />
+                          Key Responsibilities
+                        </h3>
+                        <ul className="space-y-3">
                           {selectedApp.job.responsibilities.map((resp, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 flex gap-2">
-                              <span className="text-[#00B8DB] font-bold flex-shrink-0">•</span>
-                              <span>{resp}</span>
+                            <li key={idx} className="flex gap-3 items-start">
+                              <div className="mt-1 w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                                <Target className="w-3 h-3 text-amber-600" />
+                              </div>
+                              <span className="text-sm text-gray-700 leading-relaxed flex-1">{resp}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
 
+                    {/* Resume & Documents */}
+                    {selectedApp.resume && (
+                      <div className="p-5 bg-gradient-to-br from-teal-50 to-green-50 rounded-xl border border-teal-100">
+                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-teal-600" />
+                          Submitted Documents
+                        </h3>
+                        <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-teal-100">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-teal-100 rounded-lg">
+                              <FileText className="w-5 h-5 text-teal-600" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-gray-900">{selectedApp.resume.title}</p>
+                              <p className="text-xs text-gray-500">Resume Document</p>
+                            </div>
+                          </div>
+                          {selectedApp.resume.url && (
+                            <a
+                              href={selectedApp.resume.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 bg-teal-600 text-white text-xs font-semibold rounded-lg hover:bg-teal-700 transition flex items-center gap-1"
+                            >
+                              <Eye className="w-3 h-3" />
+                              View
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Application Notes */}
                     {selectedApp.notes && (
-                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                          <FileText className="w-4 h-4 flex-shrink-0" /> Your Notes
+                      <div className="p-5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+                        <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-indigo-600" /> Your Notes
                         </h3>
-                        <p className="text-sm text-gray-600 line-clamp-2">{selectedApp.notes}</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{selectedApp.notes}</p>
                       </div>
                     )}
 

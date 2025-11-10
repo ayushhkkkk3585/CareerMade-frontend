@@ -79,7 +79,7 @@ export default function ViewEmployerProfile() {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
+            {/* <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
               <button
                 onClick={() => router.push("/dashboard/employee/jobs")}
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
@@ -87,7 +87,7 @@ export default function ViewEmployerProfile() {
                 <ArrowLeft className="w-5 h-5 mr-1" />
                 Back
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

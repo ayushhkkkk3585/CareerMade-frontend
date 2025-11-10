@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
-import { MapPin, Briefcase, Bookmark } from "lucide-react";
+import { MapPin, Briefcase, Bookmark, ArrowLeft } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 type Job = {
@@ -61,40 +61,26 @@ export default function BrowseJobs() {
               style={{ backgroundImage: "url('/bg.png')" }}
             ></div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div>
-                <h1 className="text-3xl font-semibold leading-tight">
-                  Browse{" "}
-                  <span className="italic text-[#CBA2FF] font-light">
-                    Jobs
-                  </span>
-                </h1>
-                <p className="text-sm text-gray-200 mt-1">
-                  Explore thousands of healthcare opportunities tailored just for you
-                </p>
-              </div>
-
-              <div>
-                <button
-                  onClick={() => router.back()}
-                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#CBA2FF] hover:bg-[#B482FF] text-[#1A0152] rounded-lg text-sm font-semibold transition-all shadow-lg"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  Back to Dashboard
-                </button>
+            <div className="relative z-10 max-w-7xl mx-auto px-6 py-10">
+              <button
+                onClick={() => router.push("/dashboard/jobseeker")}
+                className="flex items-center gap-2 text-white hover:text-gray-200 mb-4 transition text-sm"
+              >
+                <ArrowLeft size={16} />
+                <span>Back</span>
+              </button>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                <div>
+                  <h1 className="text-3xl font-semibold leading-tight">
+                    Browse{" "}
+                    <span className="italic text-[#CBA2FF] font-light">
+                      Jobs
+                    </span>
+                  </h1>
+                  <p className="text-sm text-gray-200 mt-1">
+                    Explore thousands of healthcare opportunities tailored just for you
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -10,6 +10,8 @@ import {
   Stethoscope,
   LogOut,
   User,
+  Briefcase,
+  Building2,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -68,9 +70,9 @@ export default function Navbar() {
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="bg-white shadow-sm sticky top-0 z-50"
+      className="bg-white border-b border-gray-200 sticky top-0 z-50"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <motion.div
@@ -78,16 +80,54 @@ export default function Navbar() {
             whileHover={{ scale: 1.05 }}
             onClick={() => router.push("/")}
           >
-            <img src="/logo.png" alt="CareerMade" className="h-10" />
+            <img src="/logo.png" alt="CareerMade" className="h-8" />
           </motion.div>
+
+          {/* Center: Jobs and Employers Buttons - Only for Jobseekers */}
+          {user?.role === "jobseeker" && (
+            <div className="hidden md:flex items-center space-x-2 absolute left-1/2 transform -translate-x-1/2">
+              <button
+                onClick={() => router.push("/dashboard/jobseeker")}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+              >
+                Jobs
+              </button>
+              
+              <button
+                onClick={() => router.push("/dashboard/jobseeker/employers")}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+              >
+                Employers
+              </button>
+            </div>
+          )}
+
+          {/* Center: Jobs and Create Buttons - Only for Employers */}
+          {user?.role === "employer" && (
+            <div className="hidden md:flex items-center space-x-2 absolute left-1/2 transform -translate-x-1/2">
+              <button
+                onClick={() => router.push("/dashboard/employee/jobs")}
+                className="px-4 py-2 text-md font-medium text-gray-700 hover:text-blue-600 transition"
+              >
+                Jobs
+              </button>
+              
+              <button
+                onClick={() => router.push("/dashboard/employee/jobs/create")}
+                className="px-4 py-2 text-md font-medium text-gray-700 hover:text-blue-600 transition"
+              >
+                Create
+              </button>
+            </div>
+          )}
 
           {/* Profile Icon - visible on all screens */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex items-center justify-center w-10 h-10 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl shadow-md hover:scale-105 transition"
+              className="flex items-center justify-center w-9 h-9 bg-blue-600 rounded-full hover:bg-blue-700 transition"
             >
-              <User className="text-white" size={20} />
+              <User className="text-white" size={18} />
             </button>
 
             {/* Dropdown Menu (for both desktop & mobile) */}
