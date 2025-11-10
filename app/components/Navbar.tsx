@@ -1,14 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Stethoscope, Menu, X } from "lucide-react";
+import {
+  Home,
+  FileText,
+  Bookmark,
+  Stethoscope,
+  LogOut,
+  User,
+} from "lucide-react";
 
 export default function Navbar() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -22,6 +30,17 @@ export default function Navbar() {
         }
       }
     }
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleProfileClick = () => {
@@ -59,130 +78,133 @@ export default function Navbar() {
             whileHover={{ scale: 1.05 }}
             onClick={() => router.push("/")}
           >
-
-            <img src="/logo.png" alt="CareerMade" className="h-13" />
+            <img src="/logo.png" alt="CareerMade" className="h-10" />
           </motion.div>
 
-          {/* Desktop Buttons */}
-          <div className="hidden sm:flex items-center space-x-4">
-            {/* Show user's name if available */}
-            {/* {user && (
-              <span className="text-gray-700 font-medium">
-                Hi, {user.firstName}
-              </span>
-            )} */}
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={handleProfileClick}
-              className="text-gray-700 font-medium"
+          {/* Profile Icon - visible on all screens */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center justify-center w-10 h-10 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl shadow-md hover:scale-105 transition"
             >
-              Profile
-            </motion.button>
+              <User className="text-white" size={20} />
+            </button>
 
-
-            {/* Employer-only buttons */}
-            {user?.role === "jobseeker" && (
-              <>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  onClick={handleSavedJobsClick}
-                  className="text-gray-700 font-medium"
+            {/* Dropdown Menu (for both desktop & mobile) */}
+            <AnimatePresence>
+              {menuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-3 w-72 bg-white border rounded-2xl shadow-xl p-5 z-50"
                 >
-                  Saved Jobs
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleResume}
-                  className="text-gray-700 font-medium"
-                >
-                  Resumes
-                </motion.button>
-              </>
-            )}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-full font-medium shadow-md"
-            >
-              Logout
-            </motion.button>
+                  {/* Profile Header */}
+                  <div className="flex items-center space-x-3 border-b pb-4 mb-4">
+                    <div className="w-12 h-12 bg-linear-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                      {user?.firstName?.[0]?.toUpperCase() || "U"}
+                    </div>
+                    <div>
+                      <h3 className="text-gray-900 font-semibold">
+                        {user?.firstName
+                          ? `${user.firstName} ${user.lastName || ""}`
+                          : "Guest User"}
+                      </h3>
+                      <p className="text-gray-500 text-sm capitalize">
+                        {user?.role || "Jobseeker"}
+                      </p>
+                      {user && (
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            handleProfileClick();
+                          }}
+                          className="text-blue-600 text-sm font-medium mt-1"
+                        >
+                          View Profile
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
-            {/* <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={handleLogout}
-              className="text-gray-700 font-medium"
-            >
-              Logout
-            </motion.button> */}
+                  {/* Menu Items */}
+                  <div className="flex flex-col space-y-3 text-gray-700">
+                    <button
+                      onClick={() => {
+                        router.push("/");
+                        setMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 hover:text-blue-600"
+                    >
+                      <Home size={18} />
+                      <span>Home</span>
+                    </button>
+
+                    {/* <button
+                      onClick={() => {
+                        router.push("/dashboard/jobseeker/applications");
+                        setMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 hover:text-blue-600"
+                    >
+                      <FileText size={18} />
+                      <span>My Applications</span>
+                    </button> */}
+
+                    {user?.role === "jobseeker" && (
+                      <>
+                        <button
+                          onClick={() => {
+                            router.push("/dashboard/jobseeker/applications");
+                            setMenuOpen(false);
+                          }}
+                          className="flex items-center space-x-3 hover:text-blue-600"
+                        >
+                          <FileText size={18} />
+                          <span>My Applications</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleSavedJobsClick();
+                            setMenuOpen(false);
+                          }}
+                          className="flex items-center space-x-3 hover:text-blue-600"
+                        >
+                          <Bookmark size={18} />
+                          <span>Saved Jobs</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            handleResume();
+                            setMenuOpen(false);
+                          }}
+                          className="flex items-center space-x-3 hover:text-blue-600"
+                        >
+                          <Stethoscope size={18} />
+                          <span>Resume</span>
+                        </button>
+                      </>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 text-red-500 hover:text-red-600"
+                    >
+                      <LogOut size={18} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden text-gray-700"
-          >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
       </div>
-
-      {/* Mobile Dropdown */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="sm:hidden bg-white border-t shadow-md"
-          >
-            <div className="flex flex-col items-start px-4 py-2 space-y-3">
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  handleProfileClick();
-                }}
-                className="text-gray-700 text-left font-medium"
-              >
-                Profile
-              </button>
-
-              {/* Employer Buttons */}
-              {user?.role === "jobseeker" && (
-                <>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    onClick={handleSavedJobsClick}
-                    className="text-gray-700 font-medium"
-                  >
-                    Saved Jobs
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleResume}
-                    className="text-gray-700 font-medium"
-                  >
-                    Resumes
-                  </motion.button>
-                </>
-              )}
-
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  handleLogout();
-                }}
-                className="text-gray-700 text-left font-medium"
-              >
-                Logout
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.header>
   );
 }

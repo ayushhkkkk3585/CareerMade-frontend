@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 export default function JobViewPage() {
     const { id } = useParams();
     const router = useRouter();
+    const [hasApplied, setHasApplied] = useState(false);
+    const [hasSaved, setHasSaved] = useState(false);
+
     const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
@@ -18,7 +21,7 @@ export default function JobViewPage() {
     const [coverLetter, setCoverLetter] = useState<any>(null);
     const [uploadingResume, setUploadingResume] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
-    
+
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         const user = localStorage.getItem("user");

@@ -113,19 +113,29 @@ export default function ResumePage() {
                 <div className="max-w-6xl mx-auto">
 
                     {/* Header Section */}
-                    <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b pb-4">
-                        <h1 className="text-4xl font-extrabold text-gray-900 flex items-center mb-4 sm:mb-0">
-                            {/* <FileText className="w-8 h-8 mr-3 text-blue-600" /> */}
-                            📝 My Resumes
-                        </h1>
-                        <Link
-                            href="/dashboard/jobseeker/resume/build"
-                            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-[1.02]"
-                        >
-                            {/* <PlusCircle className="w-5 h-5 mr-2" /> */}
-                            ✨ Build New Resume
-                        </Link>
-                    </header>
+<header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b pb-4">
+  <div className="flex items-center gap-4 mb-4 sm:mb-0">
+    {/* 🔙 Back Button */}
+    <button
+      onClick={() => router.push("/dashboard/jobseeker")}
+      className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition duration-300 font-medium text-sm"
+    >
+      ← Back
+    </button>
+
+    <h1 className="text-4xl font-extrabold text-gray-900 flex items-center">
+      📝 My Resumes
+    </h1>
+  </div>
+
+  <Link
+    href="/dashboard/jobseeker/resume/build"
+    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-[1.02]"
+  >
+    ✨ Build New Resume
+  </Link>
+</header>
+
 
                     {/* Error Alert */}
                     {error && (
