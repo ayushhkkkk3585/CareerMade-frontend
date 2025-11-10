@@ -27,7 +27,7 @@ function OAuthHandler() {
       if (role === "jobseeker") {
         router.replace("/dashboard/jobseeker");
       } else if (role === "employer") {
-        router.replace("/dashboard/employer/jobs");
+        router.replace("/dashboard/employee/jobs");
       } else {
         router.replace("/dashboard");
       }

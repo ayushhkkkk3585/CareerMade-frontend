@@ -280,7 +280,7 @@ export default function JobViewPage() {
                                     </div>
                                 </div>
 
-                                <div>
+                                {/* <div>
                                     <button
                                         onClick={() => window.history.back()}
                                         className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-[#1A0152] rounded-lg text-sm font-semibold transition-all shadow-lg"
@@ -288,7 +288,7 @@ export default function JobViewPage() {
                                         <ArrowLeft className="w-4 h-4" />
                                         Back to Jobs
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>

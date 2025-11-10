@@ -311,18 +311,8 @@ export default function JobApplicationsPage() {
             </p>
           </div>
 
-          {/* Right Button */}
-          <div className="flex flex-row flex-wrap gap-3">
-            {/* Browse Jobs */}
-            <button
-              onClick={() => router.back()}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] bg-white/10 hover:bg-white/20 text-black rounded-full text-sm font-semibold transition-all shadow-md"
-            >
 
-              Back to Dashboard
-            </button>
-
-          </div>
+          
         </div>
       </div>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">

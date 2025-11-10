@@ -140,17 +140,21 @@ const Register = () => {
 
     return (
         <div className="min-h-screen flex flex-col md:flex-row bg-white">
+            {/* Mobile Top Logo */}
+            <div className="flex md:hidden w-full justify-center pt-6">
+                <img src="/logo.png" alt="CareerMade" className="h-10" />
+            </div>
             {/* LEFT SECTION - FORM */}
             <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : -40 }}
                 transition={{ duration: 0.8 }}
-                className="flex flex-col justify-center items-center md:w-1/2 px-6 py-10 md:px-16"
+                className="order-2 md:order-1 flex flex-col justify-center items-center md:w-1/2 px-6 py-10 md:px-16"
             >
                 {/* Logo */}
                 <motion.div
                     whileHover={{ scale: 1.05, rotate: 2 }}
-                    className="flex items-center mb-8 space-x-3"
+                    className="hidden md:flex items-center mb-8 space-x-3"
                 >
                     {/* <div className="bg-[#155DFC] p-2 rounded-lg shadow-md">
                         <Stethoscope className="w-6 h-6 text-white" />
@@ -312,12 +316,12 @@ const Register = () => {
                 initial={{ opacity: 0, x: 40 }}
                 animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 40 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="hidden md:flex md:w-1/2  justify-center items-center"
+                className="order-1 md:order-2 flex w-full md:w-1/2 justify-center items-center mb-6 md:mb-0"
             >
                 <img
                     src="/newbg.png"
                     alt="Register illustration"
-                    className=" h-auto mb-20  hover:scale-105 transition-transform duration-500"
+                    className="w-3/4 h-auto mb-10 md:mb-20 hover:scale-105 transition-transform duration-500"
                 />
             </motion.div>
         </div>

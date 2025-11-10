@@ -251,7 +251,7 @@ export default function CreateJobPage() {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
+            {/* <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => router.back()}
@@ -260,7 +260,7 @@ export default function CreateJobPage() {
                 <ArrowLeft className="w-5 h-5" />
                 Back to Jobs
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
