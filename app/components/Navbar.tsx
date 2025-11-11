@@ -74,52 +74,53 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <motion.div
-            className="flex items-center space-x-2 cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            onClick={() => router.push("/")}
-          >
-            <img src="/logo.png" alt="CareerMade" className="h-8" />
-          </motion.div>
+          {/* Left: Logo + Role-based nav items */}
+          <div className="flex items-center space-x-4">
+            <motion.div
+              className="flex items-center space-x-2 cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => router.push("/")}
+            >
+              <img src="/logo.png" alt="CareerMade" className="h-8" />
+            </motion.div>
 
-          {/* Center: Jobs and Employers Buttons - Only for Jobseekers */}
-          {user?.role === "jobseeker" && (
-            <div className="hidden md:flex items-center space-x-2 absolute left-1/2 transform -translate-x-1/2">
-              <button
-                onClick={() => router.push("/dashboard/jobseeker")}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
-              >
-                Jobs
-              </button>
-              
-              <button
-                onClick={() => router.push("/dashboard/jobseeker/employers")}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
-              >
-                Employers
-              </button>
-            </div>
-          )}
+            {/* Desktop nav items next to the logo */}
+            {user?.role === "jobseeker" && (
+              <div className="hidden md:flex items-center space-x-2">
+                <button
+                  onClick={() => router.push("/dashboard/jobseeker")}
+                  className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+                >
+                  Jobs
+                </button>
 
-          {/* Center: Jobs and Create Buttons - Only for Employers */}
-          {user?.role === "employer" && (
-            <div className="hidden md:flex items-center space-x-2 absolute left-1/2 transform -translate-x-1/2">
-              <button
-                onClick={() => router.push("/dashboard/employee/jobs")}
-                className="px-4 py-2 text-md font-medium text-gray-700 hover:text-blue-600 transition"
-              >
-                Jobs
-              </button>
-              
-              <button
-                onClick={() => router.push("/dashboard/employee/jobs/create")}
-                className="px-4 py-2 text-md font-medium text-gray-700 hover:text-blue-600 transition"
-              >
-                Create
-              </button>
-            </div>
-          )}
+                <button
+                  onClick={() => router.push("/dashboard/jobseeker/employers")}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+                >
+                  Employers
+                </button>
+              </div>
+            )}
+
+            {user?.role === "employer" && (
+              <div className="hidden md:flex items-center space-x-2">
+                <button
+                  onClick={() => router.push("/dashboard/employee/jobs")}
+                  className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+                >
+                  Jobs
+                </button>
+
+                <button
+                  onClick={() => router.push("/dashboard/employee/jobs/create")}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+                >
+                  Create
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Profile Icon - visible on all screens */}
           <div className="relative" ref={dropdownRef}>
