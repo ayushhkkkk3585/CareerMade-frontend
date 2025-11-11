@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -9,45 +9,61 @@ function OAuthHandler() {
   const [processing, setProcessing] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    try {
-      const accessToken = params.get("accessToken");
-      const refreshToken = params.get("refreshToken");
-      const role = (params.get("role") || "").toLowerCase();
+  const handleAuth = useCallback(async () => {
+    const accessToken = params.get("accessToken");
+    const refreshToken = params.get("refreshToken");
 
-      if (!accessToken || !refreshToken) {
-        setError("Missing tokens in callback.");
-        setProcessing(false);
-        return;
+    if (!accessToken || !refreshToken) {
+      setError("Missing tokens in callback.");
+      setProcessing(false);
+      return;
+    }
+
+    // 1. Store tokens
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+
+    try {
+      // 2. Fetch user profile using the new access token
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to fetch user profile.");
       }
 
-      // Debug: log tokens so we can confirm they're present after redirect
-      // and to help identify races where other code may clear storage.
-      // Remove these logs once the issue is resolved.
-      // eslint-disable-next-line no-console
-      console.log("OAuth redirect tokens:", { accessToken, refreshToken, role });
+      const { user } = data.data;
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+      // 3. Store user object in localStorage
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // Small defensive delay before navigating so localStorage writes
-      // are visible to other client components that mount immediately.
-      const navigateTo = () => {
-        if (role === "jobseeker") {
-          router.replace("/dashboard/jobseeker");
-        } else if (role === "employer") {
-          router.replace("/dashboard/employee/jobs");
-        } else {
-          router.replace("/dashboard");
-        }
-      };
-
-      setTimeout(navigateTo, 80);
+      // 4. Redirect to the correct dashboard
+      if (user.role === "jobseeker") {
+        router.replace("/dashboard/jobseeker");
+      } else if (user.role === "employer") {
+        router.replace("/dashboard/employee/jobs");
+      } else {
+        router.replace("/dashboard"); // Fallback
+      }
     } catch (e) {
-      toast.error("Failed to process OAuth response.");
-      setError("Failed to process OAuth response.");
+      const errorMessage =
+        e instanceof Error ? e.message : "An unknown error occurred.";
+      toast.error(`Authentication failed: ${errorMessage}`);
+      setError(`Authentication failed: ${errorMessage}`);
       setProcessing(false);
     }
+  }, [params, router]);
+
+  useEffect(() => {
+    handleAuth();
   }, [params, router]);
 
   if (processing && !error) {

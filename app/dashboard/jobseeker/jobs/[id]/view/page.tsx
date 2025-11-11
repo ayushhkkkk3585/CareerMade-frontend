@@ -6,6 +6,8 @@ import Navbar from "@/app/components/Navbar";
 import GradientLoader from "@/app/components/GradientLoader";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { Dialog } from "@headlessui/react";
+
 
 
 export default function JobViewPage() {
@@ -13,6 +15,8 @@ export default function JobViewPage() {
     const router = useRouter();
     const [hasApplied, setHasApplied] = useState(false);
     const [hasSaved, setHasSaved] = useState(false);
+    const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+
 
     const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -475,19 +479,79 @@ export default function JobViewPage() {
                         {/* Right Column - Actions */}
                         <div className="space-y-6">
                             {/* Apply Card */}
-                            <div className="bg-gradient-to-br from-[#0A2540] to-[#1976D2]  rounded-xl shadow-lg p-6 text-white">
+                            <div className="bg-gradient-to-br from-[#0A2540] to-[#1976D2] rounded-xl shadow-lg p-6 text-white">
                                 <h3 className="text-lg font-bold mb-2">Ready to Apply?</h3>
                                 <p className="text-sm text-gray-200 mb-4">
                                     Submit your application now and take the next step in your career.
                                 </p>
                                 <button
-                                    onClick={applyJob}
+                                    onClick={() => setIsApplyModalOpen(true)}
                                     className="w-full px-6 py-3 bg-white text-[#1A0152] hover:bg-[#00CFFF] text-sm font-bold rounded-lg transition-all shadow-md flex items-center justify-center gap-2"
                                 >
                                     <CheckCircle className="w-5 h-5" />
                                     Apply Now
                                 </button>
                             </div>
+                            <Dialog
+                                open={isApplyModalOpen}
+                                onClose={() => setIsApplyModalOpen(false)}
+                                className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm"
+                            >
+                                <Dialog.Panel className="bg-white/90 backdrop-blur-md border border-white/30 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+                                    <Dialog.Title className="text-lg font-bold text-gray-900 mb-4">
+                                        Confirm Application
+                                    </Dialog.Title>
+
+                                    <p className="text-sm text-gray-700 mb-6">
+                                        Please select or confirm your resume before applying.
+                                    </p>
+
+                                    {resume ? (
+                                        <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
+                                            <div className="flex items-center gap-2 text-sm text-gray-700">
+                                                <FileText className="w-4 h-4 text-[#1A0152]" />
+                                                <span>{resume.filename || "Resume uploaded"}</span>
+                                            </div>
+                                            <a
+                                                href={resume.url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-blue-600 text-sm hover:underline"
+                                            >
+                                                View
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <div className="border border-dashed border-gray-300 rounded-lg p-4 text-center text-gray-600 mb-4">
+                                            <p>No resume found.</p>
+                                            <p className="text-xs mt-1">Please upload a resume before applying.</p>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-end gap-3 mt-6">
+                                        <button
+                                            onClick={() => setIsApplyModalOpen(false)}
+                                            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (!resume) {
+                                                    toast.error("Please select or upload a resume before applying!");
+                                                    return;
+                                                }
+                                                applyJob();
+                                                setIsApplyModalOpen(false);
+                                            }}
+                                            className="px-5 py-2 bg-[#1A0152] hover:bg-[#2B0D85] text-white rounded-lg text-sm font-semibold transition"
+                                        >
+                                            Submit Application
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Dialog>
+
 
                             {/* Save Job Card */}
                             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">

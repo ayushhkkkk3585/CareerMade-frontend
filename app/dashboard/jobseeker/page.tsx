@@ -564,8 +564,15 @@ export default function JobSeekerJobs() {
                             {job.title}
                           </h3>
                           {job.status === "Active" && (
-                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                            <div className="relative group flex items-center">
+                              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 cursor-pointer" />
+                              {/* Tooltip */}
+                              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                Job is Verified
+                              </span>
+                            </div>
                           )}
+
                         </div>
 
                         {/* Organization Name + Type */}
@@ -631,7 +638,7 @@ export default function JobSeekerJobs() {
                       className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition p-1"
                       onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
                     >
-                      <ArrowUpRight className="w-5 h-5" />
+                      <Bookmark className="w-5 h-5" />
                     </button>
                   </div>
                 </div>

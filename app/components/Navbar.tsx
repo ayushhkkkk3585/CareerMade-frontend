@@ -12,7 +12,10 @@ import {
   User,
   Briefcase,
   Building2,
+  Star,
+  Bell,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function Navbar() {
   const router = useRouter();
@@ -123,13 +126,33 @@ export default function Navbar() {
           </div>
 
           {/* Profile Icon - visible on all screens */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative flex gap-1" ref={dropdownRef}>
+            {/* Profile Icon */}
+            {/* InstantCV Button (for jobseeker only) */}
+            {user?.role === "jobseeker" && (
+              <button
+                onClick={() => router.push("/dashboard/jobseeker/resume")}
+                className="flex items-center justify-center gap-1 px-2 text-sm font-medium"
+              >
+                <Image src="/star.png" alt="InstantCV" width={16} height={16} />
+                InstantCV
+              </button>
+            )}
+            <button
+              // onClick={() => router.push("/dashboard/jobseeker/resume")}
+              className="flex items-center justify-center gap-1 px-3 text-sm font-medium"
+            >
+              <Bell className="text-black" size={18} />
+
+            </button>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="flex items-center justify-center w-9 h-9 bg-blue-600 rounded-full hover:bg-blue-700 transition"
             >
               <User className="text-white" size={18} />
             </button>
+
+
 
             {/* Dropdown Menu (for both desktop & mobile) */}
             <AnimatePresence>
@@ -182,17 +205,6 @@ export default function Navbar() {
                       <span>Home</span>
                     </button>
 
-                    {/* <button
-                      onClick={() => {
-                        router.push("/dashboard/jobseeker/applications");
-                        setMenuOpen(false);
-                      }}
-                      className="flex items-center space-x-3 hover:text-blue-600"
-                    >
-                      <FileText size={18} />
-                      <span>My Applications</span>
-                    </button> */}
-
                     {user?.role === "jobseeker" && (
                       <>
                         <button
@@ -205,6 +217,7 @@ export default function Navbar() {
                           <FileText size={18} />
                           <span>My Applications</span>
                         </button>
+
                         <button
                           onClick={() => {
                             handleSavedJobsClick();
@@ -244,6 +257,7 @@ export default function Navbar() {
               )}
             </AnimatePresence>
           </div>
+
         </div>
       </div>
     </motion.header>
