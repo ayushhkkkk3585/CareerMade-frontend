@@ -221,6 +221,24 @@ export default function MyApplications() {
     return configs[status] || configs["Applied"];
   };
 
+  // Map status to progress percentage for the horizontal bar
+  const getProgressPercent = (status: string) => {
+    switch (status) {
+      case "Applied":
+        return 10;
+      case "Under Review":
+        return 45;
+      case "Interview":
+        return 70;
+      case "Offered":
+        return 100;
+      case "Rejected":
+        return 100;
+      default:
+        return 0;
+    }
+  };
+
   const statusOptions = ["All", "Applied", "Under Review", "Interview", "Offered", "Rejected"];
 
   return (
@@ -236,7 +254,7 @@ export default function MyApplications() {
           ></div>
           <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 text-center flex flex-col sm:flex-row items-start sm:items-center justify-center gap-6">
             <div>
               <h1 className="text-4xl font-bold leading-tight">
                 Track{" "}
@@ -272,7 +290,7 @@ export default function MyApplications() {
         </div>
 
         {/* Stats Overview (Fixed Height) */}
-        <div className="max-w-7xl w-full mx-auto px-6 py-6 flex-shrink-0">
+        {/* <div className="max-w-7xl w-full mx-auto px-6 py-6 flex-shrink-0">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm hover:shadow-md transition">
               <div className="flex items-center justify-between">
@@ -334,7 +352,7 @@ export default function MyApplications() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Main Section (Takes up remaining space) */}
         <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -417,421 +435,86 @@ export default function MyApplications() {
           </div>
 
           {/* Right Details */}
-          <div className="lg:col-span-2 bg-white rounded-xl border h-full border-gray-100 shadow-sm flex flex-col">
+          <div className="lg:col-span-2  flex flex-col">
             {selectedApp ? (
               <>
                 {/* Details Content (Scrollable) */}
                 <div className="flex-1 overflow-y-auto">
-                  <div className="p-6 space-y-6">
+                  <div className=" space-y-6">
                     {/* Header Section */}
-                    <div>
-                      <div className="flex items-start justify-between gap-3 mb-4">
+                    {/* Top summary card (matches requested design) */}
+                    <div className="p-6 bg-white rounded-xl border border-gray-100 shadow-sm">
+                      <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex-1 min-w-0">
                           <h2 className="text-2xl font-bold text-gray-900 truncate">
                             {selectedApp.job?.title}
                           </h2>
                           <p className="text-sm text-gray-600 mt-2">
-                            {selectedApp.job?.organizationName} •{" "}
-                            <span className="text-xs bg-gray-100 px-2 py-0.5 rounded inline-block mt-1">
-                              {selectedApp.job?.department}
-                            </span>
+                            {selectedApp.job?.organizationName} • <span className="text-xs bg-gray-100 px-2 py-0.5 rounded inline-block mt-1">{selectedApp.job?.department}</span>
                           </p>
+                          <a
+                            onClick={() => router.push(`/dashboard/jobseeker/?similar=${selectedApp.job?._id}`)}
+                            className="text-sm text-[#00A3FF] mt-2 inline-block hover:underline cursor-pointer"
+                          >
+                            View similar jobs
+                          </a>
                         </div>
+
                         <div className={`text-xs font-semibold px-3 py-2 rounded-full flex items-center gap-2 flex-shrink-0 whitespace-nowrap ${getStatusConfig(selectedApp.status).bgColor} ${getStatusConfig(selectedApp.status).color}`}>
                           {getStatusConfig(selectedApp.status).icon}
                           {selectedApp.status}
                         </div>
                       </div>
-                    </div>
 
-                    {/* Key Info */}
-                    <div className="grid grid-cols-2 gap-3 p-4 bg-gray-50 rounded-lg">
-                      {selectedApp.job?.location && (
-                        <div className="flex items-start gap-2">
-                          <MapPin className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
-                          <div className="text-sm min-w-0">
-                            <p className="text-gray-600">Location</p>
-                            <p className="font-semibold text-gray-900 truncate">
-                              {formatAddress(selectedApp.job.location)}
-                            </p>
+                      {/* Application status horizontal timeline */}
+                      <div className="py-4">
+                        <p className="text-sm font-semibold text-gray-900 mb-4">Application status</p>
+                        <div className="w-full bg-gray-100 rounded-full h-2 relative">
+                          <div
+                            className="absolute left-0 top-0 bottom-0 bg-[#00A3FF] rounded-full"
+                            style={{ width: `${getProgressPercent(selectedApp.status)}% ` }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between mt-6">
+                          {/* Step 1 */}
+                          <div className="flex flex-col items-center flex-1">
+                            <div className="w-9 h-9 rounded-full bg-[#00A3FF] text-white flex items-center justify-center font-semibold">✓</div>
+                            <p className="text-sm font-semibold text-gray-900 mt-2">Applied</p>
+                            <p className="text-xs text-gray-500 mt-1">{new Date(selectedApp.appliedAt).toLocaleDateString()}</p>
+                          </div>
+
+                          {/* Connector */}
+                          <div className="hidden sm:block flex-1 h-px mx-4 bg-gray-200" />
+
+                          {/* Step 2 */}
+                          <div className="flex flex-col items-center flex-1">
+                            <div className={`w-9 h-9 rounded-full ${selectedApp.viewedAt ? "bg-[#00A3FF] text-white" : "bg-white border border-gray-300 text-gray-400"} flex items-center justify-center font-semibold`}>{selectedApp.viewedAt ? '✓' : '2'}</div>
+                            <p className="text-sm font-semibold text-gray-900 mt-2">Under Review</p>
+                            <p className="text-xs text-gray-500 mt-1">{selectedApp.viewedAt ? new Date(selectedApp.viewedAt).toLocaleDateString() : '—'}</p>
+                          </div>
+
+                          {/* Connector */}
+                          <div className="hidden sm:block flex-1 h-px mx-4 bg-gray-200" />
+
+                          {/* Step 3 */}
+                          <div className="flex flex-col items-center flex-1">
+                            <div className={`w-9 h-9 rounded-full ${selectedApp.status === 'Offered' ? "bg-green-500 text-white" : "bg-white border border-gray-300 text-gray-400"} flex items-center justify-center font-semibold`}>{selectedApp.status === 'Offered' ? '✓' : '3'}</div>
+                            <p className="text-sm font-semibold text-gray-900 mt-2">Results</p>
+                            <p className="text-xs text-gray-500 mt-1">{selectedApp.status === 'Offered' ? new Date(selectedApp.offerDetails?.startDate || Date.now()).toLocaleDateString() : 'Pending'}</p>
                           </div>
                         </div>
-                      )}
-                      {selectedApp.job?.salary && (
-                        <div className="flex items-start gap-2">
-                          <DollarSign className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
-                          <div className="text-sm min-w-0">
-                            <p className="text-gray-600">Salary</p>
-                            <p className="font-semibold text-gray-900 truncate">
-                              {formatSalary(selectedApp.job.salary)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedApp.job?.jobType && (
-                        <div className="flex items-start gap-2">
-                          <Briefcase className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
-                          <div className="text-sm">
-                            <p className="text-gray-600">Job Type</p>
-                            <p className="font-semibold text-gray-900">{selectedApp.job.jobType}</p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedApp.job?.experienceLevel && (
-                        <div className="flex items-start gap-2">
-                          <TrendingUp className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
-                          <div className="text-sm">
-                            <p className="text-gray-600">Experience</p>
-                            <p className="font-semibold text-gray-900">{selectedApp.job.experienceLevel}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* Application Timeline */}
-                    <div className="py-4 border-t border-b border-gray-100">
-                      <p className="text-sm font-semibold text-gray-900 mb-4">Application Timeline</p>
-                      <div className="space-y-3">
-                        {getApplicationTimeline(selectedApp).map((item, idx) => {
-                          const isCompleted = item.completed;
-                          const isCurrent = selectedApp.status === item.status;
-                          const isRejected = selectedApp.status === "Rejected";
-
-                          return (
-                            <div key={idx}>
-                              <div className="flex items-center gap-3">
-                                <div
-                                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-semibold ${isCompleted || isCurrent
-                                    ? "border-[#00A3FF] bg-[#00A3FF] text-white"
-                                    : "border-gray-300 text-gray-400"
-                                    } ${isRejected && item.status === "Rejected"
-                                      ? "border-red-500 bg-red-500 text-white"
-                                      : ""
-                                    }`}
-                                >
-                                  {isCompleted || isCurrent ? "✓" : idx + 1}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className={`text-sm font-semibold ${isCompleted || isCurrent ? "text-gray-900" : "text-gray-500"
-                                    }`}>
-                                    {item.status}
-                                  </p>
-                                  {item.date && (
-                                    <p className="text-xs text-gray-500">
-                                      {new Date(item.date).toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "short",
-                                        day: "numeric",
-                                      })}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              {idx < getApplicationTimeline(selectedApp).length - 1 && (
-                                <div className="ml-3 mt-2 mb-2 h-4 border-l-2 border-gray-200"></div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Interview Details */}
-                    {selectedApp.status === "Interview" && selectedApp.interviewDate && (
-                      <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                          <Calendar className="w-4 h-4 flex-shrink-0" /> Interview Scheduled
-                        </h3>
-                        <div className="space-y-2 text-sm">
-                          <p className="text-gray-700">
-                            <span className="font-semibold">Date:</span>{" "}
-                            {new Date(selectedApp.interviewDate).toLocaleDateString("en-US", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </p>
-                          {selectedApp.interviewTime && (
-                            <p className="text-gray-700">
-                              <span className="font-semibold">Time:</span> {selectedApp.interviewTime}
-                            </p>
-                          )}
-                          {selectedApp.interviewLink && (
-                            <a
-                              href={selectedApp.interviewLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-purple-600 hover:underline flex items-center gap-2 mt-3 w-fit"
-                            >
-                              <Share2 className="w-4 h-4" />
-                              Join Interview Link
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Offer Details */}
-                    {selectedApp.status === "Offered" && selectedApp.offerDetails && (
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                          <Award className="w-4 h-4 flex-shrink-0" /> Offer Details
-                        </h3>
-                        <div className="space-y-2 text-sm">
-                          <p className="text-gray-700">
-                            <span className="font-semibold">Salary:</span>{" "}
-                            {new Intl.NumberFormat("en-US", {
-                              style: "currency",
-                              currency: "USD",
-                            }).format(selectedApp.offerDetails.salary)}
-                          </p>
-                          <p className="text-gray-700">
-                            <span className="font-semibold">Start Date:</span>{" "}
-                            {new Date(selectedApp.offerDetails.startDate).toLocaleDateString()}
-                          </p>
-                          {selectedApp.offerDetails.benefits && selectedApp.offerDetails.benefits.length > 0 && (
-                            <div>
-                              <p className="font-semibold text-gray-900 mb-2">Benefits:</p>
-                              <ul className="space-y-1 ml-4">
-                                {selectedApp.offerDetails.benefits.map((benefit, idx) => (
-                                  <li key={idx} className="text-gray-700 flex items-center gap-2">
-                                    <span className="text-green-600 flex-shrink-0">•</span>
-                                    <span>{benefit}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          {selectedApp.offerDetails.offerExpiry && (
-                            <p className="text-red-600 font-semibold mt-3">
-                              Offer expires on:{" "}
-                              {new Date(selectedApp.offerDetails.offerExpiry).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Company Information Card */}
-                    <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                      <div className="flex items-start gap-4">
-                        <div className="p-3 bg-white rounded-lg shadow-sm">
-                          <Building2 className="w-6 h-6 text-[#00A3FF]" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 text-lg mb-2">
-                            {selectedApp.job?.organizationName}
-                          </h3>
-                          <p className="text-sm text-gray-600 mb-3">
-                            {selectedApp.job?.department} Department
-                          </p>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2 text-sm text-gray-700">
-                              <MapPin className="w-4 h-4 text-gray-500" />
-                              <span className="truncate">{formatAddress(selectedApp.job?.location)}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-700">
-                              <Briefcase className="w-4 h-4 text-gray-500" />
-                              <span>{selectedApp.job?.jobType}</span>
-                            </div>
-                          </div>
+                        <div className="mt-6 flex justify-center">
+                          <button
+                            onClick={() => router.push(`/dashboard/jobseeker/jobs/${selectedApp.job?._id}/view`)}
+                            className="w-full md:w-1/2 lg:w-1/3 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition text-sm font-medium"
+                          >
+                            View Details
+                          </button>
                         </div>
                       </div>
                     </div>
-
-                    {/* Important Dates Card */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Calendar className="w-4 h-4 text-green-600" />
-                          <p className="text-xs font-semibold text-green-900">Applied On</p>
-                        </div>
-                        <p className="text-sm font-bold text-gray-900">
-                          {new Date(selectedApp.appliedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </p>
-                        <p className="text-xs text-gray-600 mt-1">{daysSinceApplied(selectedApp.appliedAt)}</p>
-                      </div>
-
-                      {selectedApp.job?.applicationDeadline && (
-                        <div className="p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-100">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Clock className="w-4 h-4 text-orange-600" />
-                            <p className="text-xs font-semibold text-orange-900">Deadline</p>
-                          </div>
-                          <p className="text-sm font-bold text-gray-900">
-                            {new Date(selectedApp.job.applicationDeadline).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </p>
-                          <p className="text-xs text-gray-600 mt-1">
-                            {Math.ceil(
-                              (new Date(selectedApp.job.applicationDeadline).getTime() - Date.now()) /
-                                (1000 * 60 * 60 * 24)
-                            )}{" "}
-                            days left
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Application Insights */}
-                    <div className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-                      <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <Target className="w-5 h-5 text-purple-600" />
-                        Application Insights
-                      </h3>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="text-center">
-                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
-                            <Eye className="w-6 h-6 text-purple-600" />
-                          </div>
-                          <p className="text-xs text-gray-600 mb-1">Status</p>
-                          <p className="text-sm font-bold text-gray-900">{selectedApp.status}</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
-                            <TrendingUp className="w-6 h-6 text-purple-600" />
-                          </div>
-                          <p className="text-xs text-gray-600 mb-1">Experience</p>
-                          <p className="text-sm font-bold text-gray-900">{selectedApp.job?.experienceLevel}</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-white shadow-sm flex items-center justify-center">
-                            <DollarSign className="w-6 h-6 text-purple-600" />
-                          </div>
-                          <p className="text-xs text-gray-600 mb-1">Salary Range</p>
-                          <p className="text-xs font-bold text-gray-900">
-                            {selectedApp.job?.salary?.currency} {selectedApp.job?.salary?.min.toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Job Description - Full Content */}
-                    {selectedApp.job?.description && (
-                      <div className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm">
-                        <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                          <BookOpen className="w-5 h-5 text-[#00A3FF]" />
-                          Job Description
-                        </h3>
-                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                          {selectedApp.job.description}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Requirements */}
-                    {selectedApp.job?.requirements && selectedApp.job.requirements.length > 0 && (
-                      <div className="p-5 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl border border-cyan-100">
-                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-cyan-600" />
-                          Requirements
-                        </h3>
-                        <ul className="space-y-3">
-                          {selectedApp.job.requirements.map((req, idx) => (
-                            <li key={idx} className="flex gap-3 items-start">
-                              <div className="mt-1 w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                                <Star className="w-3 h-3 text-cyan-600" />
-                              </div>
-                              <span className="text-sm text-gray-700 leading-relaxed flex-1">{req}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Responsibilities */}
-                    {selectedApp.job?.responsibilities && selectedApp.job.responsibilities.length > 0 && (
-                      <div className="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-100">
-                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                          <Zap className="w-5 h-5 text-amber-600" />
-                          Key Responsibilities
-                        </h3>
-                        <ul className="space-y-3">
-                          {selectedApp.job.responsibilities.map((resp, idx) => (
-                            <li key={idx} className="flex gap-3 items-start">
-                              <div className="mt-1 w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                                <Target className="w-3 h-3 text-amber-600" />
-                              </div>
-                              <span className="text-sm text-gray-700 leading-relaxed flex-1">{resp}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Resume & Documents */}
-                    {selectedApp.resume && (
-                      <div className="p-5 bg-gradient-to-br from-teal-50 to-green-50 rounded-xl border border-teal-100">
-                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-teal-600" />
-                          Submitted Documents
-                        </h3>
-                        <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-teal-100">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-teal-100 rounded-lg">
-                              <FileText className="w-5 h-5 text-teal-600" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-gray-900">{selectedApp.resume.title}</p>
-                              <p className="text-xs text-gray-500">Resume Document</p>
-                            </div>
-                          </div>
-                          {selectedApp.resume.url && (
-                            <a
-                              href={selectedApp.resume.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-3 py-1.5 bg-teal-600 text-white text-xs font-semibold rounded-lg hover:bg-teal-700 transition flex items-center gap-1"
-                            >
-                              <Eye className="w-3 h-3" />
-                              View
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Application Notes */}
-                    {selectedApp.notes && (
-                      <div className="p-5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                        <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-indigo-600" /> Your Notes
-                        </h3>
-                        <p className="text-sm text-gray-700 leading-relaxed">{selectedApp.notes}</p>
-                      </div>
-                    )}
-
-                    {/* Rejection Reason */}
-                    {selectedApp.status === "Rejected" && selectedApp.rejectionReason && (
-                      <div className="p-4 bg-red-50 rounded-lg border border-red-100">
-                        <h3 className="font-semibold text-red-900 mb-2 flex items-center gap-2">
-                          <XCircle className="w-4 h-4 flex-shrink-0" /> Feedback
-                        </h3>
-                        <p className="text-sm text-red-700">{selectedApp.rejectionReason}</p>
-                      </div>
-                    )}
-
-                    {/* Last Updated */}
-                    {selectedApp.lastUpdatedAt && (
-                      <p className="text-xs text-gray-500 border-t pt-4">
-                        Last updated:{" "}
-                        {new Date(selectedApp.lastUpdatedAt).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    )}
                   </div>
                 </div>
                 {/* Action Buttons (Fixed Height) */}
@@ -846,6 +529,7 @@ export default function MyApplications() {
             )}
           </div>
         </div>
+
       </div >
     </>
   );

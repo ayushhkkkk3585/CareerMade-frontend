@@ -43,6 +43,8 @@ const WORK_MODES = ["On-site", "Remote", "Full-time"];
 
 export default function JobSeekerJobs() {
   const router = useRouter();
+  const [savedJobs, setSavedJobs] = useState<string[]>([]);
+
   const [jobs, setJobs] = useState<any[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
   const [filters, setFilters] = useState({
@@ -55,6 +57,7 @@ export default function JobSeekerJobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFilters, setMobileFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [message, setMessage] = useState("");
 
   // Filter section expansion states
   const [expandedSections, setExpandedSections] = useState({
@@ -242,6 +245,63 @@ export default function JobSeekerJobs() {
 
   const displayedSpecialties = showAllSpecialties ? SPECIALIZATIONS : SPECIALIZATIONS.slice(0, 4);
 
+  useEffect(() => {
+    const fetchSavedJobs = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/me`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const data = await res.json();
+
+        if (res.ok) {
+          const savedJobIds = (data.data?.items || data.items || []).map(
+            (item: any) => item.job?._id || item.jobId
+          );
+          setSavedJobs(savedJobIds);
+        }
+      } catch (error) {
+        console.error("Failed to fetch saved jobs", error);
+      }
+    };
+
+    fetchSavedJobs();
+  }, []);
+
+  const saveJob = async (id: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const isSaved = savedJobs.includes(id);
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/jobs/${id}/${isSaved ? "unsave" : "save"
+        }`,
+        {
+          method: isSaved ? "DELETE" : "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        setSavedJobs((prev) =>
+          isSaved ? prev.filter((jobId) => jobId !== id) : [...prev, id]
+        );
+        toast.success(
+          isSaved ? "Job removed from saved list." : "Job saved successfully!"
+        );
+      } else {
+        toast.error(data.message || "Failed to save job.");
+      }
+    } catch {
+      toast.error("Failed to save job.");
+    }
+  };
   return (
     <>
       <Navbar />
@@ -544,8 +604,8 @@ export default function JobSeekerJobs() {
               {currentJobs.map((job) => (
                 <div
                   key={job._id}
-                  className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-5 cursor-pointer"
-                  onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
+                  className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md  p-5 cursor-pointer"
+                // onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
                 >
                   {/* Header Row */}
                   <div className="flex items-start justify-between gap-4">
@@ -560,16 +620,14 @@ export default function JobSeekerJobs() {
                       <div className="flex-1">
                         {/* Title with Verified Badge */}
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-semibold text-gray-900">
+                          <h3 className="text-lg font-semibold text-gray-900 hover:underline"
+                            onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}>
                             {job.title}
                           </h3>
                           {job.status === "Active" && (
-                            <div className="relative group flex items-center">
-                              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 cursor-pointer" />
-                              {/* Tooltip */}
-                              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                                Job is Verified
-                              </span>
+                            <div className="flex items-center gap-1 px-2 py-1 bg-green-500/20 border border-green-400 rounded-full">
+                              <CheckCircle className="w-2 h-2 text-green-400" />
+                              <span className="text-xs font-normal text-green-900">Verified</span>
                             </div>
                           )}
 
@@ -635,11 +693,20 @@ export default function JobSeekerJobs() {
 
                     {/* Right: Bookmark Icon */}
                     <button
-                      className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition p-1"
-                      onClick={() => router.push(`/dashboard/jobseeker/jobs/${job._id}/view`)}
+                      onClick={() => saveJob(job._id)}
+                      className={`flex-shrink-0 p-2 rounded-full transition ${savedJobs.includes(job._id)
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-gray-400 hover:text-blue-600"
+                        }`}
                     >
-                      <Bookmark className="w-5 h-5" />
+                      <Bookmark
+                        className={`w-5 h-5 transition ${savedJobs.includes(job._id)
+                          ? "fill-blue-600 text-blue-600"
+                          : "text-gray-400"
+                          }`}
+                      />
                     </button>
+
                   </div>
                 </div>
               ))}

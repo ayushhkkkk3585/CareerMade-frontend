@@ -16,6 +16,7 @@ export default function JobViewPage() {
     const [hasApplied, setHasApplied] = useState(false);
     const [hasSaved, setHasSaved] = useState(false);
     const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+    const [user, setUser] = useState<any>(null);
 
 
     const [job, setJob] = useState<any>(null);
@@ -25,7 +26,6 @@ export default function JobViewPage() {
     const [coverLetter, setCoverLetter] = useState<any>(null);
     const [uploadingResume, setUploadingResume] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
-
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         const user = localStorage.getItem("user");
@@ -34,6 +34,7 @@ export default function JobViewPage() {
             return;
         }
         const parsedUser = JSON.parse(user);
+        setUser(parsedUser);
         if (parsedUser.role !== "jobseeker") {
             router.push("/login");
             return;
@@ -502,6 +503,44 @@ export default function JobViewPage() {
                                         Confirm Application
                                     </Dialog.Title>
 
+                                    {/* User Info Section */}
+                                    <div className="space-y-3 mb-6">
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Full Name</label>
+                                            <input
+                                                type="text"
+                                                value={user?.firstName || ""}
+                                                readOnly
+                                                className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm focus:outline-none cursor-not-allowed"
+                                            />
+                                            <label className="text-sm font-medium text-gray-700">Last Name</label>
+                                            <input
+                                                type="text"
+                                                value={user?.lastName || ""}
+                                                readOnly
+                                                className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm focus:outline-none cursor-not-allowed"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Email</label>
+                                            <input
+                                                type="email"
+                                                value={user?.email || ""}
+                                                readOnly
+                                                className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm focus:outline-none cursor-not-allowed"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Phone</label>
+                                            <input
+                                                type="text"
+                                                value={user?.phone || ""}
+                                                readOnly
+                                                className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm focus:outline-none cursor-not-allowed"
+                                            />
+                                        </div>
+                                    </div>
+
                                     <p className="text-sm text-gray-700 mb-6">
                                         Please select or confirm your resume before applying.
                                     </p>
@@ -551,6 +590,7 @@ export default function JobViewPage() {
                                     </div>
                                 </Dialog.Panel>
                             </Dialog>
+
 
 
                             {/* Save Job Card */}

@@ -32,22 +32,22 @@ export default function ResumePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const router = useRouter();
-      useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-    if (!token) {
-      toast.error("Please log in to access your resumes");
-      router.push("/login");
-      return;
-    }
+        if (!token) {
+            toast.error("Please log in to access your resumes");
+            router.push("/login");
+            return;
+        }
 
-    if (!storedUser || storedUser.role !== "jobseeker") {
-      toast.error("Unauthorized access");
-      router.push("/login");
-      return;
-    }
-  }, [router]);
+        if (!storedUser || storedUser.role !== "jobseeker") {
+            toast.error("Unauthorized access");
+            router.push("/login");
+            return;
+        }
+    }, [router]);
 
     useEffect(() => {
         fetchResumes();
@@ -109,32 +109,32 @@ export default function ResumePage() {
     return (
         <>
             <Navbar />
-            <div className=" bg-gray-50 p-4 sm:p-6 lg:p-8">
+            <div className=" bg-gray-50 ">
+                <div className="bg-[#002B6B] text-white py-10 relative overflow-hidden flex-shrink-0">
+                    <div
+                        className="absolute inset-0 bg-cover bg-center opacity-90"
+                        style={{ backgroundImage: "url('/new1.png')" }}
+                    ></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
+
+                    <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                        <div>
+                            <h1 className="text-4xl font-bold leading-tight">
+                                My Resumes{" "}
+                                {/* <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+                                        Your Applications
+                                    </span> */}
+                            </h1>
+                            <p className="text-blue-100 mt-3">
+                                Create Your Resumes and Stand Out to Employers!
+                            </p>
+                        </div>
+                        <Link className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-lg text-white bg-linear-to-r from-[#155DFC] to-[#00B8DB] transition duration-300 ease-in-out transform hover:scale-[1.02]"
+                            href="/dashboard/jobseeker/resume/build">✨ Build New Resume</Link>
+                    </div>
+                </div>
                 <div className="max-w-6xl mx-auto">
-
                     {/* Header Section */}
-<header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b pb-4">
-  <div className="flex items-center gap-4 mb-4 sm:mb-0">
-    {/* 🔙 Back Button */}
-    <button
-      onClick={() => router.push("/dashboard/jobseeker")}
-      className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition duration-300 font-medium text-sm"
-    >
-      ← Back
-    </button>
-
-    <h1 className="text-4xl font-extrabold text-gray-900 flex items-center">
-      📝 My Resumes
-    </h1>
-  </div>
-
-  <Link
-    href="/dashboard/jobseeker/resume/build"
-    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-[1.02]"
-  >
-    ✨ Build New Resume
-  </Link>
-</header>
 
 
                     {/* Error Alert */}
@@ -147,7 +147,7 @@ export default function ResumePage() {
 
                     {/* Empty State */}
                     {resumes.length === 0 ? (
-                        <div className="bg-white border-2 border-dashed border-gray-300 p-12 rounded-xl text-center shadow-inner mt-10">
+                        <div className="bg-white border-2 border-dashed border-gray-300 p-12 rounded-xl text-center shadow-inner mt-10 ">
                             <p className="text-xl text-gray-600 mb-6">
                                 It looks like you haven't created any resumes yet.
                             </p>
@@ -160,79 +160,68 @@ export default function ResumePage() {
                         </div>
                     ) : (
                         // Resumes List
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-4 sm:p-6 lg:p-8">
                             {resumes.map(resume => (
                                 <div
                                     key={resume._id}
-                                    className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition duration-300 flex flex-col justify-between"
+                                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition duration-300"
                                 >
-                                    <div>
-                                        {/* Title and Default Tag */}
-                                        <div className="flex justify-between items-start mb-3">
-                                            <h2 className="text-2xl font-bold text-gray-900 truncate pr-2">
-                                                {resume.title}
-                                            </h2>
-                                            {resume.isDefault && (
-                                                <span className="flex items-center bg-green-50 text-green-700 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap border border-green-200">
-                                                    <Star className="w-3 h-3 mr-1 fill-current" />
-                                                    ⭐ Default
-                                                </span>
-                                            )}
+                                    {/* Header with Title and Default Badge */}
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="text-lg font-bold text-gray-900">
+                                            {resume.title}
+                                        </h3>
+                                        {resume.isDefault && (
+                                            <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                                Default
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Meta Info - Created Date */}
+                                    <div className="flex items-center text-xs text-gray-500 mb-3">
+                                        <FileText className="w-3 h-3 mr-1" />
+                                        Created: {formatDate(resume.createdAt)}
+                                    </div>
+
+                                    {/* Stats Row */}
+                                    <div className="flex gap-4 text-xs text-gray-600 mb-4 pb-3 border-b">
+                                        <div className="flex items-center">
+                                            <Eye className="w-3 h-3 mr-1 text-gray-400" />
+                                            Views: <span className="font-semibold ml-1">{resume.stats.views}</span>
                                         </div>
-
-                                        {/* Meta Info */}
-                                        <p className="text-sm text-gray-500 mb-4">
-                                            Created: {formatDate(resume.createdAt)}
-                                        </p>
-
-                                        {/* Stats */}
-                                        <div className="flex justify-between text-sm text-gray-700 mb-6 border-t pt-4">
-                                            <p className="flex items-center">
-                                                <Eye className="w-4 h-4 mr-1 text-blue-500" />
-                                                Views: <span className="font-semibold ml-1 text-blue-600">{resume.stats.views}</span>
-                                            </p>
-                                            <p className="flex items-center">
-                                                <Download className="w-4 h-4 mr-1 text-purple-500" />
-                                                Downloads: <span className="font-semibold ml-1 text-purple-600">{resume.stats.downloads}</span>
-                                            </p>
+                                        <div className="flex items-center">
+                                            <Download className="w-3 h-3 mr-1 text-gray-400" />
+                                            Downloads: <span className="font-semibold ml-1">{resume.stats.downloads}</span>
                                         </div>
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex flex-wrap gap-2 pt-4 border-t">
+                                    <div className="flex gap-2">
                                         {/* Edit Button */}
                                         <Link
                                             href={`/dashboard/jobseeker/resume/edit/${resume._id}`}
-                                            // ADDED: flex, items-center, justify-center for perfect alignment
-                                            className="flex-1 min-w-[80px] flex items-center justify-center px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-medium text-sm transition"
+                                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2  text-blue-600  font-medium text-xs transition border  rounded-md border-gray-200"
                                         >
-                                            {/* Make sure the icon has a consistent right margin */}
-                                            {/* Assuming Edit is available */}
-                                            <Edit className="w-4 h-4 mr-1" />
+                                            <Edit className="w-3 h-3" />
                                             Edit
                                         </Link>
 
-                                        {/* Preview Button (Fixed to include text for alignment) */}
+                                        {/* Preview Button */}
                                         <Link
                                             href={`/dashboard/jobseeker/resume/preview/${resume._id}`}
-                                            // ADDED: flex, items-center, justify-center for perfect alignment
-                                            className="flex-1 min-w-[80px] flex items-center justify-center px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 font-medium text-sm transition"
+                                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2  text-blue-600 border  font-medium text-xs transition  rounded-md border-gray-200"
                                         >
-                                            {/* Make sure the icon has a consistent right margin */}
-                                            {/* Assuming Eye is available */}
-                                            <Eye className="w-4 h-4 mr-1" />
+                                            <Eye className="w-3 h-3" />
                                             Preview
                                         </Link>
 
                                         {/* Delete Button */}
                                         <button
                                             onClick={() => handleDelete(resume._id)}
-                                            // ADDED: flex, items-center, justify-center for perfect alignment
-                                            className="flex-1 min-w-[80px] flex items-center justify-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium text-sm transition"
+                                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2  text-red-600   font-medium text-xs transition border rounded-md border-gray-200"
                                         >
-                                            {/* Make sure the icon has a consistent right margin */}
-                                            {/* Assuming Trash2 is available */}
-                                            <Trash2 className="w-4 h-4 mr-1" />
+                                            <Trash2 className="w-3 h-3" />
                                             Delete
                                         </button>
                                     </div>
