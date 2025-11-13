@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 interface Location {
   city?: string;
   state?: string;
@@ -76,6 +77,15 @@ const LOCATIONS = [
   "Chennai", "Kolkata", "Ahmedabad",
 ];
 
+const JOB_TYPES = [
+  "Full-time",
+  "Part-time",
+  "Contract",
+  "Freelance",
+  "Internship",
+  "Volunteer",
+];
+
 export default function JobListing() {
   const router = useRouter();
   const [jobs, setJobs] = useState<any[]>([]);
@@ -97,6 +107,7 @@ export default function JobListing() {
   const [expandedSections, setExpandedSections] = useState({
     specialty: true,
     location: true,
+    jobType: true,
     experience: true,
     salary: true,
   });
@@ -104,6 +115,7 @@ export default function JobListing() {
   // Selected filters
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
   const [experienceRange, setExperienceRange] = useState(0);
   const [salaryRange, setSalaryRange] = useState(0);
 
@@ -129,20 +141,33 @@ export default function JobListing() {
     );
   };
 
+  const toggleJobType = (jobType: string) => {
+    setSelectedJobTypes(prev =>
+      prev.includes(jobType)
+        ? prev.filter(jt => jt !== jobType)
+        : [...prev, jobType]
+    );
+  };
+
   const getSpecialtyCount = (specialty: string) => {
     return jobs.filter(j => j.specialization?.toLowerCase() === specialty.toLowerCase()).length;
   };
 
   const getLocationCount = (location: string) => {
-    return jobs.filter(j => 
+    return jobs.filter(j =>
       j.location?.city?.toLowerCase() === location.toLowerCase() ||
       j.location?.state?.toLowerCase().includes(location.toLowerCase())
     ).length;
   };
 
+  const getJobTypeCount = (jobType: string) => {
+    return jobs.filter(j => j.jobType?.toLowerCase() === jobType.toLowerCase()).length;
+  };
+
   const clearAllFilters = () => {
     setSelectedSpecialties([]);
     setSelectedLocations([]);
+    setSelectedJobTypes([]);
     setExperienceRange(0);
     setSalaryRange(0);
     setSearchQuery("");
@@ -158,6 +183,7 @@ export default function JobListing() {
     let count = 0;
     if (selectedSpecialties.length > 0) count++;
     if (selectedLocations.length > 0) count++;
+    if (selectedJobTypes.length > 0) count++;
     if (experienceRange > 0) count++;
     if (salaryRange > 0) count++;
     return count;
@@ -275,6 +301,15 @@ export default function JobListing() {
       );
     }
 
+    // Job Type filter (multiple selection)
+    if (selectedJobTypes.length > 0) {
+      filtered = filtered.filter(j =>
+        selectedJobTypes.some(jt =>
+          j.jobType?.toLowerCase() === jt.toLowerCase()
+        )
+      );
+    }
+
     // Experience filter
     if (experienceRange > 0) {
       filtered = filtered.filter(
@@ -291,7 +326,7 @@ export default function JobListing() {
 
     setFilteredJobs(filtered);
     setCurrentPage(1);
-  }, [searchQuery, jobs, selectedSpecialties, selectedLocations, experienceRange, salaryRange]);
+  }, [searchQuery, jobs, selectedSpecialties, selectedLocations, selectedJobTypes, experienceRange, salaryRange]);
 
 
   // ✅ Pagination
@@ -328,12 +363,12 @@ export default function JobListing() {
           <div className="max-w-2xl">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
               Find Your Perfect{" "}
-              <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
                 Healthcare Role
               </span>
             </h1>
             <p className="text-base sm:text-lg text-blue-100 mt-3">
-              Explore verified opportunities from India’s leading hospitals and
+              Explore verified opportunities from India's leading hospitals and
               healthcare facilities.
             </p>
           </div>
@@ -341,7 +376,7 @@ export default function JobListing() {
           {/* Right Button */}
           <button
             onClick={() => router.push("/dashboard/employee/jobs/create")}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
           >
             <Plus className="w-5 h-5" />
             Create Job
@@ -354,13 +389,17 @@ export default function JobListing() {
       <div className="max-w-7xl mx-auto px-4 py-10 flex gap-8 relative">
         {/* ===== LEFT SIDEBAR FILTERS ===== */}
         <div
-          className={`lg:w-80 lg:sticky lg:top-24 lg:self-start bg-white border border-gray-200 rounded-xl shadow-sm p-6 transition-all duration-300 ${
-            mobileFilters
-              ? "fixed inset-0 z-50 overflow-y-auto"
-              : "hidden lg:block"
-          }`}
+          className={`lg:w-80 lg:sticky lg:top-24 lg:self-start bg-white border border-gray-200 rounded-xl shadow-sm p-6 transition-all duration-300 ${mobileFilters
+            ? "fixed inset-0 z-50 overflow-y-auto"
+            : "hidden lg:block"
+            }`}
           style={{ maxHeight: mobileFilters ? "100vh" : "calc(100vh - 120px)" }}
         >
+          <style>{`
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+`}</style>
           {/* Mobile Header */}
           <div className="flex items-center justify-between mb-6 lg:hidden">
             <h2 className="text-xl font-bold text-gray-900">Filters</h2>
@@ -385,7 +424,7 @@ export default function JobListing() {
             )}
           </div>
 
-          <div className="space-y-6 overflow-y-auto" style={{ maxHeight: "calc(100vh - 200px)" }}>
+          <div className="space-y-6 overflow-y-auto no-scrollbar" style={{ maxHeight: "calc(100vh - 200px)" }}>
             {/* SPECIALTY FILTER */}
             <div className="pb-6 border-b">
               <button
@@ -411,7 +450,7 @@ export default function JobListing() {
                         type="checkbox"
                         checked={selectedSpecialties.includes(specialty)}
                         onChange={() => toggleSpecialty(specialty)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                        className="w-4 h-4 accent-black text-black border-gray-300 rounded"
                       />
                       <span className="text-sm text-gray-700 group-hover:text-gray-900 flex-1">
                         {specialty}
@@ -456,7 +495,7 @@ export default function JobListing() {
                         type="checkbox"
                         checked={selectedLocations.includes(location)}
                         onChange={() => toggleLocation(location)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                        className="w-4 h-4 accent-black text-black border-gray-300 rounded "
                       />
                       <span className="text-sm text-gray-700 group-hover:text-gray-900 flex-1">
                         {location}
@@ -476,6 +515,43 @@ export default function JobListing() {
               )}
             </div>
 
+            {/* JOB TYPE FILTER */}
+            <div className="pb-6 border-b">
+              <button
+                onClick={() => toggleSection("jobType")}
+                className="w-full flex items-center justify-between mb-4"
+              >
+                <h3 className="text-base font-bold text-gray-900">Job Type</h3>
+                {expandedSections.jobType ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
+
+              {expandedSections.jobType && (
+                <div className="space-y-2.5">
+                  {JOB_TYPES.map((jobType) => (
+                    <label
+                      key={jobType}
+                      className="flex items-center gap-2.5 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedJobTypes.includes(jobType)}
+                        onChange={() => toggleJobType(jobType)}
+                        className="w-4 h-4 accent-black text-black border-gray-300 rounded"
+                      />
+                      <span className="text-sm text-gray-700 group-hover:text-gray-900 flex-1">
+                        {jobType}
+                      </span>
+                      <span className="text-xs text-gray-400">({getJobTypeCount(jobType)})</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* EXPERIENCE FILTER */}
             <div className="pb-6 border-b">
               <button
@@ -491,21 +567,85 @@ export default function JobListing() {
               </button>
 
               {expandedSections.experience && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>Min: {experienceRange} years</span>
+                <div className="space-y-4 w-full">
+                  <div className="flex items-center justify-between text-sm text-gray-700">
+                    <span>Experience: {experienceRange} years</span>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="20"
-                    value={experienceRange}
-                    onChange={(e) => setExperienceRange(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                  />
+
+                  <style>{`
+        .slider {
+          --slider-width: 100%;
+          --slider-height: 6px;
+          --slider-bg: rgb(82, 82, 82);
+          --slider-border-radius: 999px;
+
+          /* black progress fill */
+          --level-color: #000;
+          --level-transition-duration: 0.1s;
+
+          /* icon */
+          --icon-margin: 15px;
+          --icon-color: var(--slider-bg);
+          --icon-size: 25px;
+
+          cursor: pointer;
+          display: inline-flex;
+          flex-direction: row-reverse;
+          align-items: center;
+        }
+
+        .slider .volume {
+          display: inline-block;
+          margin-right: var(--icon-margin);
+          color: var(--icon-color);
+          width: var(--icon-size);
+          height: auto;
+        }
+
+        .slider .level {
+          appearance: none;
+          width: var(--slider-width);
+          height: var(--slider-height);
+          background: #e2e2e2;
+          overflow: hidden;
+          border-radius: var(--slider-border-radius);
+          transition: height var(--level-transition-duration);
+          cursor: inherit;
+        }
+
+        /* progress fill (black) */
+        .slider .level::-webkit-slider-thumb {
+          appearance: none;
+          width: 0;
+          height: 0;
+          box-shadow: -200px 0 0 200px var(--level-color);
+        }
+
+        .slider .level::-moz-range-thumb {
+          width: 0;
+          height: 0;
+          box-shadow: -200px 0 0 200px var(--level-color);
+        }
+
+        .slider:hover .level {
+          height: calc(var(--slider-height) * 2);
+        }
+      `}</style>
+
+                  <label className="slider w-full">
+                    <input
+                      type="range"
+                      className="level"
+                      min="0"
+                      max="20"
+                      value={experienceRange}
+                      onChange={(e) => setExperienceRange(Number(e.target.value))}
+                    />
+                  </label>
                 </div>
               )}
             </div>
+
 
             {/* SALARY FILTER */}
             <div className="pb-6">
@@ -522,23 +662,72 @@ export default function JobListing() {
               </button>
 
               {expandedSections.salary && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="space-y-4 w-full">
+                  <div className="flex items-center justify-between text-sm text-gray-700">
                     <span>Min: ₹{salaryRange} LPA</span>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="50"
-                    step="5"
-                    value={salaryRange}
-                    onChange={(e) => setSalaryRange(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                  />
+
+                  <style>{`
+        .salary-slider {
+          --slider-height: 6px;
+          --slider-bg: #e2e2e2;
+          --slider-border-radius: 999px;
+          --level-color: #000;
+          --level-transition-duration: 0.1s;
+
+          width: 100%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+        }
+
+        .salary-slider .salary-level {
+          appearance: none;
+          width: 100%;
+          height: var(--slider-height);
+          background: var(--slider-bg);
+          border-radius: var(--slider-border-radius);
+          overflow: hidden;
+          transition: height var(--level-transition-duration);
+          cursor: inherit;
+        }
+
+        /* black progress fill */
+        .salary-slider .salary-level::-webkit-slider-thumb {
+          appearance: none;
+          width: 0;
+          height: 0;
+          box-shadow: -400px 0 0 400px var(--level-color);
+        }
+
+        .salary-slider .salary-level::-moz-range-thumb {
+          width: 0;
+          height: 0;
+          box-shadow: -400px 0 0 400px var(--level-color);
+        }
+
+        .salary-slider:hover .salary-level {
+          height: calc(var(--slider-height) * 2);
+        }
+      `}</style>
+
+                  <label className="salary-slider w-full">
+                    <input
+                      type="range"
+                      min="0"
+                      max="50"
+                      step="5"
+                      value={salaryRange}
+                      onChange={(e) => setSalaryRange(Number(e.target.value))}
+                      className="salary-level"
+                    />
+                  </label>
                 </div>
               )}
             </div>
+
           </div>
+
         </div>
 
         {/* MOBILE FILTER BUTTON */}
@@ -564,13 +753,19 @@ export default function JobListing() {
               <input
                 type="text"
                 placeholder="Search by title, specialization, or location..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
+              <button
+                type="button"
+                className="absolute right-2 top-1.5 bg-linear-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full p-2.5 shadow-md transition"
+              >
+                <Search size={18} />
+              </button>
             </div>
           </div>
+
 
           {loading ? (
             <div className="text-center py-20 text-gray-500">Loading jobs...</div>
@@ -583,11 +778,11 @@ export default function JobListing() {
                 No jobs found
               </h3>
               <p className="text-sm text-gray-500 mb-4">
-                {searchQuery || selectedSpecialties.length > 0 || experienceRange > 0 || salaryRange > 0
+                {searchQuery || selectedSpecialties.length > 0 || selectedJobTypes.length > 0 || experienceRange > 0 || salaryRange > 0
                   ? "Try adjusting your filters or search query"
                   : "You haven't created any jobs yet"}
               </p>
-              {(searchQuery || selectedSpecialties.length > 0 || experienceRange > 0 || salaryRange > 0) && (
+              {(searchQuery || selectedSpecialties.length > 0 || selectedJobTypes.length > 0 || experienceRange > 0 || salaryRange > 0) && (
                 <button
                   onClick={clearAllFilters}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
@@ -608,28 +803,29 @@ export default function JobListing() {
                     {/* Left: Icon + Content */}
                     <div className="flex gap-4 flex-1">
                       {/* Building Icon */}
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                        <Building2 className="w-6 h-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                        <Building2 className="w-6 h-6 text-gray-600" />
                       </div>
 
                       {/* Job Info */}
                       <div className="flex-1 min-w-0">
                         {/* Title + Status Badge */}
                         <div className="flex items-start gap-2 mb-1">
-                          <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition cursor-pointer">
+                          <h3 className="text-lg font-semibold text-gray-900 hover:underline transition cursor-pointer"
+                            onClick={() => router.push(`/dashboard/employee/jobs/view/${job._id}`)}>
                             {job.title}
                           </h3>
                           <span
-                            className={`px-2 py-0.5 text-xs font-bold rounded-full uppercase tracking-wide shrink-0 ${
-                              job.status === "Active"
-                                ? "bg-green-100 text-green-700"
-                                : job.status === "Pending"
+                            className={`px-2 py-1 text-xs font-bold rounded-full uppercase tracking-wide shrink-0 ${job.status === "Active"
+                              ? "bg-green-100 text-green-700"
+                              : job.status === "Pending"
                                 ? "bg-red-100 text-red-700"
                                 : "bg-yellow-100 text-yellow-700"
-                            }`}
+                              }`}
                           >
                             {job.status || "Active"}
                           </span>
+
                         </div>
 
                         {/* Organization */}
@@ -667,7 +863,7 @@ export default function JobListing() {
                             {job.specialization || "General"}
                           </span>
                           <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
-                            Full-time
+                            {job.jobType || "Full-time"}
                           </span>
                           <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
                             On-site
@@ -680,43 +876,37 @@ export default function JobListing() {
                   {/* Bottom Actions */}
                   <div className="flex justify-between items-center mt-4 pt-4 border-t">
                     <p className="text-xs text-gray-500">
-                      Posted {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : "N/A"}
+                      Created on {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : "N/A"}
                     </p>
 
+                    {/* View Details */}
                     <div className="flex items-center gap-2">
-                      {/* View Details */}
-                      <button
-                        onClick={() => router.push(`/dashboard/employee/jobs/view/${job._id}`)}
-                        className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
-                      >
-                        View Details
-                      </button>
-
-                      {/* View Applications */}
                       <button
                         onClick={() => router.push(`/dashboard/employee/jobs/${job._id}/applications`)}
-                        title="View Applications"
-                        className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                        className="px-4 py-2 rounded-lg bg-[#096BCB] text-white text-sm font-normal flex gap-1 justify-center items-center transition"
                       >
-                        <Users className="w-5 h-5" />
+                        <Users className="w-4 h-4" />
+                        Applicants
                       </button>
 
                       {/* Edit */}
                       <button
                         onClick={() => router.push(`/dashboard/employee/jobs/edit/${job._id}`)}
                         title="Edit Job"
-                        className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition"
+                        className="p-2 rounded-lg text-sm flex gap-1 justify-center items-center text-[#096BCB] font-normal border border-gray-300 transition "
                       >
-                        <Pencil className="w-5 h-5" />
+                        <Pencil className="w-4 h-4 " />
+                        Edit
                       </button>
 
                       {/* Delete */}
                       <button
                         onClick={() => handleDelete(job._id)}
                         title="Delete Job"
-                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                        className="p-2 rounded-lg  text-sm text-red-600 transition flex gap-1 justify-center items-center border border-gray-300 font-normal"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-4 h-4" />
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -760,7 +950,6 @@ export default function JobListing() {
           )}
         </div>
       </div>
-      {/* <Footer /> */}
     </>
   );
 }
