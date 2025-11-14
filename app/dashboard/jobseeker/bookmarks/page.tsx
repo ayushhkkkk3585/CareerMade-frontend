@@ -186,7 +186,7 @@ export default function SavedJobs() {
         ></div>
 
         {/* Overlay (optional subtle gradient for text contrast) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-10">
@@ -202,7 +202,7 @@ export default function SavedJobs() {
             <div className="max-w-2xl">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Saved{" "}
-                <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
                   Jobs
                 </span>
               </h1>
@@ -431,7 +431,7 @@ export default function SavedJobs() {
                     {/* Left: Icon + Content */}
                     <div className="flex gap-4 flex-1">
                       {/* Hospital Icon */}
-                      <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                         <Building2 className="w-6 h-6 text-gray-600" />
                       </div>
 
@@ -440,7 +440,7 @@ export default function SavedJobs() {
                         {/* Title with Verified Badge */}
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
                         </div>
 
                         {/* Organization Name + Type */}
@@ -483,7 +483,7 @@ export default function SavedJobs() {
 
                         {/* Description */}
                         <div className="flex items-start gap-1.5 mb-4">
-                          <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <FileText className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                           <p className="text-sm text-gray-700 line-clamp-2">
                             {job.description ||
                               "Join our hospital to advance your medical career and serve patients with excellence."}
@@ -506,7 +506,7 @@ export default function SavedJobs() {
                     </div>
 
                     {/* Right: Arrow Icon */}
-                    <button className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition p-1">
+                    <button className="shrink-0 text-gray-400 hover:text-blue-600 transition p-1">
                       <ArrowUpRight className="w-5 h-5" />
                     </button>
                   </div>

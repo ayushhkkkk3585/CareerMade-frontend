@@ -131,6 +131,7 @@ export default function CreateJobPage() {
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [workMode, setWorkMode] = useState("on-site");
 
@@ -183,7 +184,27 @@ export default function CreateJobPage() {
       return;
     }
 
-    setPageLoading(false);
+    // fetch employer profile to read verification status (user object may not include employer record)
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employer/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok && data?.data?.employer) {
+          const emp = data.data.employer;
+          setIsVerified(!!(emp?.verification?.isVerified));
+        } else {
+          // fallback: not verified
+          setIsVerified(false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch employer profile:", err);
+        setIsVerified(false);
+      } finally {
+        setPageLoading(false);
+      }
+    })();
   }, [router]);
 
   const handleInputChange = (
@@ -199,7 +220,7 @@ export default function CreateJobPage() {
       setFormData((prev) => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof FormData],
+          ...(prev[parent as keyof FormData] as object),
           [child]: type === "checkbox" ? checked : value,
         },
       }));
@@ -330,6 +351,11 @@ export default function CreateJobPage() {
     e.preventDefault();
     if (!validateStep(5)) return;
 
+    if (isVerified === false) {
+      toast.error("Your account is not verified. An admin must verify your account before posting jobs.");
+      return;
+    }
+
     const token = localStorage.getItem("accessToken");
     if (!token) {
       toast.error("Please log in again.");
@@ -422,6 +448,36 @@ export default function CreateJobPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
+      {/* If user is not verified, show blocking modal so they cannot post jobs until admin verification */}
+      {isVerified === false && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg mx-4">
+            <div className="flex items-start gap-4">
+              <div className="text-white bg-red-600 rounded-full p-2 flex items-center justify-center">
+                <X className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900">Account not verified</h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  Your employer account is not verified yet. An administrator must verify your account before you can post jobs.
+                  Please contact your administrator or support to request verification.
+                </p>
+
+                <div className="mt-4 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm"
+                  >
+                    Back
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -458,7 +514,7 @@ export default function CreateJobPage() {
                     }}
                   >
                     <div
-                      className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm flex-shrink-0 ${currentStep === step.number
+                      className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm shrink-0 ${currentStep === step.number
                           ? "bg-blue-500 text-white"
                           : currentStep > step.number
                             ? "bg-green-500 text-white"
@@ -1266,10 +1322,10 @@ export default function CreateJobPage() {
                 ) : (
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || isVerified === false}
                     className="order-1 sm:order-2 px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all"
                   >
-                    {loading ? "Posting..." : "Post Job"}
+                    {loading ? "Posting..." : (isVerified === false ? "Account unverified" : "Post Job")}
                   </button>
                 )}
               </div>
