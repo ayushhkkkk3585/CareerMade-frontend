@@ -116,9 +116,15 @@ const Register = () => {
                 localStorage.setItem("user", JSON.stringify(data.data.user));
 
                 console.log("Registration success:", data);
-                toast.error("Registration successful!");
-                router.push("/login");
-                // localStorage.setItem("user data",User)  
+                toast.success("Registration successful!");
+                // router.push("/dashboard/employee/profile/create");
+                // localStorage.setItem("user data",User)
+
+                if (formData.role === "jobseeker") {
+                    router.push("/login");
+                } else {
+                    router.push("/dashboard/employee/profile/create");
+                }
 
                 setFormData({
                     firstName: "",
