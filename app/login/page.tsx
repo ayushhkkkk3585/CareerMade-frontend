@@ -176,7 +176,7 @@ const Login = () => {
             whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#155DFC] to-[#00B8DB] text-white py-3 rounded-full font-medium transition shadow-md disabled:opacity-70"
+            className="w-full bg-linear-to-r from-[#155DFC] to-[#00B8DB] text-white py-3 rounded-full font-medium transition shadow-md disabled:opacity-70"
           >
             {loading ? "Signing In..." : "Sign In"}
           </motion.button>

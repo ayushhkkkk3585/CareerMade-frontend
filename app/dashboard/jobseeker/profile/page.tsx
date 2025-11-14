@@ -159,13 +159,13 @@ export default function JobSeekerDashboard() {
             className="absolute inset-0 bg-cover bg-center opacity-90"
             style={{ backgroundImage: "url('/new1.png')" }}
           ></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="max-w-2xl">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                 Job Seeker{" "}
-                <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
                   Profile
                 </span>
               </h1>
@@ -179,7 +179,7 @@ export default function JobSeekerDashboard() {
                 onClick={() =>
                   router.push("/dashboard/jobseeker/profile/create")
                 }
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-[#007BFF] to-[#00CFFF] hover:from-[#0066d9] hover:to-[#00B8E6] text-white rounded-full text-sm sm:text-base font-semibold transition-all shadow-lg whitespace-nowrap"
               >
                 <Edit className="w-5 h-5" />
                 Edit Profile
@@ -517,11 +517,11 @@ export default function JobSeekerDashboard() {
                 <div className="flex flex-wrap gap-2">
                   {profile.skills.map((skill: any, idx: number) => (
                     <span
-                      key={idx}
-                      className="inline-block px-4 py-2 bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
-                    >
-                      {skill.name}
-                    </span>
+                        key={idx}
+                        className="inline-block px-4 py-2 bg-linear-to-r from-indigo-100 to-blue-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
+                      >
+                        {skill.name}
+                      </span>
                   ))}
                 </div>
               </div>

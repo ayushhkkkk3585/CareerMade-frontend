@@ -243,7 +243,7 @@ export default function JobListing() {
     // ✅ Only fetch jobs if valid employer
     const fetchJobs = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs?limit=50`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/my?limit=50`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
