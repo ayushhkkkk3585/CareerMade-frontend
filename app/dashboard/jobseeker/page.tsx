@@ -43,7 +43,8 @@ const WORK_MODES = ["On-site", "Remote", "Full-time"];
 
 export default function JobSeekerJobs() {
   const router = useRouter();
-  const [savedJobs, setSavedJobs] = useState<string[]>([]);
+  // Set of saved job IDs for O(1) lookup
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
   const [jobs, setJobs] = useState<any[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
@@ -245,14 +246,17 @@ export default function JobSeekerJobs() {
 
   const displayedSpecialties = showAllSpecialties ? SPECIALIZATIONS : SPECIALIZATIONS.slice(0, 4);
 
+  // --- Saved jobs handling (use Set for O(1) lookup) ---
+
   useEffect(() => {
+    // Fetch saved jobs for the current user and populate a Set of IDs
     const fetchSavedJobs = async () => {
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/me`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/saved-jobs`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -261,9 +265,11 @@ export default function JobSeekerJobs() {
 
         if (res.ok) {
           const savedJobIds = (data.data?.items || data.items || []).map(
-            (item: any) => item.job?._id || item.jobId
+            (item: any) => String(item.job?._id || item.jobId || item.job)
           );
-          setSavedJobs(savedJobIds);
+          setSavedIds(new Set(savedJobIds));
+        } else {
+          console.error("Failed to fetch saved jobs", data?.message || data);
         }
       } catch (error) {
         console.error("Failed to fetch saved jobs", error);
@@ -274,13 +280,26 @@ export default function JobSeekerJobs() {
   }, []);
 
   const saveJob = async (id: string) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      const isSaved = savedJobs.includes(id);
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      toast.error("Please log in to save jobs.");
+      return;
+    }
 
+    const idStr = String(id);
+    const isSaved = savedIds.has(idStr);
+
+    // Optimistic update for snappy UI
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (isSaved) next.delete(idStr);
+      else next.add(idStr);
+      return next;
+    });
+
+    try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/jobs/${id}/${isSaved ? "unsave" : "save"
-        }`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/saved-jobs/jobs/${id}/${isSaved ? "unsave" : "save"}`,
         {
           method: isSaved ? "DELETE" : "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -288,17 +307,26 @@ export default function JobSeekerJobs() {
       );
       const data = await res.json();
 
-      if (res.ok) {
-        setSavedJobs((prev) =>
-          isSaved ? prev.filter((jobId) => jobId !== id) : [...prev, id]
-        );
-        toast.success(
-          isSaved ? "Job removed from saved list." : "Job saved successfully!"
-        );
-      } else {
+      if (!res.ok) {
+        // revert optimistic update on server error
+        setSavedIds((prev) => {
+          const revert = new Set(prev);
+          if (isSaved) revert.add(idStr);
+          else revert.delete(idStr);
+          return revert;
+        });
         toast.error(data.message || "Failed to save job.");
+      } else {
+        toast.success(isSaved ? "Job removed from saved list." : "Job saved successfully!");
       }
-    } catch {
+    } catch (err) {
+      // revert optimistic update on network error
+      setSavedIds((prev) => {
+        const revert = new Set(prev);
+        if (isSaved) revert.add(idStr);
+        else revert.delete(idStr);
+        return revert;
+      });
       toast.error("Failed to save job.");
     }
   };
@@ -612,7 +640,7 @@ export default function JobSeekerJobs() {
                     {/* Left: Icon + Content */}
                     <div className="flex gap-4 flex-1">
                       {/* Hospital Icon */}
-                      <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                         <Building2 className="w-6 h-6 text-gray-600" />
                       </div>
 
@@ -665,7 +693,7 @@ export default function JobSeekerJobs() {
 
                         {/* Description */}
                         <div className="flex items-start gap-1.5 mb-4">
-                          <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <FileText className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                           <p className="text-sm text-gray-700 line-clamp-2">
                             {job.description || "Join our hospital to advance your medical career and serve patients with excellence."}
                           </p>
@@ -694,13 +722,13 @@ export default function JobSeekerJobs() {
                     {/* Right: Bookmark Icon */}
                     <button
                       onClick={() => saveJob(job._id)}
-                      className={`flex-shrink-0 p-2 rounded-full transition ${savedJobs.includes(job._id)
+                      className={`shrink-0 p-2 rounded-full transition ${savedIds.has(String(job._id || job.id))
                         ? "text-blue-600 bg-blue-50"
                         : "text-gray-400 hover:text-blue-600"
                         }`}
                     >
                       <Bookmark
-                        className={`w-5 h-5 transition ${savedJobs.includes(job._id)
+                        className={`w-5 h-5 transition ${savedIds.has(String(job._id || job.id))
                           ? "fill-blue-600 text-blue-600"
                           : "text-gray-400"
                           }`}

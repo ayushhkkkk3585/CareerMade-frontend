@@ -112,14 +112,14 @@ export default function Navbar() {
                   onClick={() => router.push("/dashboard/employee/jobs")}
                   className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
                 >
-                  Jobs
+                  My Jobs Postings
                 </button>
 
                 <button
                   onClick={() => router.push("/dashboard/employee/jobs/create")}
                   className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition"
                 >
-                  Create
+                  Create Job
                 </button>
               </div>
             )}
