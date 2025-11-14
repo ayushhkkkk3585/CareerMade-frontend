@@ -22,6 +22,7 @@ import {
     UtensilsCrossed,
     Star,
     Save,
+    IndianRupee,
 } from "lucide-react";
 import Navbar from "@/app/components/Navbar";
 import GradientLoader from "@/app/components/GradientLoader";
@@ -505,40 +506,39 @@ export default function JobViewPage() {
                                     </span>
                                 </div>
 
-                                {formatPostedDate() && (
-                                    <p className="text-xs text-gray-500 mb-4">{formatPostedDate()}</p>
-                                )}
 
-                                <div className="flex gap-3 pt-4 border-t border-gray-200">
-                                    <button
-                                        onClick={saveJob}
-                                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition flex items-center justify-center gap-2"
-                                    >
-                                        <Save className="w-4 h-4" />
-                                        Save
-                                    </button>
-                                    {hasApplied ? (
+
+                                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                                    <div className="text-sm text-gray-500"> <span className="text-gray-700 font-medium">{formatPostedDate() ?? '4 days ago'}</span></div>
+                                    <div className="flex items-center gap-3">
                                         <button
-                                            disabled
-                                            className="flex-1 px-6 py-2.5 bg-gray-400 text-white rounded-lg font-medium cursor-not-allowed transition flex items-center justify-center gap-2"
+                                            onClick={saveJob}
+                                            className="px-4 py-2 border border-[#D1E9FF] text-[#0B74FF] rounded-full text-sm font-medium hover:bg-[#F3F9FF] transition"
                                         >
-                                            <CheckCircle className="w-4 h-4" />
-                                            Already Applied
+                                            Save
                                         </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => {
-                                                if (!resume) {
-                                                    toast.error("Please upload a resume before applying!");
-                                                    return;
-                                                }
-                                                setIsApplyModalOpen(true);
-                                            }}
-                                            className="flex-1 px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
-                                        >
-                                            Apply
-                                        </button>
-                                    )}
+                                        {hasApplied ? (
+                                            <button
+                                                disabled
+                                                className="px-4 py-2 bg-gray-300 text-white rounded-full text-sm font-medium cursor-not-allowed"
+                                            >
+                                                <CheckCircle className="w-4 h-4 inline-block mr-1" /> Already Applied
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => {
+                                                    if (!resume) {
+                                                        toast.error("Please upload a resume before applying!");
+                                                        return;
+                                                    }
+                                                    setIsApplyModalOpen(true);
+                                                }}
+                                                className="px-4 py-2 bg-[#007BFF] hover:bg-[#006AE6] text-white rounded-full text-sm font-semibold"
+                                            >
+                                                Apply
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -631,7 +631,7 @@ export default function JobViewPage() {
                                         return (
                                             <div key={index} className="flex items-start justify-between">
                                                 <div className="flex items-start gap-3">
-                                                    <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                    <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                                                         <Icon className="w-4 h-4 text-gray-600" />
                                                     </div>
                                                     <div>
