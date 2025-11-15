@@ -527,10 +527,10 @@ export default function JobViewPage() {
                                         ) : (
                                             <button
                                                 onClick={() => {
-                                                    if (!resume) {
-                                                        toast.error("Please upload a resume before applying!");
-                                                        return;
-                                                    }
+                                                    // if (!resume) {
+                                                    //     toast.error("Please upload a resume before applying!");
+                                                    //     return;
+                                                    // }
                                                     setIsApplyModalOpen(true);
                                                 }}
                                                 className="px-4 py-2 bg-[#007BFF] hover:bg-[#006AE6] text-white rounded-full text-sm font-semibold"
