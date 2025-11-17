@@ -242,6 +242,21 @@ export default function Navbar() {
                       </>
                     )}
 
+                    {user?.role === "employer" && (
+                      <>
+                        <button
+                          onClick={() => {
+                            router.push("/dashboard/employee/jobs/create");
+                            setMenuOpen(false);
+                          }}
+                          className="flex items-center space-x-3 hover:text-blue-600 md:hidden"
+                        >
+                          <Briefcase size={18} />
+                          <span>Create Job</span>
+                        </button>
+                      </>
+                    )}
+
                     <button
                       onClick={() => {
                         handleLogout();
