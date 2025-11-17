@@ -84,7 +84,7 @@ export default function ViewEmployerProfile() {
             <div className="flex flex-wrap gap-3 justify-start sm:justify-end w-full sm:w-auto">
               <button
                 onClick={() => router.push("/dashboard/employee/profile/create")}
-                className="flex items-center justify-center gap-2 px-6 py-2.5 border border-white text-white rounded-lg text-sm font-medium hover:bg-gray-50 transition-all"
+                className="flex items-center justify-center gap-2 px-6 py-2.5 border border-white text-white rounded-lg text-sm font-medium hover:bg-blue-500 transition-all"
               >
                 <Edit className="w-4 h-4" />
                 Edit Profile

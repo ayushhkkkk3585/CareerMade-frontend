@@ -294,7 +294,7 @@ export default function JobApplicationsPage() {
         ></div>
 
         {/* Overlay (optional subtle gradient for text contrast) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-[#001b3e]/90 via-[#002b6b]/60 to-transparent"></div>
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
@@ -302,7 +302,7 @@ export default function JobApplicationsPage() {
           <div className="max-w-2xl">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
               Job{" "}
-              <span className="bg-gradient-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-[#00A3FF] to-[#00E0FF] bg-clip-text text-transparent">
                 Applications
               </span>
             </h1>
@@ -316,44 +316,73 @@ export default function JobApplicationsPage() {
         </div>
       </div>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Application Status Summary Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          {/* All Applications */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-sm font-medium text-gray-600 mb-2">All applications</p>
+            <p className="text-3xl font-bold text-gray-900">{applications.length}</p>
+          </div>
+          {/* Under Review */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-sm font-medium text-amber-600 mb-2">Under Review</p>
+            <p className="text-3xl font-bold text-amber-600">{applications.filter(app => app.status === "Under Review").length}</p>
+          </div>
+
+          {/* Interview */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-sm font-medium text-purple-600 mb-2">Interview</p>
+            <p className="text-3xl font-bold text-purple-600">{applications.filter(app => app.status === "Interview").length}</p>
+          </div>
+
+          {/* Offered */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-sm font-medium text-green-600 mb-2">Offered</p>
+            <p className="text-3xl font-bold text-green-600">{applications.filter(app => app.status === "Offered").length}</p>
+          </div>
+
+          {/* Rejected */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-sm font-medium text-red-600 mb-2">Rejected</p>
+            <p className="text-3xl font-bold text-red-600">{applications.filter(app => app.status === "Rejected").length}</p>
+          </div>
+        </div>
+
         <div className="flex flex-col space-y-4 mb-6">
           {/* Filter toolbar (below banner) */}
           <div className="flex flex-col gap-2 mt-4">
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-between gap-4">
+              {/* Search Bar */}
+              <div className="flex-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#155DFC] focus:border-transparent transition-all"
+                  placeholder="Search applicants..."
+                />
+              </div>
+
+              {/* Filter Button */}
               <div className="relative" ref={filterRef}>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="px-4 py-2 bg-[#155DFC] hover:bg-[#1e45f6] text-white rounded-lg text-sm font-medium transition-all shadow-md flex items-center gap-2"
+                  className="px-4 py-2 bg-[#155DFC] hover:bg-[#1e45f6] text-white rounded-lg text-sm font-medium transition-all shadow-md flex items-center gap-2 whitespace-nowrap"
                 >
                   <Filter className="h-4 w-4 mr-1.5" />
                   Filter
                   {hasFilters && (
                     <span className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-white text-[#155DFC] text-xs">
-                      {[searchTerm, statusFilter, minRating > 0 ? 1 : 0].filter(Boolean).length}
+                      {[statusFilter, minRating > 0 ? 1 : 0].filter(Boolean).length}
                     </span>
                   )}
                 </button>
                 {showFilters && (
                   <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg border border-gray-200 z-10">
                     <div className="p-4 space-y-4">
-                      <div>
-                        <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-                          Search
-                        </label>
-                        <div className="relative rounded-md shadow-sm">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-gray-400" />
-                          </div>
-                          <input
-                            type="text"
-                            id="search"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="focus:ring-[#155DFC] focus:border-[#155DFC] block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                            placeholder="Search applicants..."
-                          />
-                        </div>
-                      </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Status
@@ -403,19 +432,8 @@ export default function JobApplicationsPage() {
               </div>
             </div>
             {/* Active filters */}
-            {hasFilters && (
-              <div className="flex flex-wrap gap-2 justify-end">
-                {searchTerm && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#F3E8FF] text-[#155DFC]">
-                    Search: {searchTerm}
-                    <button
-                      onClick={() => setSearchTerm('')}
-                      className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#155DFC] text-white"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
+            {(statusFilter || minRating > 0) && (
+              <div className="flex flex-wrap gap-2">
                 {statusFilter && (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E0F2FE] text-[#0369A1]">
                     Status: {statusFilter}
@@ -505,7 +523,7 @@ export default function JobApplicationsPage() {
                         <tr key={app._id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <div className="shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                                 {u.profileImage ? (
                                   <img
                                     className="h-10 w-10 rounded-full"
