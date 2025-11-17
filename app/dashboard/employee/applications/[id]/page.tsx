@@ -221,7 +221,7 @@ export default function ApplicationDetailPage() {
   const resumeObj = app.jobSeeker?.resume;
   const resumeHref = typeof resumeObj === "string" ? resumeObj : resumeObj?.url;
   const resumeFilename = resumeObj?.filename || "Resume";
-  
+
   const coverLetterObj = app.coverLetter;
   const coverLetterHref = typeof coverLetterObj === "string" ? coverLetterObj : coverLetterObj?.url;
   const coverLetterFilename = coverLetterObj?.filename || "Cover Letter";
@@ -336,17 +336,19 @@ export default function ApplicationDetailPage() {
                 Cover Letter
               </h3>
 
-              {coverLetterHref ? (
+              {coverLetterText ? (
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
                     <p className="text-sm text-gray-500 mb-2">{coverLetterFilename}</p>
                     <div className="flex gap-2">
                       {/* View Cover Letter */}
                       <a
-                        href={coverLetterHref}
+                        href={coverLetterText}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-md text-white bg-linear-to-r from-[#00A3FF] to-[#00E0FF] hover:opacity-90 transition-all"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-transparent 
+          text-sm font-medium rounded-md shadow-md text-white 
+          bg-linear-to-r from-[#00A3FF] to-[#00E0FF] hover:opacity-90 transition-all"
                       >
                         <FileText className="h-4 w-4 text-white" />
                         View Cover Letter
@@ -354,9 +356,11 @@ export default function ApplicationDetailPage() {
 
                       {/* Download Cover Letter */}
                       <a
-                        href={coverLetterHref}
+                        href={coverLetterText}
                         download={coverLetterFilename}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#00A3FF] text-[#00A3FF] bg-white text-sm font-medium rounded-md shadow-md hover:bg-blue-50 transition-all"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 
+          border border-[#00A3FF] text-[#00A3FF] bg-white text-sm font-medium rounded-md shadow-md 
+          hover:bg-blue-50 transition-all"
                       >
                         <FileText className="h-4 w-4 text-[#00A3FF]" />
                         Download

@@ -575,7 +575,7 @@ export default function JobApplicationsPage() {
                               {status}
                               {/* <ChevronDown className="ml-1 h-3 w-3" /> */}
                               {/* </button> */}
-                              <div className="absolute z-10 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden group-hover:block">
+                              {/* <div className="absolute z-10 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden group-hover:block">
                                 <div className="py-1">
                                   {Object.entries(statusColors).map(([statusValue, statusClass]) => (
                                     <button
@@ -590,14 +590,14 @@ export default function JobApplicationsPage() {
                                     </button>
                                   ))}
                                 </div>
-                              </div>
+                              </div> */}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex justify-end space-x-2">
                               <button
                                 onClick={() => router.push(`/dashboard/employee/applications/${app._id}`)}
-                                className="text-[#155DFC]"
+                                className="text-[#155DFC] hover:cursor-pointer"
                                 title="View details"
                               >
                                 <svg
