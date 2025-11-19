@@ -280,6 +280,14 @@ export default function ApplicationDetailPage() {
       : cover?.url;
   const coverFilename = (cover as any)?.filename || "Cover Letter";
   const coverText = !coverHref ? toText(cover) : "";
+  // ✅ Unified cover letter URL (file or generated text file)
+  const coverLetterURL =
+    coverHref || (coverText ? `data:text/plain;charset=utf-8,${encodeURIComponent(coverText)}` : null);
+  let coverLetterDownloadName = coverFilename;
+  if (!/\.[a-zA-Z0-9]{2,5}$/.test(coverLetterDownloadName)) {
+    // add .txt if it is generated from plain text
+    if (!coverHref && coverText) coverLetterDownloadName += ".txt";
+  }
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -490,7 +498,7 @@ export default function ApplicationDetailPage() {
                   Resume
                 </h3>
                 <div className="flex items-center gap-3">
-                  <a
+                  {/* <a
                     href={resumeHref}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -498,11 +506,11 @@ export default function ApplicationDetailPage() {
                   >
                     <FileText className="h-4 w-4" />
                     View resume
-                  </a>
+                  </a> */}
                   <a
                     href={resumeHref}
                     download={resumeFilename}
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-[#155DFC] text-[#155DFC] bg-white text-sm font-medium rounded-md hover:bg-blue-50"
+                    className="inline-flex items-center gap-2 px-4 py-2 border text-white  text-sm font-medium rounded-md  bg-linear-to-r from-[#155DFC] to-[#00A3FF] hover:opacity-95"
                   >
                     <FileText className="h-4 w-4" />
                     Download resume
@@ -511,53 +519,37 @@ export default function ApplicationDetailPage() {
               </div>
             )}
 
-            {/* Cover Letter */}
+            {/* Cover Letter (now EXACTLY like Resume) */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center">
                 <FileText className="h-5 w-5 mr-2 text-[#155DFC]" />
                 Cover Letter
               </h3>
-
-              {coverHref ? (
+              {coverLetterURL ? (
                 <div className="flex items-center gap-3">
-                  <a
-                    href={coverHref}
+                  {/* <a
+                    href={coverLetterURL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white bg-gradient-to-r from-[#155DFC] to-[#00A3FF] hover:opacity-95"
                   >
                     <FileText className="h-4 w-4" />
-                    View Cover Letter
-                  </a>
+                    View cover letter
+                  </a> */}
                   <a
-                    href={coverHref}
-                    download={coverFilename}
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-[#155DFC] text-[#155DFC] bg-white text-sm font-medium rounded-md hover:bg-blue-50"
+                    href={coverLetterURL}
+                    download={coverLetterDownloadName}
+                    className="inline-flex items-center gap-2 px-4 py-2 border text-white bg-white text-sm font-medium rounded-md bg-linear-to-r from-[#155DFC] to-[#00A3FF] hover:opacity-95"
                   >
                     <FileText className="h-4 w-4" />
-                    Download
+                    Download cover letter
                   </a>
-                </div>
-              ) : coverText ? (
-                <div className="space-y-4">
-                  <div className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg">
-                    {coverText.split("\n").map((paragraph, i) => (
-                      <p key={i} className="mb-2 last:mb-0">
-                        {paragraph || <br />}
-                      </p>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(coverText)}
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-[#155DFC] text-[#155DFC] bg-white text-sm font-medium rounded-md hover:bg-blue-50"
-                  >
-                    Copy Text
-                  </button>
                 </div>
               ) : (
                 <p className="text-gray-500 text-sm">No cover letter provided</p>
               )}
             </div>
+
           </div>
 
           {/* ===== Right Column ===== */}
@@ -570,7 +562,7 @@ export default function ApplicationDetailPage() {
               <div className="flex flex-col space-y-3">
                 {resumeHref && (
                   <>
-                    <a
+                    {/* <a
                       href={resumeHref}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -578,11 +570,11 @@ export default function ApplicationDetailPage() {
                     >
                       <FileText className="h-4 w-4" />
                       View resume
-                    </a>
+                    </a> */}
                     <a
                       href={resumeHref}
                       download={resumeFilename}
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#155DFC] text-[#155DFC] bg-white text-sm font-medium rounded-md hover:bg-blue-50"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 border text-white  text-sm font-medium rounded-md  bg-linear-to-r from-[#155DFC] to-[#00A3FF] hover:opacity-95"
                     >
                       <FileText className="h-4 w-4" />
                       Download resume

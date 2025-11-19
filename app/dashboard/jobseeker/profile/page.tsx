@@ -33,7 +33,7 @@ export default function JobSeekerDashboard() {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-    
+
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const user = localStorage.getItem("user");
@@ -141,12 +141,32 @@ export default function JobSeekerDashboard() {
         <p className="text-gray-700 mb-4">Profile not found.</p>
         <button
           onClick={() => router.push("/dashboard/jobseeker/profile/create")}
-          className="bg-[#8F59ED] hover:bg-[#7c4dd4] text-white px-5 py-2.5 rounded-lg font-medium shadow-md transition-all"
+          className="bg-linear-to-r from-[#007BFF] to-[#00CFFF] text-white px-5 py-2.5 rounded-lg font-medium shadow-md transition-all"
         >
           Create Profile
         </button>
       </div>
     );
+
+  // ✅ Validation logic (right side completion card)
+  const missingSections: { key: string; label: string; isMissing: boolean }[] = [
+    { key: "bio", label: "Professional Summary", isMissing: !profile?.bio },
+    { key: "workExperience", label: "Work Experience", isMissing: !(profile?.workExperience?.length > 0) },
+    { key: "education", label: "Education", isMissing: !(profile?.education?.length > 0) },
+    { key: "certifications", label: "Certifications", isMissing: !(profile?.certifications?.length > 0) },
+    { key: "skills", label: "Skills", isMissing: !(profile?.skills?.length > 0) },
+    { key: "specializations", label: "Specializations", isMissing: !(profile?.specializations?.length > 0) },
+    { key: "resume", label: "Resume", isMissing: !resume?.url },
+    { key: "coverLetter", label: "Cover Letter", isMissing: !coverLetter?.url },
+  ];
+
+  const incomplete = missingSections.filter(s => s.isMissing);
+  const autoCompletion =
+    Math.round(
+      ((missingSections.length - incomplete.length) / missingSections.length) * 100
+    );
+
+  const overallCompletion = profile?.profileCompletion ?? autoCompletion;
 
   return (
     <>
@@ -346,6 +366,60 @@ export default function JobSeekerDashboard() {
 
           {/* ===== RIGHT COLUMN ===== */}
           <div className="md:col-span-2 space-y-6">
+            {/* ✅ Completion / Validation Card */}
+            {overallCompletion < 100 && (
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-linear-to-r from-[#007BFF] to-[#00CFFF] text-white text-sm font-bold">
+                    {overallCompletion}%
+                  </span>
+                  Complete Your Profile
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Finish the sections below to reach 100% and improve visibility.
+                </p>
+
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div
+                    className="h-2 rounded-full bg-linear-to-r from-[#007BFF] to-[#00CFFF]"
+                    style={{ width: `${overallCompletion}%` }}
+                  />
+                </div>
+
+                {incomplete.length > 0 ? (
+                  <ul className="space-y-2 mb-4">
+                    {incomplete.map(item => (
+                      <li
+                        key={item.key}
+                        className="flex items-center justify-between bg-rose-50 border border-rose-200 rounded-lg px-3 py-2"
+                      >
+                        <span className="text-xs font-medium text-rose-700">
+                          {item.label} missing
+                        </span>
+                        <button
+                          onClick={() => router.push("/dashboard/jobseeker/profile/create")}
+                          className="text-xs font-semibold text-[#007BFF] hover:underline"
+                        >
+                          Add
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-emerald-600 font-medium mb-4">
+                    All required sections completed.
+                  </p>
+                )}
+
+                <button
+                  onClick={() => router.push("/dashboard/jobseeker/profile/create")}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold text-white bg-linear-to-r from-[#007BFF] to-[#00CFFF] hover:opacity-90 transition"
+                >
+                  <Edit className="w-4 h-4" />
+                  Update Now
+                </button>
+              </div>
+            )}
             {/* Professional Summary */}
             {profile?.bio && (
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
@@ -517,11 +591,11 @@ export default function JobSeekerDashboard() {
                 <div className="flex flex-wrap gap-2">
                   {profile.skills.map((skill: any, idx: number) => (
                     <span
-                        key={idx}
-                        className="inline-block px-4 py-2 bg-linear-to-r from-indigo-100 to-blue-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
-                      >
-                        {skill.name}
-                      </span>
+                      key={idx}
+                      className="inline-block px-4 py-2 bg-linear-to-r from-indigo-100 to-blue-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
+                    >
+                      {skill.name}
+                    </span>
                   ))}
                 </div>
               </div>
